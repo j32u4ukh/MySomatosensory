@@ -40,13 +40,12 @@ public class DetectManager : MonoBehaviour {
     {
         // 初始化 各個動作 標準模型
         poseModelMap = new Dictionary<DetectSkeleton, PoseModelHelper[]>();
-        poseModelMap.Add(DetectSkeleton.PutHandsUp, poseModelHelpers);
         // 初始化 各個動作 比對關節
         comparingPartsMap = new Dictionary<DetectSkeleton, List<HumanBodyBones>>();
-        comparingPartsMap.Add(DetectSkeleton.PutHandsUp, comparingParts);
         // 初始化 各個動作 分解動作門檻值
         thresholdsMap = new Dictionary<DetectSkeleton, float[]>();
-        thresholdsMap.Add(DetectSkeleton.PutHandsUp, handsUpThreshold);
+
+        init(DetectSkeleton.PutHandsUp, poseModelHelpers, comparingParts, handsUpThreshold);
 
         resetState();
     }
@@ -214,7 +213,7 @@ public class DetectManager : MonoBehaviour {
             case DetectSkeleton.SingleFootJump:
                 return compareAccuracy(DetectSkeleton.SingleLeftFootJump, DetectSkeleton.SingleRightFootJump);
             default:
-                return compareAccuracy(detects);
+                return detects;
         }
     }
 
@@ -259,5 +258,23 @@ public class DetectManager : MonoBehaviour {
             accuracyMap.Add(skeleton, new float[10]);
 
         }
+    }
+
+    void init(DetectSkeleton detect, PoseModelHelper[] poseModelHelpers, List<HumanBodyBones> comparingParts, float[] thresholds)
+    {
+        poseModelMap.Add(detect, poseModelHelpers);
+        comparingPartsMap.Add(detect, comparingParts);
+        thresholdsMap.Add(detect, thresholds);
+    }
+
+    public static float[] sliceArray(float[] array, int start, int end)
+    {
+        int len = end - start, i;
+        float[] new_array = new float[len];
+        for (i = 0; i < len; i++)
+        {
+            new_array[i] = array[start + i];
+        }
+        return new_array;
     }
 }

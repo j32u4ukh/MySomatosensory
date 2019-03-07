@@ -93,9 +93,15 @@ public class PoseModelHelper : MonoBehaviour
     {
         // check for double start
         if (bones != null)
+        {
             return;
+        }
+            
         if (!gameObject.activeInHierarchy)
+        {
             return;
+        }
+            
 
         // inits the bones array
         bones = new Transform[31];

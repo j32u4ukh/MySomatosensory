@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class Main : MonoBehaviour {
     public PoseModelHelper modelHelper;
     Dictionary<int, HumanBodyBones> index2BodyMap;
-    int len;
+    
 
     DetectManager detect_manager;
 
@@ -20,6 +20,7 @@ public class Main : MonoBehaviour {
     Dictionary<HumanBodyBones, Vector3> skeletons;
     Dictionary<HumanBodyBones, Vector3> rotations;
     bool startRecodeSkeleton = false;
+    int len;
     //float time = 3f;
     //public Text show_time;    
     #endregion
@@ -34,22 +35,11 @@ public class Main : MonoBehaviour {
         detect_manager = GetComponent<DetectManager>();
 
         StartCoroutine(dataOutput());
-
-        //for (int i = 0; i < len; i++)
-        //{
-        //    if ((bone = modelHelper.GetBoneTransform(i)) == null)
-        //    {
-        //        continue;
-        //    }
-        //    skeleton = bone.transform.position;
-        //    print(string.Format("Bone {0}: {1}, Position:({2}, {3}. {4})", i, index2BodyMap[i], skeleton.x, skeleton.y, skeleton.z));
-        //}
     }
 	
 	// Update is called once per frame
 	void Update () {
-        //show_time.text = string.Format("{0}", (int)time);
-        
+                
     }
 
     private void FixedUpdate()
@@ -72,7 +62,6 @@ public class Main : MonoBehaviour {
                 vector3 = bone.transform.rotation.eulerAngles;
                 rotations.Add(index2BodyMap[i], vector3);
 
-                //print(string.Format("Bone {0}: {1}, Position:({2}, {3}. {4})", i, index2BodyMap[i], skeleton.x, skeleton.y, skeleton.z));
             }
             recordData.addSkeletons(skeletons);
             recordData.addRotations(rotations);
@@ -88,7 +77,7 @@ public class Main : MonoBehaviour {
         {
             yield return new WaitForSeconds(Time.deltaTime);
         }
-        endMatch((DetectSkeleton)result);
+        endMatch(DetectSkeleton.PutHandsUp);
     }
 
     void startMatch(DetectSkeleton pose)
@@ -96,25 +85,12 @@ public class Main : MonoBehaviour {
         print("startMatch");
         startRecodeSkeleton = true;
         detect_manager.detectSkeleton = pose;
-        recordData.setType(pose);
         recordData.setStage("Test");
         recordData.setStartTime();
 
     }
 
-    float[] sliceArray(float[] array, int start, int end)
-    {
-        int len = end - start, i;
-        float[] new_array = new float[len];
-        for (i = 0; i < len; i++)
-        {
-            new_array[i] = array[start + i];
-        }
-        return new_array;
-    }
-
-    
-    void endMatch(DetectSkeleton pose)
+    DetectSkeleton endMatch(DetectSkeleton pose)
     {
         print("endMatch");
         startRecodeSkeleton = false;
@@ -143,15 +119,19 @@ public class Main : MonoBehaviour {
                 detect = pose;
                 break;
         }
-        
+
+        // detect：最後認定玩家做的動作
+        recordData.setType(detect);
         recordData.setThreshold(detect_manager.thresholdsMap[detect]);
         int length = detect_manager.poseModelMap[detect].Length;
-        recordData.setAccuracy(sliceArray(detect_manager.accuracyMap[detect], 0, length));
+        recordData.setAccuracy(DetectManager.sliceArray(detect_manager.accuracyMap[detect], 0, length));
 
         // 取消偵測
         detect_manager.detectSkeleton = DetectSkeleton.None;
         RecordData.save(recordData);
         recordData = new RecordData();
+
+        return detect;
     }
     
 
