@@ -232,7 +232,7 @@ public class DetectManager : MonoBehaviour {
             {
                 mean *= accuracyMap[skeleton][i];
             }
-            mean /= len;
+            mean = Mathf.Pow(mean, (float) 1/len);
             // 比較幾何平均大小，傳回最大的那個動作
             if (mean > max_mean)
             {
