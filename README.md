@@ -22,5 +22,6 @@ RePlay.cs：
 RecordData.cs
 * public string save(string file_id)，利用時間戳 file_id 區分檔案，並回傳路徑
 
-// 一個遊戲的所有紀錄皆寫完後，加上後綴"_done"，告訴其他程式已經可以上傳
+
 * public static void finishWriting(string path)
+// 一個遊戲的所有紀錄皆寫完後，加上後綴"_done"，告訴其他程式已經可以上傳
