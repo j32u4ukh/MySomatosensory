@@ -18,3 +18,9 @@ Main.cs：
 RePlay.cs：
 
 * 因為紀錄資料中新增了旋轉角度，現在重播可直接用模型，我覺得效果比用sphere好
+
+RecordData.cs
+* public string save(string file_id)，利用時間戳 file_id 區分檔案，並回傳路徑
+
+// 一個遊戲的所有紀錄皆寫完後，加上後綴"_done"，告訴其他程式已經可以上傳
+* public static void finishWriting(string path)
