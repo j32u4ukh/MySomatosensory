@@ -19,7 +19,7 @@ class RecordData
     public float[] accuracy;
     public List<Dictionary<HumanBodyBones, Vector3>> skeletons_list;
     public List<Dictionary<HumanBodyBones, Vector3>> rotations_list;
-    #endregion    
+    #endregion
 
     public RecordData()
     {
@@ -72,20 +72,22 @@ class RecordData
     }
 
     #region 紀錄記錄
-    public static void save(RecordData record_data)
+    public string save(string file_id)
     {
+        // 資料儲存目錄
         // [我的文件] 資料夾 \Somatosensory\Data
-        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Somatosensory\\Data");
+        string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Somatosensory\\Data");
         // [我的文件] 資料夾 \Somatosensory\Data\(User Id)\(Date)
-        path = Path.Combine(path, string.Format("{0}\\{1}", GameInfo.id, DateTime.Now.ToString("yyyy-MM-dd")));
-        if (!Directory.Exists(path))
+        directory = Path.Combine(directory, string.Format("{0}\\{1}", GameInfo.id, DateTime.Now.ToString("yyyy-MM-dd")));
+        if (!Directory.Exists(directory))
         {
-            Directory.CreateDirectory(path);
+            // 若目錄不存在，則產生
+            Directory.CreateDirectory(directory);
         }
 
-        path = Path.Combine(path, string.Format("{0}_{1}.txt",
-            SceneManager.GetActiveScene().name,
-            DateTime.Now.ToString("HH-mm-ss-ffff")));
+        // 檔名：場景名稱-(file_id產生瞬間的時間戳)
+        // [我的文件] 資料夾 \Somatosensory\Data\(User Id)\(Date)\(場景名稱)-(時間戳).txt
+        string path = Path.Combine(directory, string.Format("{0}-{1}.txt", SceneManager.GetActiveScene().name, file_id));
 
         // 檢查檔案是否存在，不存在則建立
         StreamWriter writer;
@@ -99,11 +101,23 @@ class RecordData
         }
 
         // JsonConvert.SerializeObject 將 record_data 轉換成json格式的字串
-        writer.WriteLine(JsonConvert.SerializeObject(record_data));
+        writer.WriteLine(JsonConvert.SerializeObject(this));
         writer.Close();
         writer.Dispose();
+
+        // 回傳檔案路徑
+        return path;
     }
 
+    // 一個遊戲的所有紀錄皆寫完後，加上後綴"_done"，告訴其他程式已經可以上傳
+    public static void finishWriting(string path) {
+        // ex path: [我的文件] 資料夾 \Somatosensory\Data\(User Id)\(Date)\(場景名稱)-(時間戳).txt
+        FileInfo file_info = new FileInfo(path);
+        // ex file_name: (場景名稱)-(時間戳)
+        string file_name = file_info.Name.Split('.')[0];
+        // ex new_path: [我的文件] 資料夾 \Somatosensory\Data\(User Id)\(Date)\(場景名稱)-(時間戳)_done.txt
+        string new_path = Path.Combine(file_info.DirectoryName, string.Format("{0}_done.txt", file_name));
+    }
     #endregion
 
     #region 讀取記錄

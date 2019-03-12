@@ -13,6 +13,8 @@ public class Main : MonoBehaviour {
 
     #region 紀錄遊戲數據
     RecordData recordData;
+    string path;
+    string file_id;
 
     #region 紀錄骨架位置
     Transform bone;
@@ -33,6 +35,7 @@ public class Main : MonoBehaviour {
         len = modelHelper.GetBoneTransformCount();
         recordData = new RecordData();
         detect_manager = GetComponent<DetectManager>();
+        file_id = DateTime.Now.ToString("HH-mm-ss-ffff");
 
         StartCoroutine(dataOutput());
     }
@@ -78,6 +81,8 @@ public class Main : MonoBehaviour {
             yield return new WaitForSeconds(Time.deltaTime);
         }
         endMatch(DetectSkeleton.PutHandsUp);
+
+        RecordData.finishWriting(path);
     }
 
     void startMatch(DetectSkeleton pose)
@@ -128,7 +133,7 @@ public class Main : MonoBehaviour {
 
         // 取消偵測
         detect_manager.detectSkeleton = DetectSkeleton.None;
-        RecordData.save(recordData);
+        path = recordData.save(file_id);
         recordData = new RecordData();
 
         return detect;
