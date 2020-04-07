@@ -16,29 +16,11 @@ namespace Somatosensory2
         // 用於選擇偵測何種動作
         public DetectSkeleton detectSkeleton = DetectSkeleton.None;
 
-        //// 各個動作 是否通過
-        //Dictionary<DetectSkeleton, bool[]> matchMap;
-        //// 各個動作 正確率
-        //public Dictionary<DetectSkeleton, float[]> accuracyMap;
-        //// 各個動作 門檻
-        //public Dictionary<DetectSkeleton, float[]> thresholdsMap;
-        //// 各個動作 標準模型
-        //public Dictionary<DetectSkeleton, PoseModelHelper[]> poseModelMap;
-        //// 各個動作 比對關節
-        //Dictionary<DetectSkeleton, List<HumanBodyBones>> comparingPartsMap;
-
-        #region 比對標準
         // 各個動作 的 動作物件
         public Movement[] movements;
 
         // 動作名稱 與 動作物件 的字典
         public Dictionary<DetectSkeleton, Movement> movement_map;
-
-        //public PoseModelHelper[] poseModelHelpers;
-        //public List<HumanBodyBones> comparingParts;
-        //// 門檻值數量要與模型數量相同
-        //float[] handsUpThreshold = new float[] { 0.9f, 0.9f };
-        #endregion
 
         #endregion
 
@@ -47,6 +29,7 @@ namespace Somatosensory2
         Vector3? init_pos;
         float max_z_distance;
 
+        #region Life cycle
         // Use this for initialization
         void Start()
         {
@@ -107,6 +90,7 @@ namespace Somatosensory2
             pose_type = string.Format("{0}", detectSkeleton);
             GUILayout.Label(pose_type + "\n" + message);
         }
+        #endregion
 
         // ====================
         // 取得單一姿勢正確率
@@ -348,13 +332,6 @@ namespace Somatosensory2
             }
         }
 
-        //void init(DetectSkeleton detect, PoseModelHelper[] poseModelHelpers, List<HumanBodyBones> comparingParts, float[] thresholds)
-        //{
-        //    poseModelMap.Add(detect, poseModelHelpers);
-        //    comparingPartsMap.Add(detect, comparingParts);
-        //    thresholdsMap.Add(detect, thresholds);
-        //}
-
         // read GameConfig
         void initMovement()
         {
@@ -384,6 +361,7 @@ namespace Somatosensory2
                 try
                 {
                     string key = string.Format("{0}", skeleton);
+
                     // 透過名稱，取得 門檻值
                     _threshold = threshold_config[key];
 
