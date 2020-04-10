@@ -65,7 +65,7 @@ public class HumanBodyBonesDemo : MonoBehaviour {
         //}
         bone = modelHelper.GetBoneTransform(13);
         pos = bone.transform.position;
-        Debug.Log(string.Format("Bone : {0}, Position:({1}, {2}. {3})", bodyMap[13], pos.x, pos.y, pos.z));
+        Debug.Log(string.Format("Bone: {0}, Position:({1}, {2}. {3})", bodyMap[13], pos.x, pos.y, pos.z));
         
     }
 

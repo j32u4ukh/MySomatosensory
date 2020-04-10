@@ -88,7 +88,6 @@ public class PoseModelHelper : MonoBehaviour
         {HumanBodyBones.RightToes, 24}
     };
 
-
     public void Awake()
     {
         // check for double start
@@ -147,6 +146,21 @@ public class PoseModelHelper : MonoBehaviour
 		}
 
 		return null;
+	}
+
+	public static int boneToIndex(HumanBodyBones bone)
+	{
+		if (bone2IndexMap.ContainsKey(bone))
+		{
+			return bone2IndexMap[bone];
+		}
+
+		return -1;
+	}
+
+	public static HumanBodyBones indexToBone(int index)
+	{
+		return boneIndex2MecanimMap[index];
 	}
 
 	/// <summary>

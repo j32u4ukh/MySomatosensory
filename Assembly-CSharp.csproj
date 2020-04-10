@@ -71,13 +71,17 @@
     <Compile Include="Assets\_Script\Kinect\AvatarController.cs" />
     <Compile Include="Assets\_Script\Kinect\KinectGestures.cs" />
     <Compile Include="Assets\_Script\Kinect\KinectManager.cs" />
+    <Compile Include="Assets\_Script\Kinect\PoseModelHelper.cs" />
     <Compile Include="Assets\_Script\Kinect\SimpleGestureListener.cs" />
     <Compile Include="Assets\_Script\Main.cs" />
-    <Compile Include="Assets\_Script\MyCamera.cs" />
-    <Compile Include="Assets\_Script\PoseModelHelper.cs" />
     <Compile Include="Assets\_Script\ReadCsvTest.cs" />
     <Compile Include="Assets\_Script\RecordData.cs" />
     <Compile Include="Assets\_Script\RePlay.cs" />
+    <Compile Include="Assets\_Script\S3\DetectManager.cs" />
+    <Compile Include="Assets\_Script\S3\GameManager.cs" />
+    <Compile Include="Assets\_Script\S3\Player.cs" />
+    <Compile Include="Assets\_Script\S3\RecordData.cs" />
+    <Compile Include="Assets\_Script\S3\RecordRePlay.cs" />
     <Compile Include="Assets\_Script\Test.cs" />
     <Compile Include="Assets\_Script\Version2\DetectManager.cs" />
     <Compile Include="Assets\_Script\Version2\GameConfig.cs" />
@@ -230,6 +234,7 @@
     <None Include="Assets\K2Examples\Resources\Body2DepthShaderInv.shader" />
     <None Include="Assets\K2Examples\KinectDemos\RecorderDemo\Resources\PlayerGrammar.grxml.txt" />
     <None Include="Assets\K2Examples\Resources\CoordMapper.compute" />
+    <None Include="Assets\StreamingAssets\MovementData\PutHandsUp\RecordRePlay-16-41-46-9602.txt" />
     <None Include="Assets\K2Examples\Resources\Depth2ColorShader.shader" />
     <None Include="Assets\JsonDotNet\link.xml" />
     <None Include="Assets\K2Examples\Resources\Erode.shader" />

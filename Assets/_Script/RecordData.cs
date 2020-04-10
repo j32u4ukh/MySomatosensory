@@ -16,7 +16,7 @@ class RecordData
     public string start_time;
     public string end_time;
     public float[] threshold;
-    public float[] accuracy;
+    public float[] accuracy;    
     public List<Dictionary<HumanBodyBones, Vector3>> skeletons_list;
     public List<Dictionary<HumanBodyBones, Vector3>> rotations_list;
     #endregion

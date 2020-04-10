@@ -3,26 +3,33 @@ using System.IO;
 using UnityEngine;
 
 public class Test : MonoBehaviour {
-    public GameObject player;
-    public GameObject avatar;
-    float time = 0f;
+    //float time = 0f;
 
 	// Use this for initialization
 	void Start () {
-        avatar.transform.localPosition = Vector3.zero;
-        avatar.transform.localRotation = Quaternion.identity;
+        //avatar.transform.localPosition = Vector3.zero;
+        //avatar.transform.localRotation = Quaternion.identity;
+        string[] words = {"a", "b", "c"};
+        paramTest(words);
+
     }
 	
 	// Update is called once per frame
 	void Update () {
-        time += Time.deltaTime;
-        player.transform.position = new Vector3(0f, 0f, time * 10f);
-        avatar.transform.localPosition = Vector3.zero;
+        //time += Time.deltaTime;
+        //player.transform.position = new Vector3(0f, 0f, Mathf.Sin(time));
+        //avatar.transform.localPosition = Vector3.zero;
 
     }
 
-
-
+    void paramTest(params string[] words)
+    {
+        foreach(string word in words)
+        {
+            print(word);
+        }
+    }
+    
     void fileInfoTest(string path) {
         // 給予路徑，取得檔案資訊
         FileInfo file_info = new FileInfo(path);

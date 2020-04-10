@@ -49,7 +49,7 @@ public class Main : MonoBehaviour {
     {
         if (startRecodeSkeleton)
         {
-            // 每次紀錄1幀，所有關節位置，直到 startRecodeSkeleton = false，最終會記錄許多幀
+            // 每次紀錄 1 幀，所有關節位置，直到 startRecodeSkeleton = false，最終會記錄許多幀
             skeletons = new Dictionary<HumanBodyBones, Vector3>();
             rotations = new Dictionary<HumanBodyBones, Vector3>();
 
