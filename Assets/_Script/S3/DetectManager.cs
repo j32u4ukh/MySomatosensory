@@ -6,7 +6,7 @@ namespace S3
 {
     public class DetectManager : MonoBehaviour
     {
-        public DetectSkeleton pose;
+        public Pose pose;
 
         // Start is called before the first frame update
         void Start()

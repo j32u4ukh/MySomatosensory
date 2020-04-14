@@ -14,7 +14,7 @@ namespace S3
         public string guid;
         public string id;
         public string date;
-        public string type;
+        public string pose;
         public string stage;
         public string start_time;
         public string end_time;
@@ -25,7 +25,7 @@ namespace S3
         public List<Dictionary<HumanBodyBones, Vector3>> rotations_list;
         #endregion
 
-        public RecordData()
+        public RecordData(Player player)
         {
             guid = Guid.NewGuid().ToString();
             id = GameInfo.id;
@@ -34,9 +34,9 @@ namespace S3
             rotations_list = new List<Dictionary<HumanBodyBones, Vector3>>();
         }
 
-        public void setType(DetectSkeleton type)
+        public void setPose(Pose pose)
         {
-            this.type = string.Format("{0}", type);
+            this.pose = pose.ToString();
         }
 
         public void setStage(string stage)
@@ -127,12 +127,7 @@ namespace S3
         // 一個遊戲的所有紀錄皆寫完後，加上後綴"_done"，告訴其他程式已經可以上傳
         public static void finishWriting(string path)
         {
-            // ex path: [我的文件] 資料夾 \Somatosensory\Data\(User Id)\(Date)\(場景名稱)-(時間戳).txt
-            FileInfo file_info = new FileInfo(path);
-            // ex file_name: (場景名稱)-(時間戳)
-            string file_name = file_info.Name.Split('.')[0];
-            // ex new_path: [我的文件] 資料夾 \Somatosensory\Data\(User Id)\(Date)\(場景名稱)-(時間戳)_done.txt
-            string new_path = Path.Combine(file_info.DirectoryName, string.Format("{0}_done.txt", file_name));
+            Utils.renameSuffix(path, "done");
         }
         #endregion
 

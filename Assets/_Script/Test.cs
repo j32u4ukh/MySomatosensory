@@ -1,24 +1,33 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 public class Test : MonoBehaviour {
-    //float time = 0f;
 
-	// Use this for initialization
-	void Start () {
-        //avatar.transform.localPosition = Vector3.zero;
-        //avatar.transform.localRotation = Quaternion.identity;
-        string[] words = {"a", "b", "c"};
-        paramTest(words);
+	void Start () {        
+        int n_sample = 39, length = 34, start, end;
+        if (n_sample > length)
+        {
+            n_sample = length;
+        }
 
+        float sample_size = (float)length / n_sample;
+        print(string.Format("sample_size: {0:F4}", sample_size));
+
+        System.Random random = new System.Random();
+        for (int i = 0; i < n_sample; i++)
+        {
+            start = (int)(sample_size * i);
+            end = (int)(start + sample_size);
+            int rand = random.Next(start, end);
+            print(string.Format("start: {0}, end: {1} -> rand: {2}", start, end, rand));
+        }
+        
     }
 	
 	// Update is called once per frame
 	void Update () {
-        //time += Time.deltaTime;
-        //player.transform.position = new Vector3(0f, 0f, Mathf.Sin(time));
-        //avatar.transform.localPosition = Vector3.zero;
 
     }
 

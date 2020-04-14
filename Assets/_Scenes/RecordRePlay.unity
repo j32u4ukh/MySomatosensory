@@ -496,5 +496,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 1706666702}
   mode: 1
-  pose: 22
-  replay_index: 0
+  pose: 17
+  replay_index: 9

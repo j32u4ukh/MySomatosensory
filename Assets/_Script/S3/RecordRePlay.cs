@@ -20,7 +20,7 @@ namespace S3
         public Mode mode = Mode.Stop;
 
         // 要錄製或重播的動作
-        public DetectSkeleton pose = DetectSkeleton.None;
+        public Pose pose = Pose.None;
 
         // 路徑
         string root, dir, path;
@@ -54,12 +54,13 @@ namespace S3
             {
                 files = Directory.GetFiles(dir);
 
-                if(replay_index > files.Length)
+                if(replay_index > files.Length / 2)
                 {
-                    replay_index = files.Length - 1;
-                }               
+                    replay_index = files.Length / 2 - 1;
+                }
 
-                path = files[replay_index];
+                path = files[replay_index * 2];
+                print(string.Format("path: {0}", path));
             }
 
             gm = GetComponent<GameManager>();
@@ -69,20 +70,23 @@ namespace S3
             switch (mode)
             {
                 case Mode.Record:
-                    record = new RecordData();
-                    record.setType(pose);
-                    record.setStage("Record");
-                    record.setStartTime();
+                    gm.setPose(pose);
+                    gm.setStage("Record");
+                    gm.setStartTime();
                     mode = Mode.Stop;
                     break;
                 case Mode.RePlay:
                     record = RecordData.loadRecordData(path);
-                    record.setType(pose);
-                    record.setStage("Record");
-                    record.setStartTime();
 
                     skeletons_list = record.getSkeletonsList();
                     rotations_list = record.getRotationsList();
+                    print(string.Format("skeletons_list: {0}", skeletons_list.Count));
+                    List<int> indexs = Utils.sampleIndex(skeletons_list.Count, 30);
+                    print(string.Format("indexs: {0}", indexs.Count));
+                    skeletons_list = Utils.sampleList(skeletons_list, indexs);
+                    rotations_list = Utils.sampleList(rotations_list, indexs);
+                    print(string.Format("skeletons_list: {0}", skeletons_list.Count));
+
                     bones_number = player.getBonesNumber();
                     frame_number = skeletons_list.Count;
                     break;
@@ -105,6 +109,7 @@ namespace S3
                 case Mode.RePlay:
                     if (frame < frame_number)
                     {
+                        print(string.Format("Frame {0}", frame));
                         skeletons = skeletons_list[frame];
                         rotations = rotations_list[frame];
 
