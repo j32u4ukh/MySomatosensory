@@ -20,7 +20,7 @@ namespace S3
 
         // 用於存取骨架資訊
         RecordData record;
-        List<Dictionary<HumanBodyBones, Vector3>> skeletons_list, rotations_list;
+        List<Posture> posture_list;
         Dictionary<HumanBodyBones, Vector3> skeletons, rotations;
         HumanBodyBones humanBodyBone;
         Transform bone;
@@ -50,13 +50,9 @@ namespace S3
             print(string.Format("path: {0}", path));
 
             record = RecordData.loadRecordData(path);
-            skeletons_list = record.getSkeletonsList();
-            rotations_list = record.getRotationsList();
-
-            List<int> indexs = Utils.sampleIndex(skeletons_list.Count, 5);
-            skeletons_list = Utils.sampleList(skeletons_list, indexs);
-            rotations_list = Utils.sampleList(rotations_list, indexs);
-            frame_number = skeletons_list.Count;
+            posture_list = record.getPostureList();
+            posture_list = Utils.sampleList(posture_list, 30);
+            frame_number = posture_list.Count;
             print(string.Format("frame_number: {0}", frame_number));
 
             setModelPosture();
@@ -156,7 +152,7 @@ namespace S3
 
         float getAccuracy(Player player, Posture posture)
         {
-            List<HumanBodyBones> comparing_parts = posture.comparing_parts;
+            List<HumanBodyBones> comparing_parts = comparingParts;
             HumanBodyBones bone;
             Vector3 player_vector, standrad_vector;
             Vector3 s1, s2, p1, p2;
@@ -186,7 +182,7 @@ namespace S3
                 }
                 else
                 {
-                    s1 = posture.getBoneTransform(bone);
+                    s1 = posture.getBonePosition(bone);
                 }
 
                 if ((i + 1) >= len)
@@ -213,7 +209,7 @@ namespace S3
                 }
                 else
                 {
-                    s2 = posture.getBoneTransform(bone);
+                    s2 = posture.getBonePosition(bone);
                 }
 
                 //取得玩家與標準模型 目前節點(jointType)的向量
@@ -236,14 +232,9 @@ namespace S3
 
         void setModelPosture()
         {
-            skeletons = skeletons_list[frame];
-            rotations = rotations_list[frame];
-
-            posture = new Posture
-            {
-                comparing_parts = comparingParts,
-                skeletons = skeletons
-            };
+            posture = posture_list[frame];
+            skeletons = record.getSkeletons(frame);
+            rotations = record.getRotations(frame);
 
             for (bone_index = 0; bone_index < bones_number; bone_index++)
             {

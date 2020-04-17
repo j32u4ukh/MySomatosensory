@@ -23,7 +23,7 @@ namespace S3
         public Pose pose = Pose.None;
 
         // 路徑
-        string root, dir, path;
+        string dir, path;
         string[] files;
         public int replay_index;
 
@@ -32,7 +32,7 @@ namespace S3
         RecordData record;
 
         // 用於存取骨架資訊
-        List<Dictionary<HumanBodyBones, Vector3>> skeletons_list, rotations_list;
+        List<Posture> posture_list;
         Dictionary<HumanBodyBones, Vector3> skeletons, rotations;
         HumanBodyBones humanBodyBone;
         Transform bone;
@@ -42,8 +42,7 @@ namespace S3
         // Start is called before the first frame update
         void Start()
         {
-            root = Path.Combine(Application.streamingAssetsPath, "MovementData");
-            dir = Path.Combine(root, pose.ToString());
+            dir = Path.Combine(Application.streamingAssetsPath, "MovementData", pose.ToString());
 
             if (!Directory.Exists(dir))
             {
@@ -64,6 +63,7 @@ namespace S3
             }
 
             gm = GetComponent<GameManager>();
+            player.setId("9527");
             gm.registPlayers(player);
             print(string.Format("file_id: {0}", gm.file_id));
 
@@ -71,24 +71,18 @@ namespace S3
             {
                 case Mode.Record:
                     gm.setPose(pose);
-                    gm.setStage("Record");
+                    gm.setStage(GameStage.Test);
                     gm.setStartTime();
                     mode = Mode.Stop;
                     break;
                 case Mode.RePlay:
                     record = RecordData.loadRecordData(path);
-
-                    skeletons_list = record.getSkeletonsList();
-                    rotations_list = record.getRotationsList();
-                    print(string.Format("skeletons_list: {0}", skeletons_list.Count));
-                    List<int> indexs = Utils.sampleIndex(skeletons_list.Count, 30);
-                    print(string.Format("indexs: {0}", indexs.Count));
-                    skeletons_list = Utils.sampleList(skeletons_list, indexs);
-                    rotations_list = Utils.sampleList(rotations_list, indexs);
-                    print(string.Format("skeletons_list: {0}", skeletons_list.Count));
+                    posture_list = record.getPostureList();
+                    posture_list = Utils.sampleList(posture_list, 30);
+                    print(string.Format("skeletons_list: {0}", posture_list.Count));
 
                     bones_number = player.getBonesNumber();
-                    frame_number = skeletons_list.Count;
+                    frame_number = posture_list.Count;
                     break;
             }
         }
@@ -110,8 +104,8 @@ namespace S3
                     if (frame < frame_number)
                     {
                         print(string.Format("Frame {0}", frame));
-                        skeletons = skeletons_list[frame];
-                        rotations = rotations_list[frame];
+                        skeletons = record.getSkeletons(frame);
+                        rotations = record.getRotations(frame);
 
                         for (bone_index = 0; bone_index < bones_number; bone_index++)
                         {

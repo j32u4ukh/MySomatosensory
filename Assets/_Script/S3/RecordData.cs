@@ -15,23 +15,21 @@ namespace S3
         public string id;
         public string date;
         public string pose;
-        public string stage;
+        public GameStage stage;
         public string start_time;
         public string end_time;
         public float[] threshold;
         public float[] accuracy;
         public string remark;
-        public List<Dictionary<HumanBodyBones, Vector3>> skeletons_list;
-        public List<Dictionary<HumanBodyBones, Vector3>> rotations_list;
+        public List<Posture> posture_list;
         #endregion
 
         public RecordData(Player player)
         {
             guid = Guid.NewGuid().ToString();
-            id = GameInfo.id;
+            id = player.getId();
             date = DateTime.Now.ToString("yyyy-MM-dd");
-            skeletons_list = new List<Dictionary<HumanBodyBones, Vector3>>();
-            rotations_list = new List<Dictionary<HumanBodyBones, Vector3>>();
+            posture_list = new List<Posture>();
         }
 
         public void setPose(Pose pose)
@@ -39,7 +37,7 @@ namespace S3
             this.pose = pose.ToString();
         }
 
-        public void setStage(string stage)
+        public void setStage(GameStage stage)
         {
             this.stage = stage;
         }
@@ -69,14 +67,15 @@ namespace S3
             this.remark = remark;
         }
 
-        public void addSkeletons(Dictionary<HumanBodyBones, Vector3> skeletons)
+        public void addPosture(Dictionary<HumanBodyBones, Vector3> skeletons, Dictionary<HumanBodyBones, Vector3> rotations)
         {
-            skeletons_list.Add(skeletons);
-        }
+            Posture posture = new Posture()
+            {
+                skeletons = skeletons,
+                rotations = rotations
+            };
 
-        public void addRotations(Dictionary<HumanBodyBones, Vector3> rotations)
-        {
-            rotations_list.Add(rotations);
+            posture_list.Add(posture);
         }
 
         #region 紀錄記錄
@@ -89,7 +88,7 @@ namespace S3
 
             if (dir.Equals(""))
             {
-                dir = Path.Combine(root, string.Format("{0}\\{1}", GameInfo.id, DateTime.Now.ToString("yyyy-MM-dd")));
+                dir = Path.Combine(root, string.Format("{0}\\{1}", id, DateTime.Now.ToString("yyyy-MM-dd")));
             }
 
             if (!Directory.Exists(dir))
@@ -141,14 +140,54 @@ namespace S3
             return JsonConvert.DeserializeObject<RecordData>(load_data);
         }
 
-        public List<Dictionary<HumanBodyBones, Vector3>> getSkeletonsList()
+        public List<Posture> getPostureList()
         {
-            return skeletons_list;
+            return posture_list;
         }
 
-        public List<Dictionary<HumanBodyBones, Vector3>> getRotationsList()
+        public Posture getPosture(int index)
         {
-            return rotations_list;
+            if(index < 0 || posture_list.Count <= index)
+            {
+                throw new IndexOutOfRangeException(string.Format("posture_list length is {0}.", posture_list.Count));
+            }
+
+            return posture_list[index];
+        }
+
+        public Dictionary<HumanBodyBones, Vector3> getSkeletons(int index)
+        {
+            if (index < 0 || posture_list.Count <= index)
+            {
+                throw new IndexOutOfRangeException(string.Format("posture_list length is {0}.", posture_list.Count));
+            }
+
+            return posture_list[index].skeletons;
+        }
+
+        public Vector3 getBonePosition(int index, HumanBodyBones bone)
+        {
+            if (index < 0 || posture_list.Count <= index)
+            {
+                throw new IndexOutOfRangeException(string.Format("posture_list length is {0}.", posture_list.Count));
+            }
+
+            if (!posture_list[index].contain(bone))
+            {
+                throw new KeyNotFoundException(string.Format("Without {0} in posture.", bone));
+            }
+
+            return posture_list[index].getBonePosition(bone);
+        }
+
+        public Dictionary<HumanBodyBones, Vector3> getRotations(int index)
+        {
+            if (index < 0 || posture_list.Count <= index)
+            {
+                throw new IndexOutOfRangeException(string.Format("posture_list length is {0}.", posture_list.Count));
+            }
+
+            return posture_list[index].rotations;
         }
         #endregion
     }

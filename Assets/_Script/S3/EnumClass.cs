@@ -20,7 +20,7 @@ namespace S3
         KickLeft,           // 左踢
         KickRight,          // 右踢
 
-        RaiseHand,          // 舉雙手
+        RaiseHand,          // 舉單手
         RaiseLeftHand,      // 舉雙手
         RaiseRightHand,     // 舉雙手
 
@@ -39,4 +39,11 @@ namespace S3
         Walk,               // 走路
     }
 
+    public enum GameStage { 
+        Start,
+        Game1,
+        Game2,
+        Game3,
+        Test
+    }
 }

@@ -6,6 +6,9 @@ namespace S3
 {
     public class DetectManager : MonoBehaviour
     {
+        /* TODO:
+         * 姿勢匹配(bool[] is_matched) 與 額外條件(bool is_additional_matched) 都要通過才是真的通過
+         */
         public Pose pose;
 
         // Start is called before the first frame update

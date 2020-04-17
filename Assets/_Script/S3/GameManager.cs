@@ -73,8 +73,7 @@ namespace S3
                         rotations.Add(player.indexToBones(i), vector3);
                     }
 
-                    records[player.index()].addSkeletons(skeletons);
-                    records[player.index()].addRotations(rotations);
+                    records[player.index()].addPosture(skeletons, rotations);
                 }
             }
         }
@@ -121,7 +120,7 @@ namespace S3
             }
         }
 
-        public void setStage(string stage)
+        public void setStage(GameStage stage)
         {
             foreach (var record in records)
             {
@@ -150,7 +149,7 @@ namespace S3
             this.detect_manager = detect_manager;
         }
 
-        public void startMatch(Pose pose)
+        public void startMatch(Pose pose, GameStage game_stage)
         {
             print("startMatch");
             is_skeleton_recording = true;
@@ -158,7 +157,7 @@ namespace S3
 
             foreach (Player player in players)
             {
-                records[player.index()].setStage("Test");
+                records[player.index()].setStage(game_stage);
                 records[player.index()].setStartTime();
             }
         }

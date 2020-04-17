@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Newtonsoft.Json;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -30,9 +31,10 @@ namespace S3
             return indexs;
         }
 
-        public static List<Dictionary<HumanBodyBones, Vector3>> sampleList(List<Dictionary<HumanBodyBones, Vector3>> list, List<int> indexs)
+        public static List<T> sampleList<T>(List<T> list, int n_sample = 1)
         {
-            List<Dictionary<HumanBodyBones, Vector3>> sample = new List<Dictionary<HumanBodyBones, Vector3>>();
+            List<T> sample = new List<T>();
+            List<int> indexs = sampleIndex(list.Count, n_sample);
 
             foreach (var index in indexs)
             {
@@ -42,19 +44,18 @@ namespace S3
             return sample;
         }
 
-        public static List<Dictionary<HumanBodyBones, Vector3>> sampleList(List<Dictionary<HumanBodyBones, Vector3>> list, int n_sample = 1)
+        public static List<T> sampleList<T>(List<T> list, List<int> indexs)
         {
-            List<Dictionary<HumanBodyBones, Vector3>> sample = new List<Dictionary<HumanBodyBones, Vector3>>();
-            List<int> indexs = sampleIndex(list.Count, n_sample);
+            List<T> sample = new List<T>();
 
-            foreach(var index in indexs)
+            foreach (var index in indexs)
             {
                 sample.Add(list[index]);
             }
 
             return sample;
         }
-
+               
         public static void rename(string path, string new_name){
             FileInfo info = new FileInfo(path);
             string dir = info.DirectoryName;
@@ -88,6 +89,25 @@ namespace S3
                 string new_name = string.Format("{0}_{1}", file_name, suffix);
                 rename(path, new_name);
             }
+        }
+
+        public static void saveJsonData(object data, string path)
+        {
+            // 檢查檔案是否存在，不存在則建立
+            StreamWriter writer;
+            if (!File.Exists(path))
+            {
+                writer = new FileInfo(path).CreateText();
+            }
+            else
+            {
+                writer = new FileInfo(path).AppendText();
+            }
+
+            // JsonConvert.SerializeObject 將 record_data 轉換成json格式的字串
+            writer.WriteLine(JsonConvert.SerializeObject(data));
+            writer.Close();
+            writer.Dispose();
         }
 
     }

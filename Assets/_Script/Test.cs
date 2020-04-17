@@ -2,28 +2,39 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using S3;
+using Pose = S3.Pose;
+using System.Text;
+using Newtonsoft.Json;
 
 public class Test : MonoBehaviour {
 
-	void Start () {        
-        int n_sample = 39, length = 34, start, end;
-        if (n_sample > length)
+	void Start () {
+        MovementDatas datas = MovementDatas.loadMovementDatas();
+        MovementData data;
+        List<HumanBodyBones> comparing_parts;
+
+        foreach (var key in datas.getKeys())
         {
-            n_sample = length;
+            print(string.Format("Pose {0}", key));
+            data = datas.get(key);
+            comparing_parts = data.comparing_parts;
+
+            foreach (var part in comparing_parts)
+            {
+                print(string.Format("{0}", part));
+            }
+
+            if (data.has_additional_condition)
+            {
+                print("With additional condition.");
+            }
+            else
+            {
+                print("Without additional condition.");
+            }
         }
 
-        float sample_size = (float)length / n_sample;
-        print(string.Format("sample_size: {0:F4}", sample_size));
-
-        System.Random random = new System.Random();
-        for (int i = 0; i < n_sample; i++)
-        {
-            start = (int)(sample_size * i);
-            end = (int)(start + sample_size);
-            int rand = random.Next(start, end);
-            print(string.Format("start: {0}, end: {1} -> rand: {2}", start, end, rand));
-        }
-        
     }
 	
 	// Update is called once per frame
