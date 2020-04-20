@@ -25,7 +25,7 @@ namespace S3
         protected PoseModelHelper model_helper;
         #endregion
 
-        // 動作名稱 與 動作物件 的字典
+        // 動作名稱 與 動作物件
         Pose[] poses = {
             Pose.HopLeft,            // 左腳單腳跳
             Pose.HopRight,           // 右腳單腳跳
@@ -36,9 +36,8 @@ namespace S3
             Pose.KickLeft,           // 左踢
             Pose.KickRight,          // 右踢
 
-            Pose.RaiseHand,          // 舉雙手
-            Pose.RaiseLeftHand,      // 舉雙手
-            Pose.RaiseRightHand,     // 舉雙手
+            Pose.RaiseLeftHand,      // 舉左手
+            Pose.RaiseRightHand,     // 舉右手
 
             Pose.WaveLeft,           // 左揮動(水平)
             Pose.WaveRight,          // 右揮動(水平)
@@ -63,14 +62,14 @@ namespace S3
             avatar_controller = GetComponent<AvatarController>();
             model_helper = GetComponent<PoseModelHelper>();
             movement_map = new Dictionary<Pose, Movement>();
-            init();
+            
         }
 
         // Start is called before the first frame update
         void Start()
         {
             player_index = avatar_controller.playerIndex;
-            //bones_number = getBonesNumber();
+
         }
 
         public void setId(string id)
@@ -147,7 +146,7 @@ namespace S3
         }
         #endregion
 
-        void init()
+        public void init()
         {
             PlayerData player_data = new PlayerData(id);
             game_stage = player_data.game_stage;
@@ -163,7 +162,7 @@ namespace S3
 
             foreach (Pose pose in poses)
             {
-                movement = new Movement(pose);
+                movement = new Movement(pose, n_posture: 30);
 
                 // 數據包含該 pose 才作為
                 if (datas.contain(pose))
@@ -179,6 +178,18 @@ namespace S3
                     Debug.Log(string.Format("數據中不包含動作 {0}", pose));
                 }
             }
+        }
+
+        public List<HumanBodyBones> getComparingParts(Pose pose)
+        {
+            Movement movement = getMovement(pose);
+
+            if(movement != null)
+            {
+                return movement.getComparingParts();
+            }
+
+            return null;
         }
 
         public void save()

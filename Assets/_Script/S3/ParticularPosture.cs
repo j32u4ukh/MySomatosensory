@@ -30,12 +30,23 @@ namespace S3
         float acc, max_acc = 0f;
 
         // Posture
+        Movement movement;
         Posture posture;
 
         // Start is called before the first frame update
         void Start()
         {
+            player.setId("9527");            
+            player.init();
+            GameStage game_stage = player.getGameStage();
+            print(string.Format("GameStage: {0}", game_stage));
             bones_number = player.getBonesNumber();
+            movement = player.getMovement(pose);
+
+            if(movement == null)
+            {
+                print("movement is null.");
+            }
 
             root = Path.Combine(Application.streamingAssetsPath, "MovementData");
             dir = Path.Combine(root, pose.ToString());
@@ -50,7 +61,10 @@ namespace S3
             print(string.Format("path: {0}", path));
 
             record = RecordData.loadRecordData(path);
+            // Movement -> List<List<Posture>> multi_postures
+            // RecordData - > List<Posture> posture_list
             posture_list = record.getPostureList();
+            print(string.Format("Origin posture_list length: {0}", posture_list.Count));
             posture_list = Utils.sampleList(posture_list, 30);
             frame_number = posture_list.Count;
             print(string.Format("frame_number: {0}", frame_number));
@@ -64,10 +78,10 @@ namespace S3
             acc = getAccuracy(player, posture);
             max_acc = Mathf.Max(max_acc, acc);
 
-            if (acc > 0.75f)
+            if (acc > 0.7f)
             {
                 frame++;
-                print(string.Format("Current frame: {0}, Accuracy: {1:F4}", frame, acc));
+                print(string.Format("Current frame: {0}, Accuracy: {1:F4}, thresholds: {2:F4}", frame, acc, movement.getThreshold(frame)));
 
                 if (frame < frame_number)
                 {
@@ -84,7 +98,12 @@ namespace S3
         {            
             GUI.color = Color.red;
             GUI.skin.label.fontSize = 50;
-            GUILayout.Label(string.Format("Frame: {0}/{1}\nAccuracy: {2:F4}", frame + 1, frame_number, acc));
+            GUILayout.Label(string.Format("Frame: {0}/{1}\nAccuracy: {2:F4}\nthresholds: {3}", 
+                frame + 1, 
+                frame_number, 
+                acc, 
+                movement.getThreshold(frame)),
+                GUILayout.Width(500));
         }
 
         private void OnDestroy()
@@ -152,7 +171,8 @@ namespace S3
 
         float getAccuracy(Player player, Posture posture)
         {
-            List<HumanBodyBones> comparing_parts = comparingParts;
+            // TODO: comparing_parts should load from file
+            List<HumanBodyBones> comparing_parts = player.getComparingParts(pose);
             HumanBodyBones bone;
             Vector3 player_vector, standrad_vector;
             Vector3 s1, s2, p1, p2;

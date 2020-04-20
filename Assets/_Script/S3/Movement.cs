@@ -199,7 +199,7 @@ namespace S3
                 {
                     // 一行是一筆紀錄
                     line = reader.ReadLine().Trim();
-                    Debug.Log(line);
+                    //Debug.Log(line);
                     record_data = JsonConvert.DeserializeObject<RecordData>(line);
                     posture_list = record_data.posture_list;
 

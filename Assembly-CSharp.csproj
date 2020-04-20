@@ -229,6 +229,7 @@
     <None Include="Assets\K2Examples\Resources\BlurShader.shader" />
     <None Include="Assets\K2Examples\Resources\AstraCoordMapper.compute" />
     <None Include="Assets\K2Examples\Resources\MedianShader.shader" />
+    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-11-50-24-4417.txt" />
     <None Include="Assets\K2Examples\Resources\DepthShader.shader" />
     <None Include="Assets\K2Examples\Resources\Body2DepthShader.shader" />
     <None Include="Assets\K2Examples\Resources\SpeechGrammar.grxml.txt" />
@@ -240,6 +241,7 @@
     <None Include="Assets\K2Examples\Resources\Depth2BodyShaderNN.shader" />
     <None Include="Assets\K2Examples\Resources\ForegroundBlendShader.shader" />
     <None Include="Assets\K2Examples\Resources\BlurShader2.shader" />
+    <None Include="Assets\StreamingAssets\PlayerData\9527.txt" />
     <None Include="Assets\K2Examples\Resources\Body2ColorShaderInv.shader" />
     <None Include="Assets\K2Examples\Resources\Body2DepthShaderInv.shader" />
     <None Include="Assets\K2Examples\KinectDemos\RecorderDemo\Resources\PlayerGrammar.grxml.txt" />
@@ -253,6 +255,7 @@
     <None Include="Assets\K2Examples\Resources\Dilate.shader" />
     <None Include="Assets\K2Examples\Resources\Body2DepthShaderNN.shader" />
     <None Include="Assets\K2Examples\KinectDemos\ProjectorDemo\Resources\calibration.xml" />
+    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands.txt" />
     <None Include="Assets\K2Examples\Resources\BlurShader5.shader" />
     <None Include="Assets\K2Examples\_Readme\License.txt" />
     <None Include="Assets\K2Examples\KinectDemos\FittingRoomDemo\Resources\Shaders\UserBlendShader.shader" />
@@ -264,6 +267,7 @@
     <None Include="Assets\K2Examples\KinectDemos\VisualizerDemo\Attribution.txt" />
     <None Include="Assets\K2Examples\Resources\AstraSpaceMapper.compute" />
     <None Include="Assets\K2Examples\_Readme\致盗版使用者-ToPiracyUsers.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-11-46-17-9336.txt" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/Unity Projects/MySomatosensory/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>

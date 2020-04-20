@@ -23,7 +23,7 @@ namespace S3
         public Pose pose = Pose.None;
 
         // 路徑
-        string dir, path;
+        string root, dir, path;
         string[] files;
         public int replay_index;
 
@@ -42,7 +42,8 @@ namespace S3
         // Start is called before the first frame update
         void Start()
         {
-            dir = Path.Combine(Application.streamingAssetsPath, "MovementData", pose.ToString());
+            root = Path.Combine(Application.streamingAssetsPath, "MovementData");
+            dir = Path.Combine(root, pose.ToString());
 
             if (!Directory.Exists(dir))
             {
@@ -64,6 +65,8 @@ namespace S3
 
             gm = GetComponent<GameManager>();
             player.setId("9527");
+            player.init();
+
             gm.registPlayers(player);
             print(string.Format("file_id: {0}", gm.file_id));
 
@@ -78,7 +81,7 @@ namespace S3
                 case Mode.RePlay:
                     record = RecordData.loadRecordData(path);
                     posture_list = record.getPostureList();
-                    posture_list = Utils.sampleList(posture_list, 30);
+                    //posture_list = Utils.sampleList(posture_list, 30);
                     print(string.Format("skeletons_list: {0}", posture_list.Count));
 
                     bones_number = player.getBonesNumber();

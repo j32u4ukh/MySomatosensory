@@ -14,7 +14,10 @@ namespace S3
         public string guid;
         public string id;
         public string date;
+
+        // TODO: change string to Pose
         public string pose;
+
         public GameStage stage;
         public string start_time;
         public string end_time;
@@ -23,6 +26,13 @@ namespace S3
         public string remark;
         public List<Posture> posture_list;
         #endregion
+
+        public RecordData()
+        {
+            guid = Guid.NewGuid().ToString();
+            date = DateTime.Now.ToString("yyyy-MM-dd");
+            posture_list = new List<Posture>();
+        }
 
         public RecordData(Player player)
         {

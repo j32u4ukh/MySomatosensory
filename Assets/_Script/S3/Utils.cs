@@ -2,12 +2,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEngine;
 
 namespace S3
 {
     public static class Utils
     {
+        // 返回格式化陣列的字串
+        public static string arrayToString<T>(T[] array)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[");
+
+            int i, len = array.Length;
+            for(i = 0; i < len - 1; i++)
+            {
+                sb.Append(string.Format("{0:F2}, ", array[i]));
+            }
+
+            sb.Append(string.Format("{0:F2}]", array[len - 1]));
+
+            return sb.ToString();
+        }
+
+        // 產生抽樣的索引值
         public static List<int> sampleIndex(int length, int n_sample = 1)
         {
             List<int> indexs = new List<int>();
@@ -31,6 +50,7 @@ namespace S3
             return indexs;
         }
 
+        // 根據樣本數抽樣
         public static List<T> sampleList<T>(List<T> list, int n_sample = 1)
         {
             List<T> sample = new List<T>();
@@ -44,6 +64,7 @@ namespace S3
             return sample;
         }
 
+        // 根據索引值抽樣
         public static List<T> sampleList<T>(List<T> list, List<int> indexs)
         {
             List<T> sample = new List<T>();
@@ -55,7 +76,8 @@ namespace S3
 
             return sample;
         }
-               
+
+        // 修改檔名
         public static void rename(string path, string new_name){
             FileInfo info = new FileInfo(path);
             string dir = info.DirectoryName;
@@ -64,6 +86,7 @@ namespace S3
             File.Move(path, new_path);
         }
 
+        // 修改檔名後綴
         public static void renameSuffix(string path, string suffix)
         {
             FileInfo info = new FileInfo(path);
@@ -89,25 +112,6 @@ namespace S3
                 string new_name = string.Format("{0}_{1}", file_name, suffix);
                 rename(path, new_name);
             }
-        }
-
-        public static void saveJsonData(object data, string path)
-        {
-            // 檢查檔案是否存在，不存在則建立
-            StreamWriter writer;
-            if (!File.Exists(path))
-            {
-                writer = new FileInfo(path).CreateText();
-            }
-            else
-            {
-                writer = new FileInfo(path).AppendText();
-            }
-
-            // JsonConvert.SerializeObject 將 record_data 轉換成json格式的字串
-            writer.WriteLine(JsonConvert.SerializeObject(data));
-            writer.Close();
-            writer.Dispose();
         }
 
     }

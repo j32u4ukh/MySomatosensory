@@ -39,11 +39,12 @@ namespace S3
         Walk,               // 走路
     }
 
-    public enum GameStage { 
-        Start,
+    public enum GameStage {
+        Test=-1,
+        Start=0,
         Game1,
         Game2,
         Game3,
-        Test
+        
     }
 }

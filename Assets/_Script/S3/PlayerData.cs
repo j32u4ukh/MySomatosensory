@@ -19,6 +19,39 @@ namespace S3
         
         string path;
 
+        // 動作名稱 與 動作物件
+        Pose[] poses = {
+            Pose.HopLeft,            // 左單腳跳
+            Pose.HopRight,           // 右單腳跳
+
+            Pose.StrikeLeft,         // 左打擊
+            Pose.StrikeRight,        // 右打擊
+
+            Pose.KickLeft,           // 左踢
+            Pose.KickRight,          // 右踢
+
+            Pose.RaiseLeftHand,      // 舉左手
+            Pose.RaiseRightHand,     // 舉右手
+
+            Pose.WaveLeft,           // 左揮動(水平)
+            Pose.WaveRight,          // 右揮動(水平)
+
+            Pose.VerticalWave,       // 揮動(垂直)
+            Pose.RaiseTwoHands,      // 舉雙手
+            Pose.Jump,               // 雙腳跳
+            Pose.Run,                // 跑
+            Pose.CrossJump,          // 跨跳
+            Pose.Stretch,            // 伸展
+            Pose.Squat,              // 蹲下
+            Pose.Dribble,            // 運球
+            Pose.Walk                // 走路
+        };
+
+        public PlayerData()
+        {
+
+        }
+
         public PlayerData(string id)
         {
             this.id = id;
@@ -52,7 +85,6 @@ namespace S3
             }
         }
 
-        // TODO: 建立玩家名單，檢查玩家名稱是否註冊過，若無則呼叫此函式，以初始化 PlayerData 的檔案
         public void save()
         {
             string scene = SceneManager.GetActiveScene().name;
@@ -60,10 +92,10 @@ namespace S3
             switch (scene)
             {
                 case "":
-                    game_stage = GameStage.Game1;
+                    game_stage = GameStage.Test;
                     break;
                 default:
-                    game_stage = GameStage.Game1;
+                    game_stage = GameStage.Test;
                     break;
             }
 
@@ -94,6 +126,18 @@ namespace S3
                 // 檔案不存在則協助初始化
                 game_stage = GameStage.Start;
                 thresholds = new Dictionary<Pose, float[]>();
+                float[] thres;
+                int res;
+
+                foreach(Pose pose in poses)
+                {
+                    thres = new float[30];
+                    for(res = 0; res < 30; res++)
+                    {
+                        thres[res] = 1f;
+                    }
+                    thresholds.Add(pose, thres);
+                }
             }
         }
     }
