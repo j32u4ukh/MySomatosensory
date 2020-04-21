@@ -196,28 +196,58 @@ namespace S3
             List<List<Posture>> multi_postures = new List<List<Posture>>();
 
             // Posture 數據儲存路徑
-            string path = Path.Combine(Application.streamingAssetsPath, "MovementData", string.Format("{0}.txt", pose));
+            string dir = Path.Combine(Application.streamingAssetsPath, "MovementData", pose.ToString());
 
-            if (File.Exists(path))
+            if (Directory.Exists(dir))
             {
-                StreamReader reader = new StreamReader(path);
-                string line;
+                string[] files = Directory.GetFiles(dir);
+                StreamReader reader;
+                string load_data;
                 RecordData record_data;
                 List<Posture> posture_list;
-
-                while (reader.Peek() >= 0)
+                
+                foreach (string file in files)
                 {
-                    // 一行是一筆紀錄
-                    line = reader.ReadLine().Trim();
-                    //Debug.Log(line);
-                    record_data = JsonConvert.DeserializeObject<RecordData>(line);
-                    posture_list = record_data.posture_list;
+                    // 不包含 .meta 的才是真正的檔案
+                    if (!file.Contains(".meta"))
+                    {
+                        reader = new StreamReader(file);
+                        load_data = reader.ReadToEnd().Trim();
+                        reader.Close();
 
-                    multi_postures.Add(posture_list);
+                        record_data = JsonConvert.DeserializeObject<RecordData>(load_data);
+                        posture_list = record_data.posture_list;
+                        multi_postures.Add(posture_list);
+                    }
                 }
-
-                reader.Close();                
             }
+            else
+            {
+                Debug.Log(string.Format("MovementData {0} is not exist.", pose.ToString()));
+            }
+
+            //string path = Path.Combine(Application.streamingAssetsPath, "MovementData", string.Format("{0}.txt", pose));
+
+            //if (File.Exists(path))
+            //{
+            //    StreamReader reader = new StreamReader(path);
+            //    string line;
+            //    RecordData record_data;
+            //    List<Posture> posture_list;
+
+            //    while (reader.Peek() >= 0)
+            //    {
+            //        // 一行是一筆紀錄
+            //        line = reader.ReadLine().Trim();
+            //        //Debug.Log(line);
+            //        record_data = JsonConvert.DeserializeObject<RecordData>(line);
+            //        posture_list = record_data.posture_list;
+
+            //        multi_postures.Add(posture_list);
+            //    }
+
+            //    reader.Close();                
+            //}
 
             return multi_postures;
         }

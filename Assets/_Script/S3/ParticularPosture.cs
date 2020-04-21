@@ -19,8 +19,9 @@ namespace S3
         public List<HumanBodyBones> comparingParts;
 
         // 用於存取骨架資訊
-        RecordData record;
+        //RecordData record;
         List<Posture> posture_list;
+        List<List<Posture>> multi_postures;
         HumanBodyBones humanBodyBone;
         Transform bone;
         Vector3 vector3;
@@ -37,8 +38,10 @@ namespace S3
         {
             player.setId("9527");            
             player.loadData();
+
             GameStage game_stage = player.getGameStage();
             print(string.Format("GameStage: {0}", game_stage));
+
             bones_number = player.getBonesNumber();
             movement = player.getMovement(pose);
 
@@ -59,11 +62,12 @@ namespace S3
             path = files[replay_index * 2];
             print(string.Format("path: {0}", path));
 
-            record = RecordData.loadRecordData(path);
+            //record = RecordData.loadRecordData(path);
             // Movement -> List<List<Posture>> multi_postures
             // RecordData - > List<Posture> posture_list
             //posture_list = record.getPostureList();
             posture_list = movement.getMultiPosture()[0];
+            multi_postures = movement.getMultiPosture();
             print(string.Format("Origin posture_list length: {0}", posture_list.Count));
             posture_list = Utils.sampleList(posture_list, 30);
             frame_number = posture_list.Count;

@@ -64,32 +64,32 @@ namespace S3
             {
                 movement = player.getMovement(pose);
                 print(string.Format("{0}: {1}", pose, Utils.arrayToString(movement.getThresholds())));
-                print(string.Format("{0}: {1}", pose, movement.getThreshold(0)));
-                
-                //List<List<Posture>> postures = movement.loadMultiPosture();
+                //print(string.Format("{0}: {1}", pose, movement.getThreshold(0)));
+
+                List<List<Posture>> postures = movement.getMultiPosture();
 
 
-                //if (postures.Count != 0)
-                //{
-                //    int l = 0;
-                //    foreach (List<Posture> list in postures)
-                //    {
-                //        l++;
-                //        print(string.Format("list {0}: {1}", l, list.Count));
-                //        Dictionary<HumanBodyBones, Vector3> skeletons = list[0].skeletons;
-                //        Dictionary<HumanBodyBones, Vector3> rotations = list[0].rotations;
+                if (postures.Count != 0)
+                {
+                    int l = 0;
+                    foreach (List<Posture> list in postures)
+                    {
+                        l++;
+                        print(string.Format("list {0}: {1}", l, list.Count));
+                        Dictionary<HumanBodyBones, Vector3> skeletons = list[0].skeletons;
+                        Dictionary<HumanBodyBones, Vector3> rotations = list[0].rotations;
 
-                //        foreach(var key in skeletons.Keys)
-                //        {
-                //            print(string.Format("skeletons {0}: {1}", key, skeletons[key]));
-                //        }
+                        foreach (var key in skeletons.Keys)
+                        {
+                            print(string.Format("skeletons {0}: {1}", key, skeletons[key]));
+                        }
 
-                //        foreach (var key in rotations.Keys)
-                //        {
-                //            print(string.Format("rotations {0}: {1}", key, rotations[key]));
-                //        }
-                //    }
-                //}
+                        foreach (var key in rotations.Keys)
+                        {
+                            print(string.Format("rotations {0}: {1}", key, rotations[key]));
+                        }
+                    }
+                }
 
 
             }
