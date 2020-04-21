@@ -250,6 +250,7 @@
     <None Include="Assets\JsonDotNet\link.xml" />
     <None Include="Assets\StreamingAssets\MovementData.txt" />
     <None Include="Assets\K2Examples\Resources\Erode.shader" />
+    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-52-31-2503.txt" />
     <None Include="Assets\K2Examples\Resources\BodyShader.shader" />
     <None Include="Assets\K2Examples\KinectDemos\ProjectorDemo\Resources\calibration-empty.xml" />
     <None Include="Assets\K2Examples\Resources\Dilate.shader" />

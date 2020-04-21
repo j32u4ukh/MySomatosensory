@@ -19,6 +19,11 @@ namespace S3
         public Vector3 getBonePosition(HumanBodyBones bone) {
             return skeletons[bone];
         }
+
+        public Vector3 getBoneRotation(HumanBodyBones bone)
+        {
+            return rotations[bone];
+        }
     }
 
     public class Movement
@@ -60,6 +65,11 @@ namespace S3
             resetState();
 
             multi_postures = loadMultiPosture();
+        }
+
+        public List<List<Posture>> getMultiPosture()
+        {
+            return multi_postures;
         }
 
         public int getMovementNumber()

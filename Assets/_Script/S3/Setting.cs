@@ -26,7 +26,7 @@ namespace S3
         void testPlayerData(string id)
         {
             player.setId(id);
-            player.init();
+            player.loadData();
 
             GameStage game_stage = player.getGameStage();
             print(string.Format("GameStage: {0}", game_stage));

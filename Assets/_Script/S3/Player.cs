@@ -146,7 +146,7 @@ namespace S3
         }
         #endregion
 
-        public void init()
+        public void loadData()
         {
             PlayerData player_data = new PlayerData(id);
             game_stage = player_data.game_stage;

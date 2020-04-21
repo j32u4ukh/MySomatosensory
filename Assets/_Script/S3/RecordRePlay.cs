@@ -65,7 +65,7 @@ namespace S3
 
             gm = GetComponent<GameManager>();
             player.setId("9527");
-            player.init();
+            player.loadData();
 
             gm.registPlayers(player);
             print(string.Format("file_id: {0}", gm.file_id));

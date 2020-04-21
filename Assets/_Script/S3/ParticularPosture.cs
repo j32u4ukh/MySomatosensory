@@ -21,7 +21,6 @@ namespace S3
         // 用於存取骨架資訊
         RecordData record;
         List<Posture> posture_list;
-        Dictionary<HumanBodyBones, Vector3> skeletons, rotations;
         HumanBodyBones humanBodyBone;
         Transform bone;
         Vector3 vector3;
@@ -37,7 +36,7 @@ namespace S3
         void Start()
         {
             player.setId("9527");            
-            player.init();
+            player.loadData();
             GameStage game_stage = player.getGameStage();
             print(string.Format("GameStage: {0}", game_stage));
             bones_number = player.getBonesNumber();
@@ -63,7 +62,8 @@ namespace S3
             record = RecordData.loadRecordData(path);
             // Movement -> List<List<Posture>> multi_postures
             // RecordData - > List<Posture> posture_list
-            posture_list = record.getPostureList();
+            //posture_list = record.getPostureList();
+            posture_list = movement.getMultiPosture()[0];
             print(string.Format("Origin posture_list length: {0}", posture_list.Count));
             posture_list = Utils.sampleList(posture_list, 30);
             frame_number = posture_list.Count;
@@ -253,8 +253,6 @@ namespace S3
         void setModelPosture()
         {
             posture = posture_list[frame];
-            skeletons = record.getSkeletons(frame);
-            rotations = record.getRotations(frame);
 
             for (bone_index = 0; bone_index < bones_number; bone_index++)
             {
@@ -269,10 +267,10 @@ namespace S3
 
                 bone = model.getBoneTransform(bone_index);
 
-                vector3 = skeletons[humanBodyBone];
+                vector3 = posture.getBonePosition(humanBodyBone);
                 bone.position = vector3;
 
-                vector3 = rotations[humanBodyBone];
+                vector3 = posture.getBoneRotation(humanBodyBone);
                 bone.rotation = Quaternion.Euler(vector3);
 
             }
