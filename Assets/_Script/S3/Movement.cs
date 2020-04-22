@@ -72,7 +72,20 @@ namespace S3
             return multi_postures;
         }
 
-        public int getMovementNumber()
+        // 根據索引值，返回多個 Posture 形成的 List<Posture>
+        public List<Posture> getPostures(int index)
+        {
+            List<Posture> posture_list = new List<Posture>();
+
+            foreach(List<Posture> postures in multi_postures)
+            {
+                posture_list.Add(postures[index]);
+            }
+
+            return posture_list;
+        }
+
+        public int getPostureNumber()
         {
             return n_posture;
         }
@@ -217,6 +230,10 @@ namespace S3
 
                         record_data = JsonConvert.DeserializeObject<RecordData>(load_data);
                         posture_list = record_data.posture_list;
+
+                        // 確保 posture_list 長度為 n_posture
+                        posture_list = Utils.sampleList(posture_list, n_posture);
+
                         multi_postures.Add(posture_list);
                     }
                 }
@@ -225,29 +242,6 @@ namespace S3
             {
                 Debug.Log(string.Format("MovementData {0} is not exist.", pose.ToString()));
             }
-
-            //string path = Path.Combine(Application.streamingAssetsPath, "MovementData", string.Format("{0}.txt", pose));
-
-            //if (File.Exists(path))
-            //{
-            //    StreamReader reader = new StreamReader(path);
-            //    string line;
-            //    RecordData record_data;
-            //    List<Posture> posture_list;
-
-            //    while (reader.Peek() >= 0)
-            //    {
-            //        // 一行是一筆紀錄
-            //        line = reader.ReadLine().Trim();
-            //        //Debug.Log(line);
-            //        record_data = JsonConvert.DeserializeObject<RecordData>(line);
-            //        posture_list = record_data.posture_list;
-
-            //        multi_postures.Add(posture_list);
-            //    }
-
-            //    reader.Close();                
-            //}
 
             return multi_postures;
         }

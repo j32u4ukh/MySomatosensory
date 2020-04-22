@@ -82,6 +82,7 @@
     <Compile Include="Assets\_Script\S3\GameInfo.cs" />
     <Compile Include="Assets\_Script\S3\GameManager.cs" />
     <Compile Include="Assets\_Script\S3\Movement.cs" />
+    <Compile Include="Assets\_Script\S3\NumList.cs" />
     <Compile Include="Assets\_Script\S3\ParticularPosture.cs" />
     <Compile Include="Assets\_Script\S3\Player.cs" />
     <Compile Include="Assets\_Script\S3\PlayerData.cs" />

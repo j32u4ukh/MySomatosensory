@@ -13,7 +13,7 @@ namespace S3
         private int player_index;
         private GameStage game_stage;
         private Dictionary<Pose, Movement> movement_map;
-        //private int bones_number;
+        private Vector3? init_pos;
 
         #region Data for remark
         string remark;
@@ -69,7 +69,7 @@ namespace S3
         void Start()
         {
             player_index = avatar_controller.playerIndex;
-
+            init_pos = transform.position;
         }
 
         public void setId(string id)
@@ -110,6 +110,24 @@ namespace S3
             }
         }
         #endregion
+
+        // 是否需要讓它有返回 null 的情形 ?
+        public void setInitPos(Vector3? pos = null)
+        {
+            if(pos != null)
+            {
+                init_pos = transform.position;
+            }
+            else
+            {
+                init_pos = null;
+            }
+        }
+
+        public Vector3? getInitPos()
+        {
+            return init_pos;
+        }
 
 
         #region PoseModelHelper

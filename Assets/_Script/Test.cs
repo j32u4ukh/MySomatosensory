@@ -10,31 +10,10 @@ using Newtonsoft.Json;
 public class Test : MonoBehaviour {
 
 	void Start () {
-        MovementDatas datas = MovementDatas.loadMovementDatas();
-        MovementData data;
-        List<HumanBodyBones> comparing_parts;
-
-        foreach (var key in datas.getKeys())
-        {
-            print(string.Format("Pose {0}", key));
-            data = datas.get(key);
-            comparing_parts = data.comparing_parts;
-
-            foreach (var part in comparing_parts)
-            {
-                print(string.Format("{0}", part));
-            }
-
-            if (data.has_additional_condition)
-            {
-                print("With additional condition.");
-            }
-            else
-            {
-                print("Without additional condition.");
-            }
-        }
-
+        FloatList nums = new FloatList();
+        print(nums.toString());
+        print("sum:" + nums.sum());
+        print("mean:" + nums.mean());
     }
 	
 	// Update is called once per frame
