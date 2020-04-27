@@ -82,6 +82,7 @@ public class Main : MonoBehaviour {
         }
         endMatch(DetectSkeleton.PutHandsUp);
 
+        // 一個遊戲的所有紀錄皆寫完後，加上後綴"_done"，告訴其他程式已經可以上傳
         RecordData.finishWriting(path);
     }
 

@@ -13,13 +13,14 @@ namespace S3
         {
             //setPlayerData("9527");
             testPlayerData("9527");
+            //setMovementData();
         }
 
         void setPlayerData(string id)
         {
             player.setId(id);
             player.setGameStage(GameStage.Test);
-            // TODO: 遊戲過程中，動態調整門檻值
+            // 實際進行時，這裡會進行門檻值動態調整
             player.save();
         }
 
@@ -69,27 +70,27 @@ namespace S3
                 List<List<Posture>> postures = movement.getMultiPosture();
 
 
-                if (postures.Count != 0)
-                {
-                    int l = 0;
-                    foreach (List<Posture> list in postures)
-                    {
-                        l++;
-                        print(string.Format("list {0}: {1}", l, list.Count));
-                        Dictionary<HumanBodyBones, Vector3> skeletons = list[0].skeletons;
-                        Dictionary<HumanBodyBones, Vector3> rotations = list[0].rotations;
+                //if (postures.Count != 0)
+                //{
+                //    int l = 0;
+                //    foreach (List<Posture> list in postures)
+                //    {
+                //        l++;
+                //        print(string.Format("list {0}: {1}", l, list.Count));
+                //        Dictionary<HumanBodyBones, Vector3> skeletons = list[0].skeletons;
+                //        Dictionary<HumanBodyBones, Vector3> rotations = list[0].rotations;
 
-                        foreach (var key in skeletons.Keys)
-                        {
-                            print(string.Format("skeletons {0}: {1}", key, skeletons[key]));
-                        }
+                //        foreach (var key in skeletons.Keys)
+                //        {
+                //            print(string.Format("skeletons {0}: {1}", key, skeletons[key]));
+                //        }
 
-                        foreach (var key in rotations.Keys)
-                        {
-                            print(string.Format("rotations {0}: {1}", key, rotations[key]));
-                        }
-                    }
-                }
+                //        foreach (var key in rotations.Keys)
+                //        {
+                //            print(string.Format("rotations {0}: {1}", key, rotations[key]));
+                //        }
+                //    }
+                //}
 
 
             }
@@ -112,7 +113,7 @@ namespace S3
                 HumanBodyBones.LeftLowerLeg,
                 HumanBodyBones.RightLowerLeg,
             };
-            data = new MovementData(comparing_parts, true);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 右腳單腳跳
@@ -123,7 +124,7 @@ namespace S3
                 HumanBodyBones.LeftLowerLeg,
                 HumanBodyBones.RightLowerLeg,
             };
-            data = new MovementData(comparing_parts, true);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 左打擊
@@ -134,7 +135,7 @@ namespace S3
                 HumanBodyBones.LeftLowerArm,
                 HumanBodyBones.RightLowerArm,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 右打擊
@@ -145,7 +146,7 @@ namespace S3
                 HumanBodyBones.LeftLowerArm,
                 HumanBodyBones.RightLowerArm,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 左踢
@@ -156,7 +157,7 @@ namespace S3
                 HumanBodyBones.LeftLowerLeg,
                 HumanBodyBones.RightLowerLeg,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 右踢
@@ -167,7 +168,7 @@ namespace S3
                 HumanBodyBones.LeftLowerLeg,
                 HumanBodyBones.RightLowerLeg,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 舉左手
@@ -176,7 +177,7 @@ namespace S3
                 HumanBodyBones.LeftUpperArm,
                 HumanBodyBones.LeftLowerArm,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 舉右手
@@ -185,7 +186,7 @@ namespace S3
                 HumanBodyBones.RightUpperArm,
                 HumanBodyBones.RightLowerArm,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 左揮動(水平)
@@ -194,7 +195,7 @@ namespace S3
                 HumanBodyBones.LeftUpperArm,
                 HumanBodyBones.LeftLowerArm,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 右揮動(水平)
@@ -203,7 +204,7 @@ namespace S3
                 HumanBodyBones.RightUpperArm,
                 HumanBodyBones.RightLowerArm,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 揮動(垂直)
@@ -214,7 +215,7 @@ namespace S3
                 HumanBodyBones.LeftLowerArm,
                 HumanBodyBones.RightLowerArm,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 舉雙手
@@ -225,7 +226,7 @@ namespace S3
                 HumanBodyBones.LeftLowerArm,
                 HumanBodyBones.RightLowerArm,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 雙腳跳
@@ -236,7 +237,7 @@ namespace S3
                 HumanBodyBones.LeftLowerLeg,
                 HumanBodyBones.RightLowerLeg,
             };
-            data = new MovementData(comparing_parts, true);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 跑
@@ -247,7 +248,7 @@ namespace S3
                 HumanBodyBones.LeftLowerLeg,
                 HumanBodyBones.RightLowerLeg,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 跨跳
@@ -258,7 +259,7 @@ namespace S3
                 HumanBodyBones.LeftLowerLeg,
                 HumanBodyBones.RightLowerLeg,
             };
-            data = new MovementData(comparing_parts, true);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 伸展
@@ -269,7 +270,7 @@ namespace S3
                 HumanBodyBones.LeftLowerArm,
                 HumanBodyBones.RightLowerArm,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 蹲下
@@ -280,7 +281,7 @@ namespace S3
                 HumanBodyBones.LeftLowerLeg,
                 HumanBodyBones.RightLowerLeg,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 運球
@@ -291,7 +292,7 @@ namespace S3
                 HumanBodyBones.LeftLowerArm,
                 HumanBodyBones.RightLowerArm,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 走路
@@ -302,7 +303,7 @@ namespace S3
                 HumanBodyBones.LeftLowerLeg,
                 HumanBodyBones.RightLowerLeg,
             };
-            data = new MovementData(comparing_parts, false);
+            data = new MovementData(comparing_parts);
             datas.set(pose, data);
 
             // 檔案儲存

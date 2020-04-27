@@ -21,7 +21,6 @@ namespace Somatosensory2
 
         // 動作名稱 與 動作物件 的字典
         public Dictionary<DetectSkeleton, Movement> movement_map;
-
         #endregion
 
         // 偵測結果呈現

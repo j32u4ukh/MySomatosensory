@@ -31,14 +31,11 @@ namespace S3
         [Header("動作類型")]
         private Pose pose;
 
-        // 
+        // 多比較源
         private List<List<Posture>> multi_postures;
 
         [Header("比對關節")]
         private List<HumanBodyBones> comparing_parts;
-
-        [Header("是否有額外條件")]
-        private bool has_additional_condition;
 
         // 門檻值
         private float[] thresholds;
@@ -55,6 +52,10 @@ namespace S3
         // 額外條件是否通過
         private bool is_additional_matched;
 
+        public Movement()
+        {
+        }
+
         public Movement(Pose pose, int n_posture=30)
         {
             this.pose = pose;
@@ -67,12 +68,19 @@ namespace S3
             multi_postures = loadMultiPosture();
         }
 
+        // 取得多比較源的全部 Posture
         public List<List<Posture>> getMultiPosture()
         {
             return multi_postures;
         }
 
-        // 根據索引值，返回多個 Posture 形成的 List<Posture>
+        // 取得多比較源的個數
+        public int getMultiNumber()
+        {
+            return multi_postures.Count;
+        }
+
+        // 根據索引值，返回多個比較源的 Posture 形成的 List<Posture>
         public List<Posture> getPostures(int index)
         {
             List<Posture> posture_list = new List<Posture>();
@@ -85,11 +93,13 @@ namespace S3
             return posture_list;
         }
 
+        // 取得分解動作數量
         public int getPostureNumber()
         {
             return n_posture;
         }
 
+        // 以陣列初始化門檻值
         public void setThresholds(float[] _thresholds)
         {
             int _length = _thresholds.Length;
@@ -98,19 +108,39 @@ namespace S3
             {
                 thresholds[i] = _thresholds[i];
             }
+        }
 
-            if (has_additional_condition)
+        // 設置指定的門檻值
+        public void setThreshold(int index, float val)
+        {
+            try
             {
-                // 額外條件：移動距離 是否達到要求距離
-                thresholds[_length - 1] = 1f;
+                // 取得正確率和門檻值的平均
+                val += thresholds[index];
+                val /= 2;
+
+                /* 以小於或等於兩者平均的整數做為新門檻值，
+                 * 門檻高於正確率 -> 降低門檻值；正確率高於門檻 -> 提高門檻值。
+                 * 若當正確率(87.5)高於門檻值(87.0)，由於平均後取較小的整數，
+                 * 正確率在 87.0 ~ 87.9 之間時，門檻值都會是 87.0
+                 * 限制其最小值為 0.5f
+                 */
+                // Mathf.Floor: the biggest number that "small" than val
+                thresholds[index] = Mathf.Max(val, 0.5f);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Debug.LogError("[setThreshold] IndexOutOfRangeException");
             }
         }
 
+        // 取得全部門檻值
         public float[] getThresholds()
         {
             return thresholds;
         }
 
+        // 取得指定門檻值
         public float getThreshold(int index)
         {
             try
@@ -123,11 +153,16 @@ namespace S3
             }
         }
 
-        public void setAccuracy(int index, float value)
+        // 紀錄正確率的最高值
+        public void setHighestAccuracy(int index, float value)
         {
             try
             {
-                accuracys[index] = value;
+                // 新數值較大才更新
+                if(value > accuracys[index])
+                {
+                    accuracys[index] = value;
+                }
             }
             catch (IndexOutOfRangeException)
             {
@@ -167,14 +202,26 @@ namespace S3
             return comparing_parts;
         }
 
-        public void setAddtionalCondition(bool condition)
+        // 檢查是否所有動作皆通過
+        public bool isMatched()
         {
-            has_additional_condition = condition;
+            bool pass = true;
+
+            int len = getPostureNumber(), i;
+            for (i = 0; i < len; i++)
+            {
+                pass &= is_matched[i];
+            }
+
+            // 姿勢匹配(bool[] is_matched) 與 額外條件(bool is_additional_matched) 都要通過才是真的通過
+            pass &= is_additional_matched;
+
+            return pass;
         }
 
-        public bool hasAddtionalCondition()
+        public void setMatched(int index, bool status)
         {
-            return has_additional_condition;
+            is_matched[index] = status;
         }
 
         public bool isMatched(int index)
@@ -182,9 +229,9 @@ namespace S3
             return is_matched[index];
         }
 
-        public void setMatched(int index, bool status)
+        public void setAddtionalMatched(bool is_matched)
         {
-            is_matched[index] = status;
+            is_additional_matched = is_matched;
         }
 
         public bool isAddtionalMatched()
@@ -200,10 +247,10 @@ namespace S3
             // 初始化正確率
             accuracys = new float[n_posture];
 
-            is_additional_matched = !has_additional_condition;
         }
 
         #region 讀取數據
+        // 需要真人預錄才會有數據
         public List<List<Posture>> loadMultiPosture()
         {
             List<List<Posture>> multi_postures = new List<List<Posture>>();
@@ -231,7 +278,7 @@ namespace S3
                         record_data = JsonConvert.DeserializeObject<RecordData>(load_data);
                         posture_list = record_data.posture_list;
 
-                        // 確保 posture_list 長度為 n_posture
+                        // 確保 posture_list 長度為 n_posture，每次抽樣含有一定的隨機性
                         posture_list = Utils.sampleList(posture_list, n_posture);
 
                         multi_postures.Add(posture_list);
@@ -250,7 +297,7 @@ namespace S3
         public void save()
         {
             MovementData data = new MovementData();
-            data.set(comparing_parts, has_additional_condition);
+            data.set(comparing_parts);
 
             MovementDatas datas = new MovementDatas();
             datas.set(pose, data);
@@ -265,46 +312,21 @@ namespace S3
         #region 要紀錄的數據
         // 比對關節
         public List<HumanBodyBones> comparing_parts;
-
-        // 是否有額外條件
-        public int has;
-        public bool has_additional_condition;
         #endregion
 
         public MovementData()
         {
             comparing_parts = new List<HumanBodyBones>();
-            //has_additional_condition = false;
         }
 
-        public MovementData(List<HumanBodyBones> comparing_parts, bool has_additional_condition)
+        public MovementData(List<HumanBodyBones> comparing_parts)
         {
             this.comparing_parts = comparing_parts;
-            this.has_additional_condition = has_additional_condition;
-
-            if (has_additional_condition)
-            {
-                has = 1;
-            }
-            else
-            {
-                has = 0;
-            }
         }
 
-        public void set(List<HumanBodyBones> comparing_parts, bool has_additional_condition)
+        public void set(List<HumanBodyBones> comparing_parts)
         {
             this.comparing_parts = comparing_parts;
-            this.has_additional_condition = has_additional_condition;
-
-            if (has_additional_condition)
-            {
-                has = 1;
-            }
-            else
-            {
-                has = 0;
-            }
         }
     }
 

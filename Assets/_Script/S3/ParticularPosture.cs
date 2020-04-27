@@ -13,10 +13,7 @@ namespace S3
         Player[] models;
         int model_idx, n_model;
 
-        // 用於存取骨架資訊
-        List<Posture> posture_list;
-
-        // 多來源的第 frame 幀 Posture
+        // 多來源的第 posture_idx 幀 Posture
         List<Posture> postures;
         int posture_idx;
 
@@ -28,7 +25,6 @@ namespace S3
         #region getAccuracy
         Transform bone;
         Vector3 vector3;
-        int frame = 0, frame_number = 0;
 
         FloatList acc_list;
         float acc;
@@ -36,11 +32,7 @@ namespace S3
 
         // Posture
         Movement movement;
-        List<List<Posture>> multi_postures;
         int n_posture;
-        Posture posture1;
-
-        
 
         // Start is called before the first frame update
         void Start()
@@ -56,7 +48,7 @@ namespace S3
                 print("movement is null.");
             }
 
-            multi_postures = movement.getMultiPosture();
+            //multi_postures = movement.getMultiPosture();
 
             n_posture = movement.getPostureNumber();
             posture_idx = 0;
@@ -70,15 +62,17 @@ namespace S3
         // Update is called once per frame
         void Update()
         {
+            // 有序姿勢比對
             if (posture_idx < n_posture)
             {
                 postures = movement.getPostures(posture_idx);
                 acc_list.clear();
 
+                // 多標準共同衡量正確率
                 for (model_idx = 0; model_idx < n_model; model_idx++)
                 {
                     acc_list.add(getAccuracy(player, postures[model_idx]));
-                    setModelPosture(models[model_idx], postures[model_idx]);
+                    //setModelPosture(models[model_idx], postures[model_idx]);
                 }
 
                 acc = acc_list.geometricMean();
@@ -128,7 +122,6 @@ namespace S3
 
         float getAccuracy(Player player, Posture posture)
         {
-            // TODO: comparing_parts should load from file
             List<HumanBodyBones> comparing_parts = player.getComparingParts(pose);
             HumanBodyBones bone;
             Vector3 player_vector, standrad_vector;

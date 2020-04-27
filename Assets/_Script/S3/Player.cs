@@ -109,6 +109,11 @@ namespace S3
                 return null;
             }
         }
+
+        public Dictionary<Pose, Movement>.KeyCollection getKeys()
+        {
+            return movement_map.Keys;
+        }
         #endregion
 
         // 是否需要讓它有返回 null 的情形 ?
@@ -169,7 +174,7 @@ namespace S3
             PlayerData player_data = new PlayerData(id);
             game_stage = player_data.game_stage;
 
-            // MovementDatas 數據儲存路徑
+            // MovementDatas 數據儲存路徑(不會因人而異的部分)
             string path = Path.Combine(Application.streamingAssetsPath, "MovementData.txt");
             StreamReader reader = new StreamReader(path);
             string load_data = reader.ReadToEnd().Trim();
@@ -187,7 +192,8 @@ namespace S3
                 {
                     data = datas.get(pose);
                     movement.setComparingParts(data.comparing_parts);
-                    movement.setAddtionalCondition(data.has_additional_condition);
+
+                    // 門檻值是會根據不同玩家，而有不同的設置
                     movement.setThresholds(player_data.getThresholds(pose));
                     movement_map.Add(pose, movement);
                 }

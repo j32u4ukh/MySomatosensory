@@ -15,8 +15,8 @@ namespace S3
         public string id;
         public string date;
 
-        // TODO: change string to Pose
-        public string pose;
+        // change string to Pose
+        public Pose pose;
 
         public GameStage stage;
         public string start_time;
@@ -44,7 +44,7 @@ namespace S3
 
         public void setPose(Pose pose)
         {
-            this.pose = pose.ToString();
+            this.pose = pose;
         }
 
         public void setStage(GameStage stage)
