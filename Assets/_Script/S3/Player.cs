@@ -59,10 +59,9 @@ namespace S3
              * 問題: 其他腳本調用 Player 物件時產生 NullReferenceException
              * 解決方法: 把最先實例化的全部放在Awake()方法中去
              */
-            avatar_controller = GetComponent<AvatarController>();
-            model_helper = GetComponent<PoseModelHelper>();
+            avatar_controller = GetComponentInChildren<AvatarController>();
+            model_helper = GetComponentInChildren<PoseModelHelper>();
             movement_map = new Dictionary<Pose, Movement>();
-            
         }
 
         // Start is called before the first frame update

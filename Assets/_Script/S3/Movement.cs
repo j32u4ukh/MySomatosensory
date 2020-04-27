@@ -124,8 +124,10 @@ namespace S3
                  * 若當正確率(87.5)高於門檻值(87.0)，由於平均後取較小的整數，
                  * 正確率在 87.0 ~ 87.9 之間時，門檻值都會是 87.0
                  * 限制其最小值為 0.5f
+                 * 
+                 * Mathf.Floor: the biggest number that "small" than val
                  */
-                // Mathf.Floor: the biggest number that "small" than val
+                val = Mathf.Floor(val * 100f) / 100f;
                 thresholds[index] = Mathf.Max(val, 0.5f);
             }
             catch (IndexOutOfRangeException)

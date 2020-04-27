@@ -18,10 +18,10 @@ namespace S3
             int i, len = array.Length;
             for(i = 0; i < len - 1; i++)
             {
-                sb.Append(string.Format("{0:F2}, ", array[i]));
+                sb.Append(string.Format("{0:F4}, ", array[i]));
             }
 
-            sb.Append(string.Format("{0:F2}]", array[len - 1]));
+            sb.Append(string.Format("{0:F4}]", array[len - 1]));
 
             return sb.ToString();
         }

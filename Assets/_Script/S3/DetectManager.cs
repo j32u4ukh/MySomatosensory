@@ -257,7 +257,7 @@ namespace S3
                     {
                         // 動態調整門檻值 movement.setThreshold(posture_idx)
                         movement.setThreshold(posture_idx, acc);
-                        //print(string.Format("Dynamic thresholds: {0}", Utils.arrayToString(movement.getThresholds())));
+                        print(string.Format("Dynamic thresholds: {0}", Utils.arrayToString(movement.getThresholds())));
                     }
                 }
 
@@ -274,6 +274,8 @@ namespace S3
                     // TODO: 全部玩家或一定比例以上才停止偵測
                     // 任一動作完成偵測，停止偵測
                     pose = Pose.None;
+
+                    print(string.Format("Final accuracy: {0}", Utils.arrayToString(movement.getAccuracy())));
                 }
             }
             catch (KeyNotFoundException)

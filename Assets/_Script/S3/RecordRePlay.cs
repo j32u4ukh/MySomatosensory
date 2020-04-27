@@ -139,7 +139,7 @@ namespace S3
                     {
                         print(string.Format("Replay finished at {0} frame.", frame));
                     }
-                    
+
                     break;
                 default:
                     if (Input.GetKeyDown(KeyCode.S))
