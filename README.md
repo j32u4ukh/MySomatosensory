@@ -25,3 +25,7 @@ RecordData.cs
 
 * public static void finishWriting(string path)
 // 一個遊戲的所有紀錄皆寫完後，加上後綴"_done"，告訴其他程式已經可以上傳
+
+## 開發注意事項
+
+發生過多次一執行場景，Unity 沒有出現錯誤訊息就直接關閉，查看 Console 當中的 Editor log 也未發現什麼錯誤，結果就是深度攝影機忘記接上，Nuitrack 無法獲取攝影機導致。
