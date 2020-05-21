@@ -133,6 +133,22 @@ namespace S3
             return init_pos;
         }
 
+        // TODO: 實作 distanceX, distanceY, distanceZ... 方便計算玩家位移
+
+        public float distanceX()
+        {
+            return 0f;
+        }
+
+        public float distanceY()
+        {
+            return 0f;
+        }
+
+        public float distanceZ()
+        {
+            return 0f;
+        }
 
         #region PoseModelHelper
         public Transform getBoneTransform(int index)
@@ -168,12 +184,15 @@ namespace S3
         }
         #endregion
 
+        // TODO: 場景轉換時，簡化這些數據的傳遞，不要再次讀取
         public void loadData()
         {
             PlayerData player_data = new PlayerData(id);
             game_stage = player_data.game_stage;
 
             // MovementDatas 數據儲存路徑(不會因人而異的部分)
+
+            // TODO: 由 DetectManager 讀取一次就好
             string path = Path.Combine(Application.streamingAssetsPath, "MovementData.txt");
             StreamReader reader = new StreamReader(path);
             string load_data = reader.ReadToEnd().Trim();

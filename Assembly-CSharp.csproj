@@ -79,6 +79,7 @@
     <Compile Include="Assets\_Script\RePlay.cs" />
     <Compile Include="Assets\_Script\S3\DetectManager.cs" />
     <Compile Include="Assets\_Script\S3\EnumClass.cs" />
+    <Compile Include="Assets\_Script\S3\EventClass.cs" />
     <Compile Include="Assets\_Script\S3\GameInfo.cs" />
     <Compile Include="Assets\_Script\S3\GameManager.cs" />
     <Compile Include="Assets\_Script\S3\Movement.cs" />
@@ -89,8 +90,13 @@
     <Compile Include="Assets\_Script\S3\RecordData.cs" />
     <Compile Include="Assets\_Script\S3\RecordRePlay.cs" />
     <Compile Include="Assets\_Script\S3\Setting.cs" />
+    <Compile Include="Assets\_Script\S3\Test\DetectManagerTest.cs" />
+    <Compile Include="Assets\_Script\S3\Test\Dont1.cs" />
+    <Compile Include="Assets\_Script\S3\Test\Dont2.cs" />
     <Compile Include="Assets\_Script\S3\Test\MovingTest.cs" />
     <Compile Include="Assets\_Script\S3\Test\PlayerTest.cs" />
+    <Compile Include="Assets\_Script\S3\Test\Scene1.cs" />
+    <Compile Include="Assets\_Script\S3\Test\Scene2.cs" />
     <Compile Include="Assets\_Script\S3\Utils.cs" />
     <Compile Include="Assets\_Script\StructTest.cs" />
     <Compile Include="Assets\_Script\Test.cs" />
@@ -252,6 +258,7 @@
     <None Include="Assets\StreamingAssets\MovementData.txt" />
     <None Include="Assets\K2Examples\Resources\Erode.shader" />
     <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-52-31-2503.txt" />
+    <None Include="Assets\StreamingAssets\PlayerData\你要不要吃哈密瓜.txt" />
     <None Include="Assets\K2Examples\Resources\BodyShader.shader" />
     <None Include="Assets\K2Examples\KinectDemos\ProjectorDemo\Resources\calibration-empty.xml" />
     <None Include="Assets\K2Examples\Resources\Dilate.shader" />

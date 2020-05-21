@@ -11,12 +11,13 @@ namespace S3
 
         private void Start()
         {
-            //setPlayerData("9527");
-            testPlayerData("9527");
+            setPlayerData("你要不要吃哈密瓜");
+            //testPlayerData("9527");
             //setMovementData();
 
         }
 
+        // 初始化玩家數據 PlayerData
         void setPlayerData(string id)
         {
             player.setId(id);
@@ -98,6 +99,7 @@ namespace S3
 
         }
 
+        // 初始化動作們的比對關節
         void setMovementData()
         {
             MovementDatas datas = new MovementDatas();

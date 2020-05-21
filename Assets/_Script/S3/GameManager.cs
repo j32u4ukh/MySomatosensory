@@ -136,6 +136,7 @@ namespace S3
             }
         }
 
+        // TODO: 開始時間大家都相同，但結束時間不一定相同
         public void setEndTime()
         {
             foreach (var record in records)

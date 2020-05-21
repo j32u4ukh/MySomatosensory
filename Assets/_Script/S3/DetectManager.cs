@@ -3,109 +3,118 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
+using UnityEngine.Events;
 
 namespace S3
 {
+    public delegate void DetectDelegate();
+
     public class DetectManager : MonoBehaviour
     {
+        public DetectDelegate detectManager;
+        bool is_manager_inited = false;
+
         public Pose pose = Pose.None;
+
+        // TODO: 和其他腳本共用 PlayerManger 當中的 Player，才不用重複讀取資源
         public Player[] players;
-        
+
+        // 
+        Dictionary<Pose, List<HumanBodyBones>> comparing_parts_dict;
+
+        public IntegerEvent onMatched;
+        public UnityEvent onAllMatched;
+        bool[] all_matching_state;
+        Dictionary<Pose, List<Pose>> pose_dict;
 
         // For gui
         string gui;
-        FloatList acc_list;
+
+        // TODO: global variable to local variable
         float acc, thres;
 
+        // TODO: 動作門檻值會隨著玩家表現而調整，在此情況下若未通過，則直接紀錄未通過這件事，而不去推測是做哪個動作但未成功
         // Start is called before the first frame update
         void Start()
         {
+            // TODO: DontDestroyOnLoad(this); 令 DetectManager 在場景轉換時不會被移除
+
+            // TODO: 外部腳本透過呼叫 setPlayer 來告訴 DetectManager 有哪些玩家
+            #region 之後會移出的部分
             players[0].setId("9527");
             players[0].loadData();
 
+            players[1].setId("你要不要吃哈密瓜");
+            players[1].loadData(); 
+            #endregion
+
             acc = 0f;
             thres = 0f;
+
+            onMatched = new IntegerEvent();
+            onAllMatched = new UnityEvent();
+
+            all_matching_state = new bool[players.Length];
+            Debug.Log(string.Format("[DetectManager] init all_matching_state, length: {0}", players.Length));
+
+            resetState();
+
+            onMatched.AddListener((int index)=> {
+                try
+                {
+                    all_matching_state[index] = true;
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    Debug.LogError(string.Format("[DetectManager] onMatched Listener index: {0}, n_state: {1}", 
+                        index, all_matching_state.Length));
+                }
+
+                Debug.Log(string.Format("[DetectManager] onMatched Listener player {0} matched.", index));
+
+                bool all_matched = true;
+                foreach(bool state in all_matching_state)
+                {
+                    all_matched &= state;
+                }
+
+                if (all_matched)
+                {
+                    onAllMatched.Invoke();
+                }
+            });
+
+            onAllMatched.AddListener(()=> {
+                Debug.Log(string.Format("[DetectManager] onAllMatched Listener"));
+            });
+
+            pose_dict = new Dictionary<Pose, List<Pose>>();
+            addPoseDict(Pose.RaiseTwoHands, new List<Pose> { Pose.RaiseTwoHands });
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                foreach (Player player in players)
-                {
-                    Movement movement = player.getMovement(pose);
-                    int model_idx, n_model = movement.getMultiNumber();
-
-                    if (movement == null)
-                    {
-                        throw new NullReferenceException("[compareMovement] movement is null.");
-                    }
-
-                    int posture_idx = 0, n_posture = movement.getPostureNumber();
-                    List<Posture> postures;
-
-                    postures = movement.getPostures(posture_idx);
-                    print(string.Format("n_posture: {0}, postures.Count: {1}, n_model: {2}", n_posture, postures.Count, n_model));
-
-                    for (posture_idx = 0; posture_idx < n_posture; posture_idx++)
-                    {
-                        // 多來源的第 posture_idx 幀 Posture
-                        //postures = movement.getPostures(posture_idx);
-                        //print(string.Format("postures.Count: {0}", postures.Count));
-                        //acc_list.clear();
-
-                        // 多標準共同衡量正確率
-                        //for (model_idx = 0; model_idx < n_model; model_idx++)
-                        //{
-                        //    acc_list.add(getAccuracy(player, postures[model_idx]));
-                        //}
-
-                        // 計算與多標準比對後的正確率
-                        //acc = acc_list.geometricMean();
-
-                        // 記錄各個分解動作的最高值
-                        //movement.setHighestAccuracy(posture_idx, acc);
-
-                        // 取得當前動作門檻值，並比較是否當前正確率超過門檻
-                        thres = movement.getThreshold(posture_idx);
-                        print(string.Format("thres {0}: {1}", posture_idx, thres));
-                        //if (acc >= thres)
-                        //{
-                        //    // TODO: 紀錄通過資訊，以利後面判斷動作是否通過
-                        //    movement.setMatched(posture_idx, true);
-                        //}
-                        //else
-                        //{
-                        //    // 動態調整門檻值 movement.setThreshold(posture_idx)
-                        //    movement.setThreshold(posture_idx, acc);
-                        //    print(string.Format("Dynamic thresholds: {0}", Utils.arrayToString(movement.getThresholds())));
-                        //}
-                    }
-
-                    // 附加額外通關條件
-                    //if (additional_accuracy >= 1f)
-                    //{
-                    //    movement.setAddtionalMatched(true);
-                    //}
-
-                    // TODO: 考慮只有一名玩家通過，或兩位都通過
-                    // 當所有動作皆通過                       
-                    if (movement.isMatched())
-                    {
-                        // 任一動作完成偵測，停止偵測
-                        pose = Pose.None;
-                    }
-                    else
-                    {
-                        print(string.Format("Accurcy: {0}", Utils.arrayToString(movement.getAccuracy())));
-                        print(string.Format("Threshold: {0}", Utils.arrayToString(movement.getThresholds())));
-                    }
-                }
-            }
-
+            /*TODO: 由外部腳本定義要偵測哪些動作，額外條件亦可在外部腳本計算
+             * delegate void detectManager()
+             * 
+             * 外部腳本 >>
+             * void detectRaiseTwoHands(){
+             *     foreach (Player player in players)
+             *     {
+             *          // 計算 additional_accuracy 的情形
+             *          float additional_accuracy = player.distanceY() > y_distance;
+             *          compareMovement(player, Pose.RaiseTwoHands, additional_accuracy);
+             *          
+             *          // 計算 additional_accuracy2 的情形
+             *          float additional_accuracy2 = player.distanceX() > x_distance;
+             *          compareMovement(player, Pose.RaiseTwoHands, additional_accuracy);
+             *     }
+             * }
+             */
             switch (pose)
-            {
+            {                
                 case Pose.RaiseTwoHands:
                     foreach (Player player in players)
                     {
@@ -116,25 +125,50 @@ namespace S3
 
                     break;
             }
+
+            // 設置了 detectManager 才能執行
+            if (is_manager_inited)
+            {
+                detectManager();
+            }
         }
 
         private void OnGUI()
         {
-            GUI.color = Color.red;
-            GUI.skin.label.fontSize = 50;
-            gui = string.Format("Pose: {0}\nAcc: {1:F4}\nThres: {2:F4}",
-                pose, acc, thres);
-            GUILayout.Label(
-                // text on gui
-                gui, 
-                // start to define gui layout
-                GUILayout.Width(800), 
-                GUILayout.Height(500));
+            //GUI.color = Color.red;
+            //GUI.skin.label.fontSize = 50;
+            //gui = string.Format("Pose: {0}\nAcc: {1:F4}\nThres: {2:F4}",
+            //    pose, acc, thres);
+            //GUILayout.Label(
+            //    // text on gui
+            //    gui, 
+            //    // start to define gui layout
+            //    GUILayout.Width(800), 
+            //    GUILayout.Height(500));
+        }
+
+        
+        public void initDetectManager()
+        {
+            // TODO: 讀取各個動作的比對關節
+            comparing_parts_dict = new Dictionary<Pose, List<HumanBodyBones>>();
+        }
+
+        public void initDetectDelegate(DetectDelegate detect_delegate)
+        {
+            is_manager_inited = true;
+            detectManager = detect_delegate;
+        }
+
+        public void setPlayer(Player player, int index)
+        {
+            players[index] = player;
         }
 
         // 取得單一姿勢正確率
         float getAccuracy(Player player, Posture posture)
         {
+            // TODO: 從 comparing_parts_dict 讀取比較關節，不需由 player 來提供
             List<HumanBodyBones> comparing_parts = player.getComparingParts(pose);
             HumanBodyBones bone;
             Vector3 player_vector, standrad_vector, s1, s2, p1, p2;
@@ -212,77 +246,133 @@ namespace S3
         }
 
         // 比對動作 + 額外條件
-        void compareMovement(Player player, Pose target_pose, float additional_accuracy = 1f)
+        public void compareMovement(Player player, Pose target_pose, float additional_accuracy = 1f)
         {
-            try
+            // 避免前面的玩家通過後，pose 被修改為 Pose.None 而導致沒有比對之標的
+            if (target_pose == Pose.None)
             {
-                // player 透過 target_pose 取得 movement
-                Movement movement = player.getMovement(target_pose);
-                int model_idx, n_model = movement.getMultiNumber();
+                return;
+            }
 
-                if (movement == null)
+            // player 透過 target_pose 取得 movement
+            Movement movement = player.getMovement(target_pose);
+
+            // 若 player.movement_map 不包含 target_pose，則 movement == null
+            if (movement == null)
+            {
+                Debug.Log(string.Format("[DetectManager] compareMovement | No {0} in movement_map", target_pose));
+                return;
+            }
+
+            // 若已經通過則直接 return (等待其他玩家通過的情形)
+            if (movement.has_matched)
+            {
+                //Debug.Log(string.Format("[DetectManager] compareMovement | player {0} has_matched.", player.getId()));
+                return;
+            }
+
+            int model_idx, n_model = movement.getMultiNumber(),
+                posture_idx, n_posture = movement.getPostureNumber();
+            List<Posture> postures;
+            FloatList acc_list;
+
+            for (posture_idx = 0; posture_idx < n_posture; posture_idx++)
+            {
+                // 多來源的第 posture_idx 幀 Posture
+                postures = movement.getPostures(posture_idx);
+                acc_list = new FloatList();
+
+                // 多標準共同衡量正確率
+                for (model_idx = 0; model_idx < n_model; model_idx++)
                 {
-                    throw new NullReferenceException("[compareMovement] movement is null.");
+                    acc_list.add(getAccuracy(player, postures[model_idx]));
                 }
 
-                int posture_idx, n_posture = movement.getPostureNumber();
-                List<Posture> postures;
+                // 計算與多標準比對後的正確率
+                acc = acc_list.geometricMean();
 
-                for (posture_idx = 0; posture_idx < n_posture; posture_idx++)
+                // 記錄各個分解動作的最高值
+                movement.setHighestAccuracy(posture_idx, acc);
+
+                // 取得當前動作門檻值，並比較是否當前正確率超過門檻
+                thres = movement.getThreshold(posture_idx);
+
+                // 正確率 大於等於 門檻值
+                if (acc >= thres)
                 {
-                    // 多來源的第 posture_idx 幀 Posture
-                    postures = movement.getPostures(posture_idx);
-                    FloatList acc_list = new FloatList();
-
-                    // 多標準共同衡量正確率
-                    for (model_idx = 0; model_idx < n_model; model_idx++)
-                    {
-                        acc_list.add(getAccuracy(player, postures[model_idx]));
-                    }
-
-                    // 計算與多標準比對後的正確率
-                    acc = acc_list.geometricMean();
-
-                    // 記錄各個分解動作的最高值
-                    movement.setHighestAccuracy(posture_idx, acc);
-
-                    // 取得當前動作門檻值，並比較是否當前正確率超過門檻
-                    thres = movement.getThreshold(posture_idx);
-                    if (acc >= thres)
-                    {
-                        // TODO: 紀錄通過資訊，以利後面判斷動作是否通過
-                        movement.setMatched(posture_idx, true);
-                    }
-                    else
-                    {
-                        // 動態調整門檻值 movement.setThreshold(posture_idx)
-                        movement.setThreshold(posture_idx, acc);
-                        print(string.Format("Dynamic thresholds: {0}", Utils.arrayToString(movement.getThresholds())));
-                    }
+                    // 紀錄"通過資訊"，以利後面判斷動作是否通過
+                    movement.setMatched(posture_idx, true);
                 }
 
-                // 附加額外通關條件
-                if(additional_accuracy >= 1f)
+                // 正確率 小於 門檻值
+                else
                 {
-                    movement.setAddtionalMatched(true);
-                }
-
-                // TODO: 考慮只有一名玩家通過，或兩位都通過
-                // 當所有動作皆通過                       
-                if (movement.isMatched())
-                {
-                    // TODO: 全部玩家或一定比例以上才停止偵測
-                    // 任一動作完成偵測，停止偵測
-                    pose = Pose.None;
-
-                    print(string.Format("Final accuracy: {0}", Utils.arrayToString(movement.getAccuracy())));
+                    // TODO: 限定於單一動作時才調整
+                    // 動態調整門檻值 movement.setThreshold(posture_idx)
+                    movement.setThreshold(posture_idx, acc);
+                    //Debug.Log(string.Format("[DetectManager] compareMovement | Dynamic thresholds: {0}", 
+                    //    Utils.arrayToString(movement.getThresholds())));
                 }
             }
-            catch (KeyNotFoundException)
-            {
-                print(string.Format("No {0} in movement_map", pose));
 
+            // 附加額外通關條件
+            if (additional_accuracy >= 1f)
+            {
+                movement.setAddtionalMatched(true);
             }
+
+            // 當所有動作皆通過                       
+            if (movement.isMatched())
+            {
+                // 紀錄已經完成的資訊，避免重複判斷
+                movement.has_matched = true;
+
+                // 透過陣列紀錄每個玩家是否通過，個別玩家通過時觸發事件，將此這列紀錄更新，同時檢查是否全部都完成
+                onMatched.Invoke(player.index());
+
+                Debug.Log(string.Format("[DetectManager] compareMovement | ID: {0}", player.getId()));
+                Debug.Log(string.Format("[DetectManager] compareMovement | Final accuracy: {0}",
+                    Utils.arrayToString(movement.getAccuracy())));
+            }
+        }
+
+        public void resetState()
+        {
+            int i, len = all_matching_state.Length;
+
+            for(i = 0; i < len; i++)
+            {
+                all_matching_state[i] = false;
+            }
+        }
+
+        public void resetState(Pose key)
+        {
+            // 初始化各個動作，是否通過 與 正確率
+            List<Pose> pose_list = pose_dict[key];
+            Movement m;
+            foreach(Player player in players)
+            {
+                foreach (Pose pose in pose_list)
+                {
+                    m = player.getMovement(pose);
+                    m.resetState();
+                }
+            }
+
+            resetState();
+        }
+
+        public void addPoseDict(Pose pose, List<Pose> pose_list)
+        {
+            if (pose_dict.ContainsKey(pose))
+            {
+                pose_dict[pose] = new List<Pose>(pose_list);
+            }
+            else
+            {
+                pose_dict.Add(pose, pose_list);
+            }            
         }
     }
 }

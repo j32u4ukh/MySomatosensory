@@ -49,6 +49,8 @@ namespace S3
         // 姿勢匹配是否通過
         private bool[] is_matched;
 
+        public bool has_matched;
+
         // 額外條件是否通過
         private bool is_additional_matched;
 
@@ -113,6 +115,7 @@ namespace S3
         // 設置指定的門檻值
         public void setThreshold(int index, float val)
         {
+            // TODO: 利用能力估計函數，調整門檻值
             try
             {
                 // 取得正確率和門檻值的平均
@@ -128,7 +131,7 @@ namespace S3
                  * Mathf.Floor: the biggest number that "small" than val
                  */
                 val = Mathf.Floor(val * 100f) / 100f;
-                thresholds[index] = Mathf.Max(val, 0.5f);
+                thresholds[index] = Mathf.Max(val, 0.6f);
             }
             catch (IndexOutOfRangeException)
             {
@@ -194,6 +197,7 @@ namespace S3
             return pose;
         }
 
+        // TODO: 其實不會因人而異的部分直接由 DetectManager 讀取應該就好了
         public void setComparingParts(List<HumanBodyBones> comparing_parts)
         {
             this.comparing_parts = comparing_parts;
@@ -246,9 +250,10 @@ namespace S3
             // 是否通過
             is_matched = new bool[n_posture];
 
+            has_matched = false;
+
             // 初始化正確率
             accuracys = new float[n_posture];
-
         }
 
         #region 讀取數據
@@ -280,7 +285,7 @@ namespace S3
                         record_data = JsonConvert.DeserializeObject<RecordData>(load_data);
                         posture_list = record_data.posture_list;
 
-                        // 確保 posture_list 長度為 n_posture，每次抽樣含有一定的隨機性
+                        // 確保 posture_list 長度為 n_posture，因而每次抽樣含有一定的隨機性
                         posture_list = Utils.sampleList(posture_list, n_posture);
 
                         multi_postures.Add(posture_list);
@@ -289,7 +294,7 @@ namespace S3
             }
             else
             {
-                Debug.Log(string.Format("MovementData {0} is not exist.", pose.ToString()));
+                Debug.Log(string.Format("[Movement] loadMultiPosture | MovementData {0} is not exist.", pose.ToString()));
             }
 
             return multi_postures;
@@ -307,6 +312,8 @@ namespace S3
         }
     }
 
+
+    #region 主要用於寫出與讀取動作們的比對關節
     public class MovementData
     {
         // 儲存"不會"因人而異的數值
@@ -399,13 +406,14 @@ namespace S3
             return null;
         }
 
-        public bool contain(Pose pose) {
+        public bool contain(Pose pose)
+        {
             return datas.ContainsKey(pose);
         }
 
         #region 紀錄數據
         public void save()
-        {            
+        {
             // 檢查檔案是否存在，不存在則建立
             StreamWriter writer = new FileInfo(path).CreateText();
 
@@ -433,7 +441,7 @@ namespace S3
             {
                 Debug.Log("Not exists");
                 return new MovementDatas();
-            }           
+            }
         }
 
         public static Dictionary<Pose, MovementData> loadMovementData()
@@ -454,8 +462,9 @@ namespace S3
             {
                 Debug.Log("Not exists");
                 return new Dictionary<Pose, MovementData>();
-            }           
+            }
         }
         #endregion
-    }
+    } 
+    #endregion
 }
