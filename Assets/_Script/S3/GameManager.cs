@@ -9,6 +9,7 @@ namespace S3
     {
         List<Player> players;
         List<RecordData> records;
+        int N_PLAYER;
         DetectManager detect_manager;
 
         #region 紀錄
@@ -29,6 +30,8 @@ namespace S3
         private void Awake()
         {
             file_id = DateTime.Now.ToString("HH-mm-ss-ffff");
+            skeletons = new Dictionary<HumanBodyBones, Vector3>();
+            rotations = new Dictionary<HumanBodyBones, Vector3>();
         }
 
         // Start is called before the first frame update
@@ -47,7 +50,7 @@ namespace S3
         {
             if (is_skeleton_recording)
             {
-                print("[GameManager] is_skeleton_recording");
+                //print("[GameManager] is_skeleton_recording");
 
                 // 每次紀錄 1 位玩家
                 foreach (var player in players)
@@ -62,16 +65,15 @@ namespace S3
                         {
                             continue;
                         }
+
                         vector3 = bone.transform.position;
                         skeletons.Add(player.indexToBones(i), vector3);
 
                         vector3 = bone.transform.rotation.eulerAngles;
                         rotations.Add(player.indexToBones(i), vector3);
-
                     }
 
-                    records[player.index()].addSkeletons(skeletons);
-                    records[player.index()].addRotations(rotations);
+                    records[player.index()].addPosture(skeletons, rotations);
                 }
             }
         }
@@ -100,14 +102,47 @@ namespace S3
         {
             players = new List<Player>();
             records = new List<RecordData>();
+            N_PLAYER = player_list.Length;
 
             foreach (Player player in player_list)
             {
                 players.Add(player);
-                records.Add(new RecordData());
+                records.Add(new RecordData(player));
             }
 
             LEN = players[0].getBonesNumber();
+        }
+
+        public void setPose(Pose pose) { 
+            foreach(var record in records)
+            {
+                record.setPose(pose);
+            }
+        }
+
+        public void setStage(GameStage stage)
+        {
+            foreach (var record in records)
+            {
+                record.setStage(stage);
+            }
+        }
+
+        public void setStartTime()
+        {
+            foreach (var record in records)
+            {
+                record.setStartTime();
+            }
+        }
+
+        // TODO: 開始時間大家都相同，但結束時間不一定相同
+        public void setEndTime()
+        {
+            foreach (var record in records)
+            {
+                record.setEndTime();
+            }
         }
 
         public void setDetectManager(DetectManager detect_manager)
@@ -115,7 +150,7 @@ namespace S3
             this.detect_manager = detect_manager;
         }
 
-        public void startMatch(DetectSkeleton pose)
+        public void startMatch(Pose pose, GameStage game_stage)
         {
             print("startMatch");
             is_skeleton_recording = true;
@@ -123,20 +158,20 @@ namespace S3
 
             foreach (Player player in players)
             {
-                records[player.index()].setStage("Test");
+                records[player.index()].setStage(game_stage);
                 records[player.index()].setStartTime();
             }
         }
 
-        public List<DetectSkeleton?> endMatch()
+        public List<Pose?> endMatch()
         {
             print("endMatch");
             is_skeleton_recording = false;
-            List<DetectSkeleton?> results = new List<DetectSkeleton?>();
+            List<Pose?> results = new List<Pose?>();
 
-            DetectSkeleton pose = detect_manager.pose;
-            DetectSkeleton? result;
-            DetectSkeleton detect = DetectSkeleton.None;
+            Pose pose = detect_manager.pose;
+            Pose? result;
+            Pose detect = Pose.None;
             foreach (Player player in players) {
                 records[player.index()].setEndTime();
 
@@ -144,7 +179,7 @@ namespace S3
                 // 判斷是單一動作還是多個動作
                 switch (pose)
                 {
-                    case DetectSkeleton.SingleFootJump:
+                    case Pose.Hop:
                         //result = detect_manager.whichOnePass(pose);
                         //if (result == null)
                         //{
@@ -164,7 +199,7 @@ namespace S3
                 }
 
                 // detect：最後認定玩家做的動作
-                records[player.index()].setType(detect);
+                records[player.index()].setPose(detect);
                 //record_data.setThreshold(detect_manager.thresholdsMap[detect]);
                 //int length = detect_manager.poseModelMap[detect].Length;
                 //record_data.setAccuracy(DetectManager.sliceArray(detect_manager.accuracyMap[detect], 0, length));
@@ -172,7 +207,9 @@ namespace S3
                 // 取消偵測
                 //detect_manager.detectSkeleton = DetectSkeleton.None;
                 //path = recordData.save(file_id);
-                records[player.index()] = new RecordData();
+
+                // 重置 RecordData
+                records[player.index()] = new RecordData(player);
 
                 results.Add(detect);
             }

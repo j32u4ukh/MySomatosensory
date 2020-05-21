@@ -209,7 +209,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   d2: {fileID: 220307029}
+<<<<<<< HEAD
   num: 0
+=======
+>>>>>>> two
 --- !u!4 &220307031
 Transform:
   m_ObjectHideFlags: 0

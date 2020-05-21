@@ -21,7 +21,6 @@ namespace Somatosensory2
 
         // 動作名稱 與 動作物件 的字典
         public Dictionary<DetectSkeleton, Movement> movement_map;
-
         #endregion
 
         // 偵測結果呈現
@@ -200,6 +199,8 @@ namespace Somatosensory2
                 float[] thresholds = _movement.getThresholds();
                 int i, len = _movement.getMovementNumber();
                 float acc;
+
+                // 各個分解動作
                 for (i = 0; i < len; i++)
                 {
                     acc = getAccuracy(poseModels[i], _movement.getComparingParts());

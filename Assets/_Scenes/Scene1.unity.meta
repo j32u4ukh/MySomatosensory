@@ -1,5 +1,14 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
+<<<<<<< HEAD:Assets/_Scenes/Scene1.unity.meta
 guid: 58d871e1e1500144691a7b3a858a324f
+=======
+guid: 395448f9b5f7f274a96d0d903f417ed4
+folderAsset: yes
+>>>>>>> two:Assets/StreamingAssets/PlayerData.meta
+=======
+guid: 58d871e1e1500144691a7b3a858a324f
+>>>>>>> two
 DefaultImporter:
   externalObjects: {}
   userData: 

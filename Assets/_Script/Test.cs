@@ -1,24 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using S3;
+using Pose = S3.Pose;
+using System.Text;
+using Newtonsoft.Json;
 
 public class Test : MonoBehaviour {
-    //float time = 0f;
 
-	// Use this for initialization
 	void Start () {
-        //avatar.transform.localPosition = Vector3.zero;
-        //avatar.transform.localRotation = Quaternion.identity;
-        string[] words = {"a", "b", "c"};
-        paramTest(words);
-
+        FloatList nums = new FloatList();
+        print(nums.toString());
+        print("sum:" + nums.sum());
+        print("mean:" + nums.mean());
     }
 	
 	// Update is called once per frame
 	void Update () {
-        //time += Time.deltaTime;
-        //player.transform.position = new Vector3(0f, 0f, Mathf.Sin(time));
-        //avatar.transform.localPosition = Vector3.zero;
 
     }
 

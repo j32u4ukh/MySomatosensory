@@ -14,32 +14,40 @@ namespace S3
         public string guid;
         public string id;
         public string date;
-        public string type;
-        public string stage;
+
+        // change string to Pose
+        public Pose pose;
+
+        public GameStage stage;
         public string start_time;
         public string end_time;
         public float[] threshold;
         public float[] accuracy;
         public string remark;
-        public List<Dictionary<HumanBodyBones, Vector3>> skeletons_list;
-        public List<Dictionary<HumanBodyBones, Vector3>> rotations_list;
+        public List<Posture> posture_list;
         #endregion
 
         public RecordData()
         {
             guid = Guid.NewGuid().ToString();
-            id = GameInfo.id;
             date = DateTime.Now.ToString("yyyy-MM-dd");
-            skeletons_list = new List<Dictionary<HumanBodyBones, Vector3>>();
-            rotations_list = new List<Dictionary<HumanBodyBones, Vector3>>();
+            posture_list = new List<Posture>();
         }
 
-        public void setType(DetectSkeleton type)
+        public RecordData(Player player)
         {
-            this.type = string.Format("{0}", type);
+            guid = Guid.NewGuid().ToString();
+            id = player.getId();
+            date = DateTime.Now.ToString("yyyy-MM-dd");
+            posture_list = new List<Posture>();
         }
 
-        public void setStage(string stage)
+        public void setPose(Pose pose)
+        {
+            this.pose = pose;
+        }
+
+        public void setStage(GameStage stage)
         {
             this.stage = stage;
         }
@@ -69,14 +77,15 @@ namespace S3
             this.remark = remark;
         }
 
-        public void addSkeletons(Dictionary<HumanBodyBones, Vector3> skeletons)
+        public void addPosture(Dictionary<HumanBodyBones, Vector3> skeletons, Dictionary<HumanBodyBones, Vector3> rotations)
         {
-            skeletons_list.Add(skeletons);
-        }
+            Posture posture = new Posture()
+            {
+                skeletons = skeletons,
+                rotations = rotations
+            };
 
-        public void addRotations(Dictionary<HumanBodyBones, Vector3> rotations)
-        {
-            rotations_list.Add(rotations);
+            posture_list.Add(posture);
         }
 
         #region 紀錄記錄
@@ -89,7 +98,7 @@ namespace S3
 
             if (dir.Equals(""))
             {
-                dir = Path.Combine(root, string.Format("{0}\\{1}", GameInfo.id, DateTime.Now.ToString("yyyy-MM-dd")));
+                dir = Path.Combine(root, string.Format("{0}\\{1}", id, DateTime.Now.ToString("yyyy-MM-dd")));
             }
 
             if (!Directory.Exists(dir))
@@ -127,12 +136,7 @@ namespace S3
         // 一個遊戲的所有紀錄皆寫完後，加上後綴"_done"，告訴其他程式已經可以上傳
         public static void finishWriting(string path)
         {
-            // ex path: [我的文件] 資料夾 \Somatosensory\Data\(User Id)\(Date)\(場景名稱)-(時間戳).txt
-            FileInfo file_info = new FileInfo(path);
-            // ex file_name: (場景名稱)-(時間戳)
-            string file_name = file_info.Name.Split('.')[0];
-            // ex new_path: [我的文件] 資料夾 \Somatosensory\Data\(User Id)\(Date)\(場景名稱)-(時間戳)_done.txt
-            string new_path = Path.Combine(file_info.DirectoryName, string.Format("{0}_done.txt", file_name));
+            Utils.renameSuffix(path, "done");
         }
         #endregion
 
@@ -146,14 +150,54 @@ namespace S3
             return JsonConvert.DeserializeObject<RecordData>(load_data);
         }
 
-        public List<Dictionary<HumanBodyBones, Vector3>> getSkeletonsList()
+        public List<Posture> getPostureList()
         {
-            return skeletons_list;
+            return posture_list;
         }
 
-        public List<Dictionary<HumanBodyBones, Vector3>> getRotationsList()
+        public Posture getPosture(int index)
         {
-            return rotations_list;
+            if(index < 0 || posture_list.Count <= index)
+            {
+                throw new IndexOutOfRangeException(string.Format("posture_list length is {0}.", posture_list.Count));
+            }
+
+            return posture_list[index];
+        }
+
+        public Dictionary<HumanBodyBones, Vector3> getSkeletons(int index)
+        {
+            if (index < 0 || posture_list.Count <= index)
+            {
+                throw new IndexOutOfRangeException(string.Format("posture_list length is {0}.", posture_list.Count));
+            }
+
+            return posture_list[index].skeletons;
+        }
+
+        public Vector3 getBonePosition(int index, HumanBodyBones bone)
+        {
+            if (index < 0 || posture_list.Count <= index)
+            {
+                throw new IndexOutOfRangeException(string.Format("posture_list length is {0}.", posture_list.Count));
+            }
+
+            if (!posture_list[index].contain(bone))
+            {
+                throw new KeyNotFoundException(string.Format("Without {0} in posture.", bone));
+            }
+
+            return posture_list[index].getBonePosition(bone);
+        }
+
+        public Dictionary<HumanBodyBones, Vector3> getRotations(int index)
+        {
+            if (index < 0 || posture_list.Count <= index)
+            {
+                throw new IndexOutOfRangeException(string.Format("posture_list length is {0}.", posture_list.Count));
+            }
+
+            return posture_list[index].rotations;
         }
         #endregion
     }
