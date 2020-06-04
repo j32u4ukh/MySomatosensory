@@ -22,7 +22,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>Temp\bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;UNITY_2019_1_4;UNITY_2019_1;UNITY_2019;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2019_1_OR_NEWER;PLATFORM_ARCH_64;UNITY_64;UNITY_INCLUDE_TESTS;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_SPRITES;ENABLE_GRID;ENABLE_TILEMAP;ENABLE_TERRAIN;ENABLE_TEXTURE_STREAMING;ENABLE_DIRECTOR;ENABLE_UNET;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_COLLAB_SOFTLOCKS;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_TIMELINE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;ENABLE_MONO_BDWGC;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;INCLUDE_PUBNUB;ENABLE_VIDEO;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_LOCALIZATION;PLATFORM_STANDALONE_WIN;PLATFORM_STANDALONE;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_SUBSTANCE;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_OUT_OF_PROCESS_CRASH_HANDLER;ENABLE_SCRIPTING_GC_WBARRIERS;ENABLE_EVENT_QUEUE;ENABLE_CLUSTER_SYNC;ENABLE_CLUSTERINPUT;ENABLE_VR;ENABLE_AR;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;NET_4_6;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_VSTU;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;UNITY_2019_1_4;UNITY_2019_1;UNITY_2019;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2019_1_OR_NEWER;PLATFORM_ARCH_64;UNITY_64;UNITY_INCLUDE_TESTS;UNITY_ANALYTICS;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_SPRITES;ENABLE_GRID;ENABLE_TILEMAP;ENABLE_TERRAIN;ENABLE_TEXTURE_STREAMING;ENABLE_DIRECTOR;ENABLE_UNET;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_COLLAB_SOFTLOCKS;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_TIMELINE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;ENABLE_MONO_BDWGC;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;INCLUDE_PUBNUB;ENABLE_VIDEO;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_LOCALIZATION;PLATFORM_STANDALONE_WIN;PLATFORM_STANDALONE;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_SUBSTANCE;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_OUT_OF_PROCESS_CRASH_HANDLER;ENABLE_SCRIPTING_GC_WBARRIERS;ENABLE_EVENT_QUEUE;ENABLE_CLUSTER_SYNC;ENABLE_CLUSTERINPUT;ENABLE_VR;ENABLE_AR;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;NET_4_6;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_VSTU;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
@@ -63,20 +63,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\_Script\ConfigData.cs" />
     <Compile Include="Assets\_Script\DetectManager.cs" />
-    <Compile Include="Assets\_Script\DetectSkeleton.cs" />
-    <Compile Include="Assets\_Script\GameInfo.cs" />
-    <Compile Include="Assets\_Script\HumanBodyBonesDemo.cs" />
-    <Compile Include="Assets\_Script\JsonTest.cs" />
+    <Compile Include="Assets\_Script\EnumClass.cs" />
+    <Compile Include="Assets\_Script\EventClass.cs" />
+    <Compile Include="Assets\_Script\Initialization.cs" />
     <Compile Include="Assets\_Script\Kinect\AvatarController.cs" />
     <Compile Include="Assets\_Script\Kinect\KinectGestures.cs" />
     <Compile Include="Assets\_Script\Kinect\KinectManager.cs" />
     <Compile Include="Assets\_Script\Kinect\PoseModelHelper.cs" />
     <Compile Include="Assets\_Script\Kinect\SimpleGestureListener.cs" />
-    <Compile Include="Assets\_Script\Main.cs" />
-    <Compile Include="Assets\_Script\ReadCsvTest.cs" />
+    <Compile Include="Assets\_Script\Movement.cs" />
+    <Compile Include="Assets\_Script\Player.cs" />
+    <Compile Include="Assets\_Script\PlayerData.cs" />
+    <Compile Include="Assets\_Script\PlayerManager.cs" />
     <Compile Include="Assets\_Script\RecordData.cs" />
-    <Compile Include="Assets\_Script\RePlay.cs" />
+    <Compile Include="Assets\_Script\RecordRePlay.cs" />
     <Compile Include="Assets\_Script\S3\DetectManager.cs" />
     <Compile Include="Assets\_Script\S3\EnumClass.cs" />
     <Compile Include="Assets\_Script\S3\EventClass.cs" />
@@ -98,8 +100,20 @@
     <Compile Include="Assets\_Script\S3\Test\Scene1.cs" />
     <Compile Include="Assets\_Script\S3\Test\Scene2.cs" />
     <Compile Include="Assets\_Script\S3\Utils.cs" />
-    <Compile Include="Assets\_Script\StructTest.cs" />
-    <Compile Include="Assets\_Script\Test.cs" />
+    <Compile Include="Assets\_Script\Test\Game1SceneTest.cs" />
+    <Compile Include="Assets\_Script\Test\StartSceneTest.cs" />
+    <Compile Include="Assets\_Script\Utils.cs" />
+    <Compile Include="Assets\_Script\Version1\DetectManager.cs" />
+    <Compile Include="Assets\_Script\Version1\DetectSkeleton.cs" />
+    <Compile Include="Assets\_Script\Version1\GameInfo.cs" />
+    <Compile Include="Assets\_Script\Version1\HumanBodyBonesDemo.cs" />
+    <Compile Include="Assets\_Script\Version1\JsonTest.cs" />
+    <Compile Include="Assets\_Script\Version1\Main.cs" />
+    <Compile Include="Assets\_Script\Version1\ReadCsvTest.cs" />
+    <Compile Include="Assets\_Script\Version1\RecordData.cs" />
+    <Compile Include="Assets\_Script\Version1\RePlay.cs" />
+    <Compile Include="Assets\_Script\Version1\StructTest.cs" />
+    <Compile Include="Assets\_Script\Version1\Test.cs" />
     <Compile Include="Assets\_Script\Version2\DetectManager.cs" />
     <Compile Include="Assets\_Script\Version2\GameConfig.cs" />
     <Compile Include="Assets\_Script\Version2\Movement.cs" />
@@ -236,33 +250,46 @@
     <None Include="Assets\K2Examples\Resources\BlurShader.shader" />
     <None Include="Assets\K2Examples\Resources\AstraCoordMapper.compute" />
     <None Include="Assets\K2Examples\Resources\MedianShader.shader" />
+    <None Include="Assets\StreamingAssets\MovementData\Run\RecordRePlay-17-28-20-4802.txt" />
     <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-11-50-24-4417.txt" />
     <None Include="Assets\K2Examples\Resources\DepthShader.shader" />
     <None Include="Assets\K2Examples\Resources\Body2DepthShader.shader" />
     <None Include="Assets\K2Examples\Resources\SpeechGrammar.grxml.txt" />
     <None Include="Assets\K2Examples\Resources\BlurShader3.shader" />
     <None Include="Assets\K2Examples\KinectDemos\ProjectorDemo\Scripts\RoomAliveToolkit\Attribution.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\StrikeRight\RecordRePlay-17-17-35-5504.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\StrikeLeft\RecordRePlay-17-17-00-3077.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\Squat\RecordRePlay-17-26-29-9576.txt" />
     <None Include="Assets\K2Examples\Resources\Body2ColorShader.shader" />
+    <None Include="Assets\StreamingAssets\MovementData\Jump\RecordRePlay-17-31-56-1435.txt" />
     <None Include="Assets\K2Examples\Resources\Depth2ColorShaderNN.shader" />
     <None Include="Assets\K2Examples\Resources\Color2BodyShaderNN.shader" />
     <None Include="Assets\K2Examples\Resources\Depth2BodyShaderNN.shader" />
     <None Include="Assets\K2Examples\Resources\ForegroundBlendShader.shader" />
     <None Include="Assets\K2Examples\Resources\BlurShader2.shader" />
+    <None Include="Assets\StreamingAssets\MovementData\RaiseLeftHand\RecordRePlay-10-43-27-9361.txt" />
     <None Include="Assets\StreamingAssets\PlayerData\9527.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\RaiseLeftHand\RecordRePlay-10-46-44-1020.txt" />
     <None Include="Assets\K2Examples\Resources\Body2ColorShaderInv.shader" />
     <None Include="Assets\K2Examples\Resources\Body2DepthShaderInv.shader" />
     <None Include="Assets\K2Examples\KinectDemos\RecorderDemo\Resources\PlayerGrammar.grxml.txt" />
     <None Include="Assets\K2Examples\Resources\CoordMapper.compute" />
+    <None Include="Assets\StreamingAssets\MovementData\HopRight\RecordRePlay-17-12-15-2232.txt" />
     <None Include="Assets\K2Examples\Resources\Depth2ColorShader.shader" />
+    <None Include="Assets\StreamingAssets\MovementData\Walk\RecordRePlay-17-27-36-8563.txt" />
     <None Include="Assets\JsonDotNet\link.xml" />
+    <None Include="Assets\StreamingAssets\MovementData\Dribble\RecordRePlay-17-32-37-2155.txt" />
     <None Include="Assets\StreamingAssets\MovementData.txt" />
     <None Include="Assets\K2Examples\Resources\Erode.shader" />
+    <None Include="Assets\StreamingAssets\MovementData\HopLeft\RecordRePlay-17-11-30-0455.txt" />
     <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-52-31-2503.txt" />
     <None Include="Assets\StreamingAssets\PlayerData\你要不要吃哈密瓜.txt" />
     <None Include="Assets\K2Examples\Resources\BodyShader.shader" />
+    <None Include="Assets\StreamingAssets\MovementData\Jump\RecordRePlay-17-30-33-8398.txt" />
     <None Include="Assets\K2Examples\KinectDemos\ProjectorDemo\Resources\calibration-empty.xml" />
     <None Include="Assets\K2Examples\Resources\Dilate.shader" />
     <None Include="Assets\K2Examples\Resources\Body2DepthShaderNN.shader" />
+    <None Include="Assets\StreamingAssets\MovementData\VerticalWave\RecordRePlay-17-21-50-1499.txt" />
     <None Include="Assets\K2Examples\KinectDemos\ProjectorDemo\Resources\calibration.xml" />
     <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands.txt" />
     <None Include="Assets\K2Examples\Resources\BlurShader5.shader" />

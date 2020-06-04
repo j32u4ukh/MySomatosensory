@@ -1,1 +1,0 @@
-{"guid":"33fc0e99-77c6-4e9a-91fc-e86ee3416203","id":"9527","date":"2020-04-09","type":null,"stage":null,"start_time":null,"end_time":null,"threshold":null,"accuracy":null,"remark":null,"skeletons_list":[],"rotations_list":[]}
