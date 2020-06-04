@@ -320,6 +320,9 @@
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>D:/Unity Projects/MySomatosensory/Assets/K2Examples/KinectScripts/SharpZipLib/ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="ConsoleE">
+      <HintPath>D:/Unity Projects/MySomatosensory/Assets/Plugins/ConsoleE/Editor/ConsoleE.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEditor.Advertisements">
       <HintPath>D:/Unity Projects/MySomatosensory/Library/PackageCache/com.unity.ads@2.0.8/Editor/UnityEditor.Advertisements.dll</HintPath>
     </Reference>

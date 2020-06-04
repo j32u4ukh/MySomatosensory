@@ -54,7 +54,6 @@ namespace S3
 
             onMatched = new IntegerEvent();
             onAllMatched = new UnityEvent();
-
             all_matching_state = new bool[players.Length];
             Debug.Log(string.Format("[DetectManager] init all_matching_state, length: {0}", players.Length));
 
@@ -90,7 +89,7 @@ namespace S3
             });
 
             pose_dict = new Dictionary<Pose, List<Pose>>();
-            addPoseDict(Pose.RaiseTwoHands, new List<Pose> { Pose.RaiseTwoHands });
+            registMultiPoses(Pose.RaiseTwoHands, new List<Pose> { Pose.RaiseTwoHands });
         }
 
         // Update is called once per frame
@@ -363,7 +362,7 @@ namespace S3
             resetState();
         }
 
-        public void addPoseDict(Pose pose, List<Pose> pose_list)
+        public void registMultiPoses(Pose pose, List<Pose> pose_list)
         {
             if (pose_dict.ContainsKey(pose))
             {
