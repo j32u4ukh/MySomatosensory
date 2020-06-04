@@ -21,26 +21,19 @@ namespace ETLab
         #endregion
 
         #region Component of player
-        private AvatarController avatar_controller;
-        private PoseModelHelper model_helper;
+        public AvatarController avatar_controller;
+        public PoseModelHelper model_helper;
         #endregion        
 
         private void Awake()
         {
-            /* https://blog.csdn.net/u011185231/article/details/49523293
-             * 問題: 其他腳本調用 Player 物件時產生 NullReferenceException
-             * 解決方法: 把最先實例化的全部放在Awake()方法中去
-             */
-            avatar_controller = GetComponentInChildren<AvatarController>();
-            model_helper = GetComponentInChildren<PoseModelHelper>();
-            //movement_map = new Dictionary<Pose, Movement>();
+
         }
 
         // Start is called before the first frame update
         void Start()
         {
             player_index = avatar_controller.playerIndex;
-            init_pos = null;
             is_recording = false;
             record = new RecordData();            
         }
@@ -204,7 +197,7 @@ namespace ETLab
         #region 計算玩家位移
         public void resetInitPos()
         {
-            init_pos = transform.position;
+            init_pos = model_helper.transform.position;
         }
 
         public Vector3? getInitPos()
@@ -215,7 +208,7 @@ namespace ETLab
         public float getDistanceX()
         {
             // 相對於初始位置的移動(向量)
-            Vector3 vector3 = transform.position - (Vector3)init_pos;
+            Vector3 vector3 = model_helper.transform.position - (Vector3)init_pos;
             float distance = Math.Abs(vector3.x);
             return distance;
         }
@@ -223,7 +216,7 @@ namespace ETLab
         public float getDistanceY()
         {
             // 相對於初始位置的移動(向量)
-            Vector3 vector3 = transform.position - (Vector3)init_pos;
+            Vector3 vector3 = model_helper.transform.position - (Vector3)init_pos;
             float distance = Math.Abs(vector3.y);
             return distance;
         }
@@ -231,7 +224,7 @@ namespace ETLab
         public float getDistanceZ()
         {
             // 相對於初始位置的移動(向量)
-            Vector3 vector3 = transform.position - (Vector3)init_pos;
+            Vector3 vector3 = model_helper.transform.position - (Vector3)init_pos;
             float distance = Math.Abs(vector3.z);
             return distance;
         } 
