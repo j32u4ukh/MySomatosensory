@@ -222,6 +222,7 @@ namespace ETLab
     public class MultiPosture
     {
         Dictionary<Pose, List<List<Posture>>> index_oriented_dict;
+        public PoseEvent onMultiPostureLoaded = new PoseEvent();
 
         public MultiPosture()
         {
@@ -274,6 +275,8 @@ namespace ETLab
             // 依照分解動作的順序，存取比對標準
             Debug.Log(string.Format("[MultiPosture] loadMultiPosture | transform to index oriented"));
             index_oriented_dict.Add(pose, transformIndexOriented(multi_postures));
+
+            onMultiPostureLoaded.Invoke(pose);
         }
 
         // 需要真人預錄才會有數據

@@ -44,6 +44,7 @@ namespace ETLab
         public IntegerEvent onMatched = new IntegerEvent();
         public UnityEvent onAllMatched = new UnityEvent();
         public UnityEvent onMatchEnded = new UnityEvent();
+        public UnityEvent onComparingPartsLoaded = new UnityEvent();
         bool[] all_matching_state;
 
         #region 紀錄骨架位置
@@ -69,13 +70,19 @@ namespace ETLab
             DontDestroyOnLoad(this);
             if (dm_instance == null)
             {
-                dm_instance = this;                
+                dm_instance = this;
 
                 pm = GameObject.Find("PlayerManager").GetComponent<PlayerManager>();
                 n_player = pm.getPlayerNumber();
 
                 // 建構當下不會讀取數據，實際需要使用到前再讀取就好
                 mp = new MultiPosture();
+
+                // 當多比對標準載入完成
+                mp.onMultiPostureLoaded.AddListener((Pose pose_type) => { 
+                
+                });
+
                 all_matching_state = new bool[n_player];
                 resetState();
                 Debug.Log(string.Format("[DetectManager] Start | init all_matching_state, n_player: {0}", n_player));
@@ -132,10 +139,16 @@ namespace ETLab
                     }
                 });
 
+                // 當比對關節載入完成
+                onComparingPartsLoaded.AddListener(()=> { 
+                
+                });
+
                 // 取得關節數量
                 n_bone = pm.getPlayer(0).getBonesNumber();
                 Debug.Log(string.Format("[DetectManager] Start | n_bone: {0}", n_bone));
 
+                // TODO: 實際偵測時才會用到，但應設置個監聽，當載入完成時通知主程式
                 // 載入各個動作要比對的關節
                 loadComparingParts();
 
@@ -330,6 +343,8 @@ namespace ETLab
                     Debug.LogError(string.Format("[DetectManager] loadComparingParts | 數據中不包含動作 {0}", pose));
                 }
             }
+
+            onComparingPartsLoaded.Invoke();
         }
 
         // 事前該動作或標籤動作要有註冊
@@ -350,12 +365,14 @@ namespace ETLab
             {
                 Debug.Log(string.Format("[DetectManager] loadMultiPosture | loading {0}", pose));
 
-                // 多動作比對標準
+                // 載入多動作比對標準
+                // TODO: 實際偵測時才會用到，但應設置個監聽，當載入完成時通知主程式
                 mp.loadMultiPosture(pose);
 
-                // 玩家各自 Movement 的初始化
+                // 玩家各自初始化
                 foreach (Player player in pm.getPlayers())
                 {
+                    // 初始化各個 pose 的 Movement
                     player.setMovement(pose);
                 }
             }
