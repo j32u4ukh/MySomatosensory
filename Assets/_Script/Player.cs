@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace ETLab
 {
-    // TODO: 每個玩家有兩個模型，一個用來呈現(external root motion)，一個用來偵測(apply root motion)
+    // 每個玩家有兩個模型，一個用來呈現(external root motion)，一個用來偵測(apply root motion)
     public class Player : MonoBehaviour
     {
         #region Information of player
@@ -27,15 +27,15 @@ namespace ETLab
 
         private void Awake()
         {
-
+            player_index = avatar_controller.playerIndex;
+            is_recording = false;
+            record = new RecordData();
         }
 
         // Start is called before the first frame update
         void Start()
         {
-            player_index = avatar_controller.playerIndex;
-            is_recording = false;
-            record = new RecordData();            
+                     
         }
 
         #region Player
@@ -43,8 +43,6 @@ namespace ETLab
         {
             this.id = id;
             record.setId(id);
-            // PlayerData 在每次關閉 DetectManager 之後都會更新數值，因此，即便沒有要使用到這些數值，
-            // 似乎也不得不將 PlayerData 載入，讓門檻值等數值是原本的，而不會被清空
             player_data = new PlayerData(id);
 
             movement_dict = new Dictionary<Pose, Movement>();
@@ -165,7 +163,6 @@ namespace ETLab
         }
         #endregion
 
-        // TODO: RecordData 和 PlayerData 會記錄到一部分共同的數據，分別要記錄那些？
         #region PlayerData
         public void setGameStage(GameStage game_stage)
         {

@@ -10,14 +10,21 @@ namespace ETLab
     public class PlayerManager : MonoBehaviour
     {
         public Player[] players;
+        private int n_player;
+        Player[] read_players;
 
         // Start is called before the first frame update
         void Start()
         {
             DontDestroyOnLoad(this);
 
-            // TODO: 根據實際人數，調整出現的模型數量 
-            
+            // 根據實際人數，調整出現的模型數量 
+            n_player = players.Length;
+            read_players = new Player[n_player];
+            for(int i = 0; i < n_player; i++)
+            {
+                read_players[i] = players[i];
+            }
         }
 
         // Update is called once per frame
@@ -26,22 +33,37 @@ namespace ETLab
 
         }
 
+        // 根據實際人數，調整出現的模型數量 
+        public void init(int n_player)
+        {
+            this.n_player = n_player;
+            read_players = new Player[n_player];
+            for (int i = 0; i < n_player; i++)
+            {
+                read_players[i] = players[i];
+            }
+        }
+
         public int getPlayerNumber()
         {
-            // TODO: 根據實際人數，調整出現的模型數量 
-            return players.Length;
+            return n_player;
         }
 
         public Player[] getPlayers()
         {
-            // TODO: 根據實際人數，調整出現的模型數量 
-            return players;
+            return read_players;
         }
 
         public Player getPlayer(int index)
         {
-            // TODO: 根據實際人數，調整出現的模型數量 
-            return players[index];
+            if(index < n_player)
+            {
+                return players[index];
+            }
+
+            Debug.LogError(string.Format("[PlayerManager] getPlayer | n_player: {0} <= index: {1} ", n_player, index));
+
+            return null;
         }
     }
 }

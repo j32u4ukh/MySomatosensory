@@ -9,15 +9,10 @@ using UnityEngine.SceneManagement;
 
 namespace ETLab
 {
-    public enum Flag { 
-        None,
-        Modify
-    }
-
     // 提供外部腳本事後定義偵測函式
     public delegate void DetectDelegate(Player player);
 
-    // 
+    // 定義修改 Flag 的函式架構
     public delegate Flag FlagDelegate(float flag);
 
     public class DetectManager : MonoBehaviour
@@ -25,8 +20,10 @@ namespace ETLab
         protected static DetectManager dm_instance;
 
         [HideInInspector] public DetectDelegate detectManager = null;
+
+        // 修改 Flag 的函式指針(指向實際的函式內容)
         [HideInInspector] public FlagDelegate modifyThresholdFlag = null;
-        Flag flag = Flag.None;
+        Flag flag = Flag.Matching;
 
         // 透過 PlayerManager 存取 Player
         PlayerManager pm;
@@ -46,6 +43,7 @@ namespace ETLab
 
         public IntegerEvent onMatched = new IntegerEvent();
         public UnityEvent onAllMatched = new UnityEvent();
+        public UnityEvent onMatchEnded = new UnityEvent();
         bool[] all_matching_state;
 
         #region 紀錄骨架位置
@@ -60,7 +58,7 @@ namespace ETLab
         string file_id;
         #endregion 
 
-        // Start is called before the first frame update
+        // TODO: 動作門檻值會隨著玩家表現而調整，在此情況下若未通過，則直接紀錄未通過這件事，而不去推測是做哪個動作但未成功
         void Start()
         {
             // 應該在同一個場景時，該文件共用同一個 file_id，才能將紀錄寫到同一個檔案中
@@ -82,6 +80,7 @@ namespace ETLab
                 resetState();
                 Debug.Log(string.Format("[DetectManager] Start | init all_matching_state, n_player: {0}", n_player));
 
+                bool all_matched = false;
                 onMatched.AddListener((int index) => {
                     try
                     {
@@ -95,7 +94,7 @@ namespace ETLab
 
                     Debug.Log(string.Format("[DetectManager] onMatched Listener player {0} matched.", index));
 
-                    bool all_matched = true;
+                    all_matched = true;
                     foreach (bool state in all_matching_state)
                     {
                         all_matched &= state;
@@ -107,8 +106,30 @@ namespace ETLab
                     }
                 });
 
+                // 全部通過
                 onAllMatched.AddListener(() => {
                     Debug.Log(string.Format("[DetectManager] onAllMatched Listener"));
+
+                    // 全部通過時，同時也會觸發"結束配對"的事件
+                    onMatchEnded.Invoke();
+                });
+
+                // 結束配對
+                onMatchEnded.AddListener(()=> {
+                    // 移除偵測函式
+                    releaseDetectDelegate();
+
+                    // 因全部通過而結束配對的情形
+                    if (all_matched)
+                    {
+
+                    }
+
+                    // 因超時而結束配對的情形
+                    else
+                    {
+
+                    }
                 });
 
                 // 取得關節數量
@@ -177,7 +198,11 @@ namespace ETLab
         {
             foreach (Player player in pm.getPlayers())
             {
-                player.save();
+                // 考慮玩家實際人數，避免結束執行時的數據自動儲存所發生的錯誤
+                if (player.getId() != null)
+                {
+                    player.save();
+                }
             }
         }
 
@@ -210,7 +235,7 @@ namespace ETLab
                 else
                 {
                     Debug.Log(string.Format("[DetectManager] registMultiPoses | update multi pose: {0}", pose));
-                    pose_dict[pose] = new List<Pose>(pose_list);
+                    pose_dict[pose] = pose_list;
                 }
             }
             else
@@ -263,6 +288,11 @@ namespace ETLab
         public void updateFlag(float f)
         {
             flag = modifyThresholdFlag(f);
+        }
+
+        public void setFlag(Flag flag)
+        {
+            this.flag = flag;
         }
 
         public void releaseFlagDelegate()
@@ -462,41 +492,45 @@ namespace ETLab
                 //    player.getId(), acc));
 
                 // 記錄各個分解動作的最高值
+                // 目前可返回最高值，是否利用這個最高值來對門檻值進行比較呢？>> 應該不行，不然通過的時間點會很奇怪
                 movement.setHighestAccuracy(posture_idx, acc);
 
                 // 取得當前動作門檻值，將用於比較是否當前正確率超過門檻
                 thres = movement.getThreshold(posture_idx);
 
                 #region 正確率 與 門檻值 之 比較 與 處理
-                // 正確率 大於等於 門檻值
-                if (acc >= thres)
+                if(flag != Flag.None)
                 {
-                    // 紀錄"通過資訊"，以利後面判斷動作是否通過
-                    movement.setMatched(posture_idx, true);
-                }
-
-                // 正確率 小於 門檻值
-                else
-                {
-                    switch (flag)
+                    // Matching / Modify 都會執行配對的判斷
+                    // 正確率 大於等於 門檻值
+                    if (acc >= thres)
                     {
-                        case Flag.Modify:
-                            // 尚未通過的分解動作，才會更新門檻值
-                            if (!movement.isMatched(posture_idx))
-                            {
-                                // TODO: 限定於單一動作時才調整，且應外加更新條件，以減緩門檻值滑落速度
-                                // 動態調整門檻值 movement.setThreshold(posture_idx)
-                                movement.setThreshold(posture_idx, acc);
-
-                                //if (player.getId().Equals("9527"))
-                                //{
-                                //    Debug.Log(string.Format("[DetectManager] compareMovement | Dynamic thresholds: {0}",
-                                //    Utils.arrayToString(movement.getThresholds())));
-                                //}
-                            }
-                            break;
+                        // 紀錄"通過資訊"，以利後面判斷動作是否通過
+                        movement.setMatched(posture_idx, true);
                     }
-                } 
+
+                    // 正確率 小於 門檻值
+                    else
+                    {
+                        switch (flag)
+                        {
+                            case Flag.Modify:
+                                // 尚未通過的分解動作，才會更新門檻值
+                                if (!movement.isMatched(posture_idx))
+                                {
+                                    // 動態調整門檻值 movement.setThreshold(posture_idx)
+                                    movement.setThreshold(posture_idx, acc);
+
+                                    //if (player.getId().Equals("9527"))
+                                    //{
+                                    //    Debug.Log(string.Format("[DetectManager] compareMovement | Dynamic thresholds: {0}",
+                                    //    Utils.arrayToString(movement.getThresholds())));
+                                    //}
+                                }
+                                break;
+                        }
+                    }
+                }
                 #endregion
             }
 

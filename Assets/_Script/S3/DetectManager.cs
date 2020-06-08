@@ -17,7 +17,7 @@ namespace S3
 
         public Pose pose = Pose.None;
 
-        // TODO: 和其他腳本共用 PlayerManger 當中的 Player，才不用重複讀取資源
+        // 和其他腳本共用 PlayerManger 當中的 Player，才不用重複讀取資源
         public Player[] players;
 
         // 
@@ -31,16 +31,16 @@ namespace S3
         // For gui
         string gui;
 
-        // TODO: global variable to local variable
+        // global variable to local variable
         float acc, thres;
 
-        // TODO: 動作門檻值會隨著玩家表現而調整，在此情況下若未通過，則直接紀錄未通過這件事，而不去推測是做哪個動作但未成功
+        
         // Start is called before the first frame update
         void Start()
         {
-            // TODO: DontDestroyOnLoad(this); 令 DetectManager 在場景轉換時不會被移除
+            // DontDestroyOnLoad(this); 令 DetectManager 在場景轉換時不會被移除
 
-            // TODO: 外部腳本透過呼叫 setPlayer 來告訴 DetectManager 有哪些玩家
+            // 外部腳本透過呼叫 setPlayer 來告訴 DetectManager 有哪些玩家
             #region 之後會移出的部分
             players[0].setId("9527");
             players[0].loadData();
@@ -95,7 +95,7 @@ namespace S3
         // Update is called once per frame
         void Update()
         {
-            /*TODO: 由外部腳本定義要偵測哪些動作，額外條件亦可在外部腳本計算
+            /*由外部腳本定義要偵測哪些動作，額外條件亦可在外部腳本計算
              * delegate void detectManager()
              * 
              * 外部腳本 >>
@@ -149,7 +149,7 @@ namespace S3
         
         public void initDetectManager()
         {
-            // TODO: 讀取各個動作的比對關節
+            // 讀取各個動作的比對關節
             comparing_parts_dict = new Dictionary<Pose, List<HumanBodyBones>>();
         }
 
@@ -167,7 +167,7 @@ namespace S3
         // 取得單一姿勢正確率
         float getAccuracy(Player player, Posture posture)
         {
-            // TODO: 從 comparing_parts_dict 讀取比較關節，不需由 player 來提供
+            // 從 comparing_parts_dict 讀取比較關節，不需由 player 來提供
             List<HumanBodyBones> comparing_parts = player.getComparingParts(pose);
             HumanBodyBones bone;
             Vector3 player_vector, standrad_vector, s1, s2, p1, p2;
@@ -306,7 +306,7 @@ namespace S3
                 // 正確率 小於 門檻值
                 else
                 {
-                    // TODO: 限定於單一動作時才調整
+                    // 限定於單一動作時才調整
                     // 動態調整門檻值 movement.setThreshold(posture_idx)
                     movement.setThreshold(posture_idx, acc);
                     //Debug.Log(string.Format("[DetectManager] compareMovement | Dynamic thresholds: {0}", 
