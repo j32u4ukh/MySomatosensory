@@ -6,12 +6,17 @@ namespace ETLab
 {
     public class Initialization : MonoBehaviour
     {
-        public Player player;
+        public PlayerManager pm;
+        Player player;
+        public string id;
+
 
         // Start is called before the first frame update
         void Start()
         {
-
+            pm.init(n_player: 1);
+            initPlayerData(id);
+            //initMovementDatas();
         }
 
         // Update is called once per frame

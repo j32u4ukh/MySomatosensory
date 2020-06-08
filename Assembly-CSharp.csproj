@@ -102,6 +102,7 @@
     <Compile Include="Assets\_Script\S3\Utils.cs" />
     <Compile Include="Assets\_Script\Test\Game1SceneTest.cs" />
     <Compile Include="Assets\_Script\Test\StartSceneTest.cs" />
+    <Compile Include="Assets\_Script\Test\TwoModelTest.cs" />
     <Compile Include="Assets\_Script\Utils.cs" />
     <Compile Include="Assets\_Script\Version1\DetectManager.cs" />
     <Compile Include="Assets\_Script\Version1\DetectSkeleton.cs" />

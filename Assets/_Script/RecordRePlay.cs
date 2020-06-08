@@ -48,6 +48,7 @@ namespace ETLab
         void Start()
         {
             root = Path.Combine(Application.streamingAssetsPath, "MovementData");
+            pm.init(n_player: 1);
             player = pm.getPlayer(0);
             player.setId(player_id);
             has_initialization = false;

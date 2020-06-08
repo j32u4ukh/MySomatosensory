@@ -136,7 +136,7 @@ namespace S3
             }
         }
 
-        // TODO: 開始時間大家都相同，但結束時間不一定相同
+        
         public void setEndTime()
         {
             foreach (var record in records)
@@ -175,7 +175,6 @@ namespace S3
             foreach (Player player in players) {
                 records[player.index()].setEndTime();
 
-                // TODO: DetectManager 直接根據
                 // 判斷是單一動作還是多個動作
                 switch (pose)
                 {

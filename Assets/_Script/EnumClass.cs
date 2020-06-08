@@ -4,6 +4,13 @@ using UnityEngine;
 
 namespace ETLab
 {
+    public enum Flag
+    {
+        None,       // 配對(X), 修改門檻值(X)
+        Matching,   // 配對(O), 修改門檻值(X)
+        Modify      // 配對(O), 修改門檻值(O)
+    }
+
     // 包含實際動作 與 多動作的分類標籤(EX: Strike 包含 StrikeLeft 和 StrikeRight，但 Strike 本身不是實際動作)
     public enum Pose
     {

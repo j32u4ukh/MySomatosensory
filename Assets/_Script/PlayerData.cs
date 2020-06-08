@@ -134,7 +134,6 @@ namespace ETLab
 
         public void save()
         {
-            // TODO: 或許每個關卡各自會告訴玩家目前的 GameStage?
             string scene = SceneManager.GetActiveScene().name;
 
             switch (scene)

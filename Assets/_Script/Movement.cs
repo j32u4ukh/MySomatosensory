@@ -135,7 +135,7 @@ namespace ETLab
         }
 
         // 紀錄正確率的最高值
-        public void setHighestAccuracy(int index, float value)
+        public float setHighestAccuracy(int index, float value)
         {
             try
             {
@@ -149,6 +149,8 @@ namespace ETLab
             {
                 Debug.LogError(string.Format("[Mo]"));
             }
+
+            return accuracys[index];
         }
 
         public float[] getAccuracy()

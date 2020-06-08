@@ -15,20 +15,31 @@ namespace ETLab
         // Start is called before the first frame update
         void Start()
         {
-            // TODO: PlayerManager 調整玩家人數，不須動態調整，但希望操作上彈性一點
             pm.getPlayer(0).setId("9527");
             pm.getPlayer(1).setId("你要不要吃哈密瓜");
             dm.setFlagDelegate(modifingFlag);
+            dm.registMultiPoses(Pose.VerticalWave);
+            dm.registMultiPoses(Pose.Squat);
+            dm.registMultiPoses(Pose.Walk);
+            dm.registMultiPoses(Pose.Run);
+            dm.registMultiPoses(Pose.Hop, new List<Pose> { Pose.HopLeft, Pose.HopRight });
+            dm.registMultiPoses(Pose.Jump);
+            dm.registMultiPoses(Pose.Strike, new List<Pose> { Pose.StrikeLeft, Pose.StrikeRight });
+            dm.registMultiPoses(Pose.Dribble);
+            dm.registMultiPoses(Pose.RaiseHand, new List<Pose> { Pose.RaiseLeftHand, Pose.RaiseRightHand });
 
             dm.onMatched.AddListener((int index) => {
                 Debug.Log(string.Format("[StartSceneTest] onMatched Listener: player {0} matched.", index));
             });
-
-            // 實務上，需要還原偵測狀態的情況，除了所有人都配對成功，也有可能是因為時間超時
-            // TODO: 處理因超時而結束偵測的情況
+       
             dm.onAllMatched.AddListener(()=> {
                 Debug.Log(string.Format("[StartSceneTest] onAllMatched Listener"));
-                dm.releaseDetectDelegate();
+                //dm.releaseDetectDelegate();                
+            });
+
+            // 處理因超時而結束偵測的情況
+            dm.onMatchEnded.AddListener(()=> {
+                Debug.Log(string.Format("[StartSceneTest] onMatchEnded Listener"));
                 accumulate_time = 0f;
             });
         }
@@ -74,6 +85,11 @@ namespace ETLab
                 return Flag.Modify;
             }
 
+            if (f > 1f)
+            {
+                return Flag.Matching;
+            }
+
             return Flag.None;
         }
 
@@ -83,6 +99,8 @@ namespace ETLab
         {
             List<Pose> poses = dm.getPoses(pose);
             accumulate_time += Time.deltaTime;
+
+            // 透過 updateFlag 將 accumulate_time 傳給 modifingFlag
             dm.updateFlag(accumulate_time);
 
             foreach (Pose pose in poses)

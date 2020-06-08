@@ -115,7 +115,7 @@ namespace S3
         // 設置指定的門檻值
         public void setThreshold(int index, float val)
         {
-            // TODO: 利用能力估計函數，調整門檻值
+            // 利用能力估計函數，調整門檻值
             try
             {
                 // 取得正確率和門檻值的平均
@@ -197,7 +197,7 @@ namespace S3
             return pose;
         }
 
-        // TODO: 其實不會因人而異的部分直接由 DetectManager 讀取應該就好了
+        // 其實不會因人而異的部分直接由 DetectManager 讀取應該就好了
         public void setComparingParts(List<HumanBodyBones> comparing_parts)
         {
             this.comparing_parts = comparing_parts;
