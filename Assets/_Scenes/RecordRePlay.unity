@@ -423,7 +423,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1237844746}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 2.05, y: 1, z: 2.2}
+  m_LocalPosition: {x: 1.17, y: 1.2, z: 4.65}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -614,5 +614,5 @@ MonoBehaviour:
   dm: {fileID: 1932749595}
   player_id: "\u4F60\u8981\u4E0D\u8981\u5403\u54C8\u5BC6\u74DC"
   mode: 1
-  pose: 24
-  replay_index: 0
+  pose: 5
+  replay_index: 2

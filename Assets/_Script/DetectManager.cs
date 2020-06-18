@@ -15,6 +15,10 @@ namespace ETLab
     // 定義修改 Flag 的函式架構
     public delegate Flag FlagDelegate(float flag);
 
+    public delegate void IntegerEventDelegate(int val);
+    public delegate void VoidEventDelegate();
+
+
     public class DetectManager : MonoBehaviour
     {
         protected static DetectManager dm_instance;
@@ -41,9 +45,15 @@ namespace ETLab
         // 註冊多動作比較
         Dictionary<Pose, List<Pose>> pose_dict;
 
-        public IntegerEvent onMatched = new IntegerEvent();
+        IntegerEvent onMatched = new IntegerEvent();
+        List<IntegerEventDelegate> onMatchedFinished;
+
         public UnityEvent onAllMatched = new UnityEvent();
-        public UnityEvent onMatchEnded = new UnityEvent();
+        List<VoidEventDelegate>  onAllMatchedFinished;
+
+        UnityEvent onMatchEnded = new UnityEvent();
+        List<VoidEventDelegate> onMatchEndedFinished;
+
         public UnityEvent onComparingPartsLoaded = new UnityEvent();
         bool[] all_matching_state;
 
@@ -59,14 +69,25 @@ namespace ETLab
         string file_id;
         #endregion 
 
-        // TODO: 動作門檻值會隨著玩家表現而調整，在此情況下若未通過，則直接紀錄未通過這件事，而不去推測是做哪個動作但未成功
-        void Start()
+        private void Awake()
         {
             // 應該在同一個場景時，該文件共用同一個 file_id，才能將紀錄寫到同一個檔案中
             file_id = DateTime.Now.ToString("HH-mm-ss-ffff");
-            Debug.Log(string.Format("[DetectManager] Scene: {0}, file_id: {1}", 
+            Debug.Log(string.Format("[DetectManager] Scene: {0}, file_id: {1}",
                 SceneManager.GetActiveScene().name, file_id));
 
+            resetListener();
+
+            // TODO: 實際偵測時才會用到，但應設置個監聽，當載入完成時通知主程式
+            // 載入各個動作要比對的關節
+            loadComparingParts();
+
+            pose_dict = new Dictionary<Pose, List<Pose>>();
+            registMultiPoses(Pose.RaiseTwoHands);
+        }
+
+        void Start()
+        {
             DontDestroyOnLoad(this);
             if (dm_instance == null)
             {
@@ -87,8 +108,12 @@ namespace ETLab
                 resetState();
                 Debug.Log(string.Format("[DetectManager] Start | init all_matching_state, n_player: {0}", n_player));
 
+                
+
                 bool all_matched = false;
                 onMatched.AddListener((int index) => {
+                    Debug.Log(string.Format("[DetectManager] onMatched Listener player {0} matched.", index));
+
                     try
                     {
                         all_matching_state[index] = true;
@@ -99,7 +124,11 @@ namespace ETLab
                             index, all_matching_state.Length));
                     }
 
-                    Debug.Log(string.Format("[DetectManager] onMatched Listener player {0} matched.", index));
+                    // 若 onMatchedFinished 不為 null 則執行此函式
+                    foreach(IntegerEventDelegate e in onMatchedFinished)
+                    {
+                        e.Invoke(index);
+                    }
 
                     all_matched = true;
                     foreach (bool state in all_matching_state)
@@ -117,12 +146,24 @@ namespace ETLab
                 onAllMatched.AddListener(() => {
                     Debug.Log(string.Format("[DetectManager] onAllMatched Listener"));
 
+                    foreach (VoidEventDelegate e in onAllMatchedFinished)
+                    {
+                        e.Invoke();
+                    }
+
                     // 全部通過時，同時也會觸發"結束配對"的事件
                     onMatchEnded.Invoke();
                 });
 
                 // 結束配對
                 onMatchEnded.AddListener(()=> {
+                    Debug.Log(string.Format("[DetectManager] onMatchEnded Listener"));
+
+                    foreach(VoidEventDelegate e in onMatchEndedFinished)
+                    {
+                        e.Invoke();
+                    }
+
                     // 移除偵測函式
                     releaseDetectDelegate();
 
@@ -135,7 +176,11 @@ namespace ETLab
                     // 因超時而結束配對的情形
                     else
                     {
+                        // TODO: 動作門檻值會隨著玩家表現而調整，在此情況下若未通過，則直接紀錄未通過這件事，而不去推測是做哪個動作但未成功
+                        foreach(Player player in pm.getPlayers())
+                        {
 
+                        }
                     }
                 });
 
@@ -147,13 +192,6 @@ namespace ETLab
                 // 取得關節數量
                 n_bone = pm.getPlayer(0).getBonesNumber();
                 Debug.Log(string.Format("[DetectManager] Start | n_bone: {0}", n_bone));
-
-                // TODO: 實際偵測時才會用到，但應設置個監聽，當載入完成時通知主程式
-                // 載入各個動作要比對的關節
-                loadComparingParts();
-
-                pose_dict = new Dictionary<Pose, List<Pose>>();
-                registMultiPoses(Pose.RaiseTwoHands);
             }
         }
 
@@ -164,8 +202,15 @@ namespace ETLab
             {
                 foreach (Player player in pm.getPlayers())
                 {
-                    // 提供外部腳本 player 物件來進行動作比對
-                    detectManager(player);
+                    // 處理移除偵測函式的瞬間，迴圈可能還在執行的問題
+                    try
+                    {                        
+                        // 提供外部腳本 player 物件來進行動作比對
+                        detectManager(player);
+                    }catch(NullReferenceException nre)
+                    {
+                        Debug.Log(string.Format("[DetectManager] FixedUpdate | detectManager is null, {0}", nre.Message));
+                    }
                 }
             }
 
@@ -223,11 +268,30 @@ namespace ETLab
             {
                 all_matching_state[i] = false;
             }
+
+            foreach(Player player in pm.getPlayers())
+            {
+                player.resetMatchedPose();
+            }
         }
 
         public void resetState(Pose key)
         {
+            // 取得標籤動作下的所有動作
+            List<Pose> poses = getPoses(key);
 
+            if(poses != null)
+            {
+                // 遍歷每位玩家
+                foreach (Player player in pm.getPlayers())
+                {
+                    // 還原每項動作的暫存資訊
+                    foreach (Pose pose in poses)
+                    {
+                        player.resetMovement(pose);
+                    }
+                }
+            }
 
             resetState();
         }
@@ -440,6 +504,12 @@ namespace ETLab
                 return;
             }
 
+            // 若已經通過則直接 return (等待其他玩家通過的情形)
+            if (player.getMatchedPose() != Pose.None)
+            {
+                return;
+            }
+
             // player 透過 target_pose 取得 movement，透過 movement 協助
             Movement movement = player.getMovement(target_pose);
 
@@ -447,13 +517,6 @@ namespace ETLab
             if (movement == null)
             {
                 Debug.Log(string.Format("[DetectManager] compareMovement | No {0} in movement_map", target_pose));
-                return;
-            }
-
-            // 若已經通過則直接 return (等待其他玩家通過的情形)
-            if (movement.has_matched)
-            {
-                //Debug.Log(string.Format("[DetectManager] compareMovement | player {0} has_matched.", player.getId()));
                 return;
             }
 
@@ -502,8 +565,12 @@ namespace ETLab
 
                 // 計算與多標準比對後的正確率
                 acc = acc_list.geometricMean();
-                //Debug.Log(string.Format("[DetectManager] getAccuracy | {0}, acc: {1:F8}", 
-                //    player.getId(), acc));
+
+                //if (player.getId() == "9527")
+                //{
+                //    Debug.Log(string.Format("[DetectManager] getAccuracy | {0}, acc: {1:F8}, pose: {2}",
+                //        player.getId(), acc, target_pose));
+                //}
 
                 // 記錄各個分解動作的最高值
                 // 目前可返回最高值，是否利用這個最高值來對門檻值進行比較呢？>> 應該不行，不然通過的時間點會很奇怪
@@ -521,6 +588,7 @@ namespace ETLab
                     {
                         // 紀錄"通過資訊"，以利後面判斷動作是否通過
                         movement.setMatched(posture_idx, true);
+                        //Debug.Log(string.Format("[DetectManager] Matched: palyer: {0}, acc: {1:F8}", player.getId(), acc));
                     }
 
                     // 正確率 小於 門檻值
@@ -558,7 +626,7 @@ namespace ETLab
             if (movement.isMatched())
             {
                 // 紀錄已經完成的資訊，避免重複判斷
-                movement.has_matched = true;
+                player.setMatchedPose(target_pose);
 
                 // 以前一次通過時的正確率，作為下一次的門檻初始值
                 movement.setThresholds(movement.getAccuracy());
@@ -566,14 +634,14 @@ namespace ETLab
                 // 更新門檻值
                 player.setThresholds(target_pose, movement.getAccuracy());
 
-                // 透過陣列紀錄每個玩家是否通過，個別玩家通過時觸發事件，將此這列紀錄更新，同時檢查是否全部都完成
-                onMatched.Invoke(player.index());
-
                 Debug.Log(string.Format("[DetectManager] compareMovement | ID: {0}", player.getId()));
                 Debug.Log(string.Format("[DetectManager] compareMovement | Final accuracy: {0}",
                     Utils.arrayToString(movement.getAccuracy())));
                 Debug.Log(string.Format("[DetectManager] compareMovement | Final threshold: {0}",
                     Utils.arrayToString(movement.getThresholds())));
+
+                // 透過陣列紀錄每個玩家是否通過，個別玩家通過時觸發事件，將此這列紀錄更新，同時檢查是否全部都完成
+                onMatched.Invoke(player.index());
             }
         }
 
@@ -668,6 +736,28 @@ namespace ETLab
             {
                 player.resetInitPos();
             }
+        }
+
+        public void resetListener()
+        {
+            onMatchedFinished = new List<IntegerEventDelegate>();
+            onAllMatchedFinished = new List<VoidEventDelegate>();
+            onMatchEndedFinished = new List<VoidEventDelegate>();
+        }
+
+        public void addOnMatchedListener(IntegerEventDelegate event_delegate)
+        {
+            onMatchedFinished.Add(event_delegate);
+        }
+
+        public void addOnAllMatchedFinishedListener(VoidEventDelegate event_delegate)
+        {
+            onAllMatchedFinished.Add(event_delegate);
+        }
+
+        public void addOnMatchEndedFinishedListener(VoidEventDelegate event_delegate)
+        {
+            onMatchEndedFinished.Add(event_delegate);
         }
         #endregion
 

@@ -42,8 +42,6 @@ namespace ETLab
         // 姿勢匹配是否通過
         private bool[] is_matched;
 
-        public bool has_matched;
-
         // 額外條件是否通過
         private bool is_additional_matched;
 
@@ -211,8 +209,6 @@ namespace ETLab
         {
             // 是否通過
             is_matched = new bool[ConfigData.n_posture];
-
-            has_matched = false;
 
             // 初始化正確率
             accuracys = new float[ConfigData.n_posture];

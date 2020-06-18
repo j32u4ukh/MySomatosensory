@@ -23,9 +23,9 @@ namespace ETLab
                     player.index(), player.getId()));
             }
 
-            dm.onMatched.AddListener((int index) => {
-                Debug.Log(string.Format("[Game1SceneTest] onMatched Listener: player {0} matched.", index));
-            });
+            //dm.onMatched.AddListener((int index) => {
+            //    Debug.Log(string.Format("[Game1SceneTest] onMatched Listener: player {0} matched.", index));
+            //});
         }
 
         // Update is called once per frame

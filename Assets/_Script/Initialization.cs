@@ -15,6 +15,8 @@ namespace ETLab
         void Start()
         {
             pm.init(n_player: 1);
+            player = pm.getPlayer(0);
+
             initPlayerData(id);
             //initMovementDatas();
         }
@@ -29,6 +31,14 @@ namespace ETLab
         {
             player.setId(id);
             player.setGameStage(GameStage.Test);
+
+            float[] thresholds;
+            foreach(Pose pose in Utils.poses)
+            {
+                thresholds = player.getThresholds(pose);
+                Debug.Log(string.Format("[Initialization] initPlayerData | Pose: {0}, thresholds: {1}", 
+                    pose.ToString(), Utils.arrayToString(thresholds)));
+            }
             player.save();
         }
 

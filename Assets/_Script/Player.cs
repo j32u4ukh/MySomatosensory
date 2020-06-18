@@ -18,6 +18,7 @@ namespace ETLab
         private Dictionary<Pose, Movement> movement_dict;
         public RecordData record;
         bool is_recording;
+        private Pose matched_pose = Pose.None;
         #endregion
 
         #region Component of player
@@ -150,6 +151,7 @@ namespace ETLab
             return null;
         }
 
+        // 配對成功後，呼叫此函式，將配對過程中的暫存資訊還原
         public void resetMovement(Pose pose)
         {
             if (movement_dict.ContainsKey(pose))
@@ -161,6 +163,24 @@ namespace ETLab
                 Debug.LogWarning(string.Format("[Player] resetMovement | No {0} in movement_dict.", pose));
             }
         }
+
+        #region 存取配對完成的動作
+        // 紀錄配對完成的動作
+        public void setMatchedPose(Pose pose)
+        {
+            matched_pose = pose;
+        }
+
+        public Pose getMatchedPose()
+        {
+            return matched_pose;
+        }
+
+        public void resetMatchedPose()
+        {
+            matched_pose = Pose.None;
+        } 
+        #endregion
         #endregion
 
         #region PlayerData

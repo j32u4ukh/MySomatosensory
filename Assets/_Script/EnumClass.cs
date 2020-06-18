@@ -47,6 +47,7 @@ namespace ETLab
         Walk,               // 走路
         Reverse,            // 扭轉
         Throw,              // 投擲
+        JaNKeNPoN,          // 猜拳
     }
 
     public enum GameStage
