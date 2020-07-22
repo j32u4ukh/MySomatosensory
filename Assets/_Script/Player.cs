@@ -156,6 +156,7 @@ namespace ETLab
         {
             if (movement_dict.ContainsKey(pose))
             {
+                // 玩家該動作是否通過及正確率等資訊的重置
                 movement_dict[pose].resetState();
             }
             else
@@ -171,6 +172,10 @@ namespace ETLab
             matched_pose = pose;
         }
 
+        /// <summary>
+        /// 提供偵測腳本判斷是否已經偵測完成，以及事後根據配對到的動作給予回饋的函式，因為現在大多改成事件監聽，無法配對成功後馬上將結果回傳，需要有變數將結果存起來
+        /// </summary>
+        /// <returns>已配對到的動作</returns>
         public Pose getMatchedPose()
         {
             return matched_pose;
@@ -204,6 +209,9 @@ namespace ETLab
             return player_data.getThresholds(pose);
         }
 
+        /// <summary>
+        /// 儲存玩家數據(PlayerData)
+        /// </summary>
         public void save()
         {
             Debug.Log(string.Format("[Player] save"));

@@ -223,6 +223,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerManager
       objectReference: {fileID: 0}
+    - target: {fileID: 6675664015664952278, guid: eb6f4448679c93449b7733e29c8c257d,
+        type: 3}
+      propertyPath: players.Array.data[0]
+      value: 
+      objectReference: {fileID: 620061709}
+    - target: {fileID: 6675664015664952278, guid: eb6f4448679c93449b7733e29c8c257d,
+        type: 3}
+      propertyPath: players.Array.data[1]
+      value: 
+      objectReference: {fileID: 620061708}
     - target: {fileID: 6675664015664952279, guid: eb6f4448679c93449b7733e29c8c257d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -278,16 +288,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6675664015664952278, guid: eb6f4448679c93449b7733e29c8c257d,
-        type: 3}
-      propertyPath: players.Array.data[0]
-      value: 
-      objectReference: {fileID: 620061709}
-    - target: {fileID: 6675664015664952278, guid: eb6f4448679c93449b7733e29c8c257d,
-        type: 3}
-      propertyPath: players.Array.data[1]
-      value: 
-      objectReference: {fileID: 620061708}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eb6f4448679c93449b7733e29c8c257d, type: 3}
 --- !u!114 &620061708 stripped
@@ -371,6 +371,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pm: {fileID: 620061710}
   id: "\u4F60\u8981\u4E0D\u8981\u5403\u54C8\u5BC6\u74DC"
+  pose: 0
 --- !u!1 &1731354965
 GameObject:
   m_ObjectHideFlags: 0

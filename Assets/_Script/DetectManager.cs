@@ -263,13 +263,15 @@ namespace ETLab
 
         public void resetState()
         {
+            // 玩家是否全部通過之資訊重置
             int i;
             for (i = 0; i < n_player; i++)
             {
                 all_matching_state[i] = false;
             }
 
-            foreach(Player player in pm.getPlayers())
+            // 玩家配對到的動作之資訊重置
+            foreach (Player player in pm.getPlayers())
             {
                 player.resetMatchedPose();
             }
@@ -288,6 +290,7 @@ namespace ETLab
                     // 還原每項動作的暫存資訊
                     foreach (Pose pose in poses)
                     {
+                        // 玩家該動作是否通過及正確率等資訊的重置
                         player.resetMovement(pose);
                     }
                 }

@@ -70,6 +70,9 @@ namespace ETLab
         public void setThreshold(int index, float acc)
         {
             /*
+             * theta: 正確率(考生能力)
+             * beta: 門檻值(考題難度)
+             * P: 通過機率
              P = e^(theta - beta) / (1 + e^(theta - beta))
              P + P * e^(theta - beta) = e^(theta - beta)
              P = (1 - P) * e^(theta - beta)
@@ -88,14 +91,17 @@ namespace ETLab
                 float P = Utils.getIrtValue(theta, beta);
 
                 // 0.5f 的情況為 theta == beta，與門檻值的下限無關
-                if(P > 0.5f)
+                // P > 0.5f: 能力較門檻高，需要上調門檻值
+                if (P > 0.5f)
                 {
                     Debug.Log(string.Format("[Movement] setThreshold | index: {0}, theta: {1:F8}, beta: {2:F8}, P: {3:F8}",
                                             index, theta, beta, P));
 
                     P = Mathf.Max(0.5f, P - ConfigData.learning_rate);
                 }
-                else if(P < 0.5f)
+
+                // P < 0.5f: 能力較門檻低，需要下調門檻值
+                else if (P < 0.5f)
                 {
                     P = Mathf.Min(0.5f, P + ConfigData.learning_rate);
                 }
@@ -105,6 +111,8 @@ namespace ETLab
 
                 // 更新門檻值(至少大於 ConfigData.min_threshold)
                 thresholds[index] = Mathf.Max(Utils.alphaToP(beta), ConfigData.min_threshold);
+                Debug.Log(string.Format("[Movement] setThreshold | update value -> " +
+                    "P : {0:F4}, beta: {1:F4}, thresholds: {2:F8}", P, beta, thresholds[index]));
             }
             catch (IndexOutOfRangeException)
             {

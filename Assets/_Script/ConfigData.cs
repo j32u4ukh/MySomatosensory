@@ -11,7 +11,8 @@ namespace ETLab
 
         public static float min_threshold = 0.5f;
         public static float max_threshold = 1.0f;
-        public static float init_threshold = (min_threshold + max_threshold) / 2.0f;
+        //public static float init_threshold = (min_threshold + max_threshold) / 2.0f;
+        public static float init_threshold = 1.0f;
         public static float learning_rate = 0.05f;
     }
 }

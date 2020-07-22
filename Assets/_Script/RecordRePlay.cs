@@ -93,13 +93,14 @@ namespace ETLab
                     case Mode.RePlay:
                         record = RecordData.loadRecordData(path);
                         frame_number = record.getPostureNumber();
-                        Debug.Log(string.Format("[RecordRePlay] frame_number: {0}", frame_number));
+                        Debug.Log(string.Format("[RecordRePlay] Mode.RePlay | frame_number: {0}", frame_number));
 
                         bones_number = player.getBonesNumber();
                         break;
                 }
 
                 has_initialization = true;
+                Debug.Log(string.Format("[RecordRePlay] Have been initialized."));
             }
 
             if (has_initialization)
@@ -107,7 +108,7 @@ namespace ETLab
                 switch (mode)
                 {
                     case Mode.Record:
-                        if (Input.GetKeyDown(KeyCode.S))
+                        if (Input.GetKeyDown(KeyCode.S) || Input.GetMouseButtonDown(0))
                         {
                             mode = Mode.Stop;
                             //gm.stopRecord();
@@ -158,7 +159,7 @@ namespace ETLab
 
                         break;
                     default:
-                        if (Input.GetKeyDown(KeyCode.S))
+                        if (Input.GetKeyDown(KeyCode.S) || Input.GetMouseButtonDown(0))
                         {
                             mode = Mode.Record;
                             dm.startRecord();

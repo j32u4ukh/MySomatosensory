@@ -66,6 +66,7 @@ namespace ETLab
                     thres = new float[ConfigData.n_posture];
                     for (res = 0; res < ConfigData.n_posture; res++)
                     {
+                        // 給予初始門檻值
                         thres[res] = ConfigData.init_threshold;
                     }
                     thresholds.Add(pose, thres);
@@ -132,6 +133,9 @@ namespace ETLab
             }
         }
 
+        /// <summary>
+        /// 儲存玩家的 PlayerData，根據場景名稱判斷目前的 game_stage
+        /// </summary>
         public void save()
         {
             string scene = SceneManager.GetActiveScene().name;
