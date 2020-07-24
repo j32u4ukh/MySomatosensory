@@ -42,11 +42,6 @@ namespace ETLab
                 dm.setDetectDelegate(detectRaiseTwoHands);
             }
 
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                dm.releaseDetectDelegate();
-            }
-
             // 跳場景
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {

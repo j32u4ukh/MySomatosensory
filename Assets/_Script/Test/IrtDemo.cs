@@ -32,8 +32,7 @@ namespace ETLab
             {
                 pm.getPlayer(1).setId("你要不要吃哈密瓜");
             }
-            
-            
+                        
             if (initialize_to_one)
             {
                 float[] temp = new float[30];
@@ -50,19 +49,6 @@ namespace ETLab
                     }
                 }
             }
-
-            // modify flag
-            dm.setFlagDelegate(modifingFlag);
-
-            // 註冊標籤動作和實際動作之間的鏈結
-            //dm.registMultiPoses(Pose.IrtDemo, new List<Pose> {
-            //    Pose.RaiseTwoHands,
-            //    Pose.StrikeLeft,
-            //    Pose.StrikeRight,
-            //    Pose.Squat
-            //});
-
-            dm.registMultiPoses(Pose.RaiseTwoHands);
 
             dm.addOnMatchedListener(onMatchedListener);
 
@@ -179,12 +165,14 @@ namespace ETLab
             int idx = player.index();
             List<Pose> poses = dm.getPoses(Pose.RaiseTwoHands);
 
+            // TODO: 這個計時可用於決定是否需要觸發 onMatchEnded 事件
             time += Time.deltaTime;
             round_time += Time.deltaTime * 10f;
 
             // 透過 updateFlag 將 accumulate_time 傳給 modifingFlag，根據時間調整偵測模式
             dm.updateFlag(time);
 
+            // 實作偵測，此形式保留了對個別動作的不同操作空間
             foreach (Pose pose in poses)
             {
                 // 比對動作
@@ -259,10 +247,46 @@ namespace ETLab
 
         IEnumerator gameStart()
         {
+            // 註冊標籤動作和實際動作之間的鏈結
+            //dm.registMultiPoses(Pose.IrtDemo, new List<Pose> {
+            //    Pose.RaiseTwoHands,
+            //    Pose.StrikeLeft,
+            //    Pose.StrikeRight,
+            //    Pose.Squat
+            //});
+
+            dm.registMultiPoses(Pose.RaiseTwoHands);
+
             yield return new WaitForSecondsRealtime(Time.deltaTime);
             dm.loadMultiPosture(Pose.RaiseTwoHands);
             yield return new WaitForSecondsRealtime(Time.deltaTime);
-            dm.setDetectDelegate(defaultDetect);
+            
+        }
+
+        IEnumerator gamePlaying()
+        {
+            yield return new WaitForSecondsRealtime(Time.deltaTime);
+            bool matched = false;
+            while(time < 30.0f)
+            {
+                yield return new WaitForSecondsRealtime(Time.deltaTime);
+
+                // detect function
+                dm.setDetectDelegate(defaultDetect);
+
+                // modify flag
+                dm.setFlagDelegate(modifingFlag);
+
+                while (time < 10.0f && !matched)
+                {
+                    yield return new WaitForSecondsRealtime(Time.deltaTime);
+                }
+
+                if (!matched)
+                {
+                    dm.onMatchEnded.Invoke();
+                }
+            }
         }
     }
 }

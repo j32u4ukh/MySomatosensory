@@ -60,31 +60,29 @@ namespace ETLab
             return player_index;
         }
 
-        public void setPose(Pose pose)
-        {
-            record.setPose(pose);
-        }
-
-        public void setStage(GameStage stage)
-        {
-            record.setStage(stage);
-        }
-
-        // 開始紀錄骨架資訊
+        #region 動作偵測紀錄
+        /// <summary>
+        /// 開始紀錄骨架資訊
+        /// </summary>
         public void startRecord()
         {
             is_recording = true;
             record.setStartTime();
         }
 
-        public void setEndTime()
+        /// <summary>
+        /// 停止紀錄骨架資訊
+        /// </summary>
+        /// <param name="file_id"></param>
+        /// <param name="root"></param>
+        /// <param name="dir"></param>
+        public void stoptRecord(string file_id, string root = "", string dir = "")
         {
+            is_recording = false;
             record.setEndTime();
-        }
-
-        public void setThreshold(float[] threshold)
-        {
-            record.setThreshold(threshold);
+            record.save(file_id, root, dir);
+            record = new RecordData();
+            record.setId(id);
         }
 
         public void setAccuracy(float[] accuracy)
@@ -101,14 +99,6 @@ namespace ETLab
         {
             record.addPosture(skeletons, rotations);
         }
-        
-        public void stoptRecord(string file_id, string root = "", string dir = "")
-        {
-            is_recording = false;
-            record.save(file_id, root, dir);
-            record = new RecordData();
-            record.setId(id);
-        }
 
         public void saveRecordData(string file_id)
         {
@@ -119,7 +109,9 @@ namespace ETLab
         {
             return is_recording;
         }
+        #endregion
 
+        #region movement_dict
         public void setMovement(Pose pose)
         {
             if (!movement_dict.ContainsKey(pose))
@@ -163,7 +155,8 @@ namespace ETLab
             {
                 Debug.LogWarning(string.Format("[Player] resetMovement | No {0} in movement_dict.", pose));
             }
-        }
+        } 
+        #endregion
 
         #region 存取配對完成的動作
         // 紀錄配對完成的動作
@@ -192,16 +185,18 @@ namespace ETLab
         public void setGameStage(GameStage game_stage)
         {
             player_data.setGameStage(game_stage);
+
+            // 動作偵測紀錄
+            record.setStage(game_stage);
         }
 
         public void setThresholds(Pose pose, float[] thres)
         {
-            player_data.setThresholds(pose, thres);
-        }
+            // 動作偵測紀錄，用於紀錄玩家遊戲過程
+            record.setPose(pose);
+            record.setThreshold(thres);
 
-        public void setThreshold(Pose pose, int index, float thres)
-        {
-            player_data.setThreshold(pose, index, thres);
+            player_data.setThresholds(pose, thres);
         }
 
         public float[] getThresholds(Pose pose)
@@ -219,7 +214,7 @@ namespace ETLab
         }
         #endregion
 
-        #region 計算玩家位移
+        #region 玩家位移
         public void resetInitPos()
         {
             init_pos = model_helper.transform.position;

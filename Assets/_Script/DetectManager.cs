@@ -45,13 +45,22 @@ namespace ETLab
         // 註冊多動作比較
         Dictionary<Pose, List<Pose>> pose_dict;
 
+        // onMatched: 配對成功的事件
         IntegerEvent onMatched = new IntegerEvent();
+
+        // 鑲嵌在配對成功事件監聽器當中的函式們
         List<IntegerEventDelegate> onMatchedFinished;
 
+        // onAllMatched: 全部皆配對完成的事件
         public UnityEvent onAllMatched = new UnityEvent();
+
+        // 鑲嵌在全部配對完成事件監聽器當中的函式們
         List<VoidEventDelegate>  onAllMatchedFinished;
 
-        UnityEvent onMatchEnded = new UnityEvent();
+        // onMatchEnded: 偵測結束事件(無關是否配對成功)
+        public UnityEvent onMatchEnded = new UnityEvent();
+
+        // 鑲嵌在偵測結束事件監聽器當中的函式們
         List<VoidEventDelegate> onMatchEndedFinished;
 
         public UnityEvent onComparingPartsLoaded = new UnityEvent();
@@ -108,8 +117,6 @@ namespace ETLab
                 resetState();
                 Debug.Log(string.Format("[DetectManager] Start | init all_matching_state, n_player: {0}", n_player));
 
-                
-
                 bool all_matched = false;
                 onMatched.AddListener((int index) => {
                     Debug.Log(string.Format("[DetectManager] onMatched Listener player {0} matched.", index));
@@ -117,6 +124,13 @@ namespace ETLab
                     try
                     {
                         all_matching_state[index] = true;
+                        Player player = pm.getPlayer(index);
+                        Pose matched_pose = player.getMatchedPose();
+                        //player.setPose(pose: matched_pose);
+                        Movement movement = player.getMovement(pose: matched_pose);
+                        player.setAccuracy(movement.getAccuracy());
+                        player.setThresholds(pose: matched_pose, thres: movement.getThresholds());
+
                     }
                     catch (IndexOutOfRangeException)
                     {
@@ -150,9 +164,6 @@ namespace ETLab
                     {
                         e.Invoke();
                     }
-
-                    // 全部通過時，同時也會觸發"結束配對"的事件
-                    onMatchEnded.Invoke();
                 });
 
                 // 結束配對
@@ -170,10 +181,11 @@ namespace ETLab
                     // 移除 flag 函式
                     releaseFlagDelegate();
 
+                    // TODO: 區分 "全部通過而結束配對的情形" 和 "超時而結束配對的情形" -> 全部通過後就不要再額外觸發本事件了?
                     // 因全部通過而結束配對的情形
                     if (all_matched)
                     {
-
+                        all_matched = false;
                     }
 
                     // 因超時而結束配對的情形
@@ -264,212 +276,8 @@ namespace ETLab
             }
         }
 
-        public void resetState()
-        {
-            // 玩家是否全部通過之資訊重置
-            int i;
-            for (i = 0; i < n_player; i++)
-            {
-                all_matching_state[i] = false;
-            }
-
-            // 玩家配對到的動作之資訊重置
-            foreach (Player player in pm.getPlayers())
-            {
-                player.resetMatchedPose();
-            }
-        }
-
-        public void resetState(Pose key)
-        {
-            // 取得標籤動作下的所有動作
-            List<Pose> poses = getPoses(key);
-
-            if(poses != null)
-            {
-                // 遍歷每位玩家
-                foreach (Player player in pm.getPlayers())
-                {
-                    // 還原每項動作的暫存資訊
-                    foreach (Pose pose in poses)
-                    {
-                        // 玩家該動作是否通過及正確率等資訊的重置
-                        player.resetMovement(pose);
-                    }
-                }
-            }
-
-            resetState();
-        }
-
-        // 告訴程式"多動作的分類標籤(pose)"下包含哪些動作(pose_list)
-        public void registMultiPoses(Pose pose, List<Pose> pose_list = null)
-        {
-            if (pose_dict.ContainsKey(pose))
-            {
-                if(pose_list == null)
-                {
-                    Debug.Log(string.Format("[DetectManager] registMultiPoses | update single pose: {0}", pose));
-                    pose_dict[pose] = new List<Pose> { pose };
-                }
-                else
-                {
-                    Debug.Log(string.Format("[DetectManager] registMultiPoses | update multi pose: {0}", pose));
-                    pose_dict[pose] = pose_list;
-                }
-            }
-            else
-            {
-                if (pose_list == null)
-                {
-                    Debug.Log(string.Format("[DetectManager] registMultiPoses | add single pose: {0}", pose));
-                    pose_dict.Add(pose, new List<Pose> { pose });
-                }
-                else
-                {
-                    Debug.Log(string.Format("[DetectManager] registMultiPoses | add multi pose: {0}", pose));
-                    pose_dict.Add(pose, pose_list);
-                }
-            }
-        }
-
-        public List<Pose> getPoses(Pose pose)
-        {
-            if (pose_dict.ContainsKey(pose))
-            {
-                return pose_dict[pose];
-            }
-            else
-            {
-                Debug.LogError(string.Format("[DetectManager] getPoses | You need regist {0} by registMultiPoses.", pose));
-                return null;
-            }
-        }
-
-        // 遊戲場景才實作偵測函式(也可統一寫到其他地方)
-        public void setDetectDelegate(DetectDelegate detect_delegate)
-        {
-            Debug.Log(string.Format("[DetectManager] setDetectDelegate"));
-            detectManager = detect_delegate;
-        }
-
-        public void releaseDetectDelegate()
-        {
-            Debug.Log(string.Format("[DetectManager] releaseDetectDelegate"));
-            detectManager = null;
-        }
-
-        public void setFlagDelegate(FlagDelegate flag_delegate)
-        {
-            Debug.Log(string.Format("[DetectManager] setFlagDelegate"));
-            modifyThresholdFlag = flag_delegate;
-        }
-
-        public void updateFlag(float f)
-        {
-            flag = modifyThresholdFlag(f);
-        }
-
-        public void setFlag(Flag flag)
-        {
-            this.flag = flag;
-        }
-
-        public void releaseFlagDelegate()
-        {
-            Debug.Log(string.Format("[DetectManager] releaseFlagDelegate"));
-            modifyThresholdFlag = null;
-        }
-
-        // TODO: loadComparingParts 改為同步讀取
-        // 讀取個動作所需比較關節
-        public void loadComparingParts()
-        {
-            Debug.Log(string.Format("[DetectManager] loadComparingParts"));
-            comparing_parts_dict = new Dictionary<Pose, List<HumanBodyBones>>();
-
-            // MovementDatas 數據儲存路徑(不會因人而異的部分)
-            string path = Path.Combine(Application.streamingAssetsPath, "MovementData.txt");
-            StreamReader reader = new StreamReader(path);
-            string load_data = reader.ReadToEnd().Trim();
-            reader.Close();
-            MovementDatas datas = JsonConvert.DeserializeObject<MovementDatas>(load_data);
-            MovementData data;
-
-            foreach (Pose pose in Utils.poses)
-            {
-                // 數據包含該 pose 才作為
-                if (datas.contain(pose))
-                {
-                    data = datas.get(pose);
-
-                    //Debug.Log(string.Format("[DetectManager] load {0} into comparing_parts_dict.", pose));
-
-                    // 載入各動作的比對關節資訊
-                    comparing_parts_dict.Add(pose, data.getComparingParts());
-                }
-                else
-                {
-                    Debug.LogError(string.Format("[DetectManager] loadComparingParts | 數據中不包含動作 {0}", pose));
-                }
-            }
-
-            onComparingPartsLoaded.Invoke();
-        }
-
-        // 事前該動作或標籤動作要有註冊
-        public void loadMultiPosture(Pose key)
-        {
-            Debug.Log(string.Format("[DetectManager] loadMultiPosture(key: {0})", key));
-
-            if (!pose_dict.ContainsKey(key))
-            {
-                Debug.LogError(string.Format("[DetectManager] loadMultiPosture | No {0} in pose_dict, you need to regist first.", key));
-                return;
-            }
-
-            // 取得標籤動作下的多動作
-            List<Pose> poses = pose_dict[key];
-
-            foreach(Pose pose in poses)
-            {
-                Debug.Log(string.Format("[DetectManager] loadMultiPosture | loading {0}", pose));
-
-                // 載入多動作比對標準
-                // TODO: 實際偵測時才會用到，但應設置個監聽，當載入完成時通知主程式
-                mp.loadMultiPosture(pose);
-
-                // 玩家各自初始化
-                foreach (Player player in pm.getPlayers())
-                {
-                    // 初始化各個 pose 的 Movement
-                    player.setMovement(pose);
-                }
-            }
-
-            #region Check loading 
-            //foreach (Pose pose in poses)
-            //{
-            //    Debug.Log(string.Format("[DetectManager] loadMultiPosture | checking {0}", pose));
-
-            //    var postures = mp.getMultiPostures(pose);
-            //    Debug.Log(string.Format("[DetectManager] loadMultiPosture | #postures: {0}", postures.Count));
-
-            //    foreach (Player player in pm.getPlayers())
-            //    {
-            //        var m = player.getMovement(pose);
-            //        if (m != null)
-            //        {
-            //            Debug.Log(string.Format("[DetectManager] loadMultiPosture | Load {0} for {1} success.",
-            //            pose, player.getId()));
-            //        }
-            //    }
-            //} 
-            #endregion
-
-            Debug.Log(string.Format("[DetectManager] loadMultiPosture | loading finished."));
-        }
-
+        // ====================================================================================================
+        // ====================================================================================================
         #region 動作匹配核心演算法        
         /// <summary>
         /// 比對動作 + 額外條件
@@ -542,12 +350,12 @@ namespace ETLab
 
             List<List<Posture>> multi_postures = mp.getMultiPostures(target_pose);
 
-            if(multi_postures == null)
+            if (multi_postures == null)
             {
                 Debug.LogError(string.Format("[DetectManager] getAccuracy | Can't load multi_postures of {0}.", target_pose));
                 return;
             }
-           
+
             int model_idx, n_model = mp.getMultiNumber(target_pose), posture_idx;
             //Debug.Log(string.Format("[DetectManager] getAccuracy | Pose {0} 有 {1} 個比對標準.", target_pose, n_model));
 
@@ -565,7 +373,7 @@ namespace ETLab
 
                 // 多標準共同衡量正確率
                 for (model_idx = 0; model_idx < n_model; model_idx++)
-                {                    
+                {
                     acc_list.add(getAccuracy(player, postures[model_idx], comparing_parts));
                 }
 
@@ -586,7 +394,7 @@ namespace ETLab
                 thres = movement.getThreshold(posture_idx);
 
                 #region 正確率 與 門檻值 之 比較 與 處理
-                if(flag != Flag.None)
+                if (flag != Flag.None)
                 {
                     // Matching / Modify 都會執行配對的判斷
                     // 正確率 大於等於 門檻值
@@ -634,7 +442,7 @@ namespace ETLab
                 // 紀錄已經完成的資訊，避免重複判斷
                 player.setMatchedPose(target_pose);
 
-                // 以前一次通過時的正確率，作為下一次的門檻初始值
+                // 使用前一次通過時的正確率，作為下一次的門檻初始值
                 movement.setThresholds(movement.getAccuracy());
 
                 // 更新門檻值
@@ -738,7 +546,7 @@ namespace ETLab
 
         public void resetInitPos()
         {
-            foreach(Player player in pm.getPlayers())
+            foreach (Player player in pm.getPlayers())
             {
                 player.resetInitPos();
             }
@@ -766,9 +574,224 @@ namespace ETLab
             onMatchEndedFinished.Add(event_delegate);
         }
         #endregion
+        
+        #region 動作偵測函式委託
+        // 遊戲場景才實作偵測函式(也可統一寫到其他地方)
+        public void setDetectDelegate(DetectDelegate detect_delegate)
+        {
+            Debug.Log(string.Format("[DetectManager] setDetectDelegate"));
+            detectManager = detect_delegate;
+        }
 
-        // 開始時間相同，結束時間不盡相同
-        #region 紀錄玩家關節數據
+        public void releaseDetectDelegate()
+        {
+            Debug.Log(string.Format("[DetectManager] releaseDetectDelegate"));
+            detectManager = null;
+        }
+
+        public void setFlagDelegate(FlagDelegate flag_delegate)
+        {
+            Debug.Log(string.Format("[DetectManager] setFlagDelegate"));
+            modifyThresholdFlag = flag_delegate;
+        }
+
+        public void updateFlag(float f)
+        {
+            flag = modifyThresholdFlag(f);
+        }
+
+        public void setFlag(Flag flag)
+        {
+            this.flag = flag;
+        }
+
+        public void releaseFlagDelegate()
+        {
+            Debug.Log(string.Format("[DetectManager] releaseFlagDelegate"));
+            modifyThresholdFlag = null;
+        }
+        #endregion
+
+        #region 多動作偵測
+        // 告訴程式"多動作的分類標籤(pose)"下包含哪些動作(pose_list)
+        public void registMultiPoses(Pose pose, List<Pose> pose_list = null)
+        {
+            if (pose_dict.ContainsKey(pose))
+            {
+                if (pose_list == null)
+                {
+                    Debug.Log(string.Format("[DetectManager] registMultiPoses | update single pose: {0}", pose));
+                    pose_dict[pose] = new List<Pose> { pose };
+                }
+                else
+                {
+                    Debug.Log(string.Format("[DetectManager] registMultiPoses | update multi pose: {0}", pose));
+                    pose_dict[pose] = pose_list;
+                }
+            }
+            else
+            {
+                if (pose_list == null)
+                {
+                    Debug.Log(string.Format("[DetectManager] registMultiPoses | add single pose: {0}", pose));
+                    pose_dict.Add(pose, new List<Pose> { pose });
+                }
+                else
+                {
+                    Debug.Log(string.Format("[DetectManager] registMultiPoses | add multi pose: {0}", pose));
+                    pose_dict.Add(pose, pose_list);
+                }
+            }
+        }
+
+        public List<Pose> getPoses(Pose pose)
+        {
+            if (pose_dict.ContainsKey(pose))
+            {
+                return pose_dict[pose];
+            }
+            else
+            {
+                Debug.LogError(string.Format("[DetectManager] getPoses | You need regist {0} by registMultiPoses.", pose));
+                return null;
+            }
+        }
+        #endregion
+
+        #region 載入動作偵測所需資訊
+        // TODO: loadComparingParts 改為同步讀取
+        // 讀取個動作所需比較關節
+        public void loadComparingParts()
+        {
+            Debug.Log(string.Format("[DetectManager] loadComparingParts"));
+            comparing_parts_dict = new Dictionary<Pose, List<HumanBodyBones>>();
+
+            // MovementDatas 數據儲存路徑(不會因人而異的部分)
+            string path = Path.Combine(Application.streamingAssetsPath, "MovementData.txt");
+            StreamReader reader = new StreamReader(path);
+            string load_data = reader.ReadToEnd().Trim();
+            reader.Close();
+            MovementDatas datas = JsonConvert.DeserializeObject<MovementDatas>(load_data);
+            MovementData data;
+
+            foreach (Pose pose in Utils.poses)
+            {
+                // 數據包含該 pose 才作為
+                if (datas.contain(pose))
+                {
+                    data = datas.get(pose);
+
+                    //Debug.Log(string.Format("[DetectManager] load {0} into comparing_parts_dict.", pose));
+
+                    // 載入各動作的比對關節資訊
+                    comparing_parts_dict.Add(pose, data.getComparingParts());
+                }
+                else
+                {
+                    Debug.LogError(string.Format("[DetectManager] loadComparingParts | 數據中不包含動作 {0}", pose));
+                }
+            }
+
+            onComparingPartsLoaded.Invoke();
+        }
+
+        // 事前該動作或標籤動作要有註冊
+        public void loadMultiPosture(Pose key)
+        {
+            Debug.Log(string.Format("[DetectManager] loadMultiPosture(key: {0})", key));
+
+            if (!pose_dict.ContainsKey(key))
+            {
+                Debug.LogError(string.Format("[DetectManager] loadMultiPosture | No {0} in pose_dict, you need to regist first.", key));
+                return;
+            }
+
+            // 取得標籤動作下的多動作
+            List<Pose> poses = pose_dict[key];
+
+            foreach (Pose pose in poses)
+            {
+                Debug.Log(string.Format("[DetectManager] loadMultiPosture | loading {0}", pose));
+
+                // 載入多動作比對標準
+                // TODO: 實際偵測時才會用到，但應設置個監聽，當載入完成時通知主程式
+                mp.loadMultiPosture(pose);
+
+                // 玩家各自初始化
+                foreach (Player player in pm.getPlayers())
+                {
+                    // 初始化各個 pose 的 Movement
+                    player.setMovement(pose);
+                }
+            }
+
+            #region Check loading 
+            //foreach (Pose pose in poses)
+            //{
+            //    Debug.Log(string.Format("[DetectManager] loadMultiPosture | checking {0}", pose));
+
+            //    var postures = mp.getMultiPostures(pose);
+            //    Debug.Log(string.Format("[DetectManager] loadMultiPosture | #postures: {0}", postures.Count));
+
+            //    foreach (Player player in pm.getPlayers())
+            //    {
+            //        var m = player.getMovement(pose);
+            //        if (m != null)
+            //        {
+            //            Debug.Log(string.Format("[DetectManager] loadMultiPosture | Load {0} for {1} success.",
+            //            pose, player.getId()));
+            //        }
+            //    }
+            //} 
+            #endregion
+
+            Debug.Log(string.Format("[DetectManager] loadMultiPosture | loading finished."));
+        }
+
+        #endregion
+
+        #region 還原配對資訊
+        public void resetState()
+        {
+            // 玩家是否全部通過之資訊重置
+            int i;
+            for (i = 0; i < n_player; i++)
+            {
+                all_matching_state[i] = false;
+            }
+
+            // 玩家配對到的動作之資訊重置
+            foreach (Player player in pm.getPlayers())
+            {
+                // matched_pose = Pose.None;
+                player.resetMatchedPose();
+            }
+        }
+
+        public void resetState(Pose key)
+        {
+            // 取得標籤動作下的所有動作
+            List<Pose> poses = getPoses(key);
+
+            if (poses != null)
+            {
+                // 遍歷每位玩家
+                foreach (Player player in pm.getPlayers())
+                {
+                    // 還原每項動作的暫存資訊
+                    foreach (Pose pose in poses)
+                    {
+                        // 玩家該動作是否通過及正確率等資訊的重置
+                        player.resetMovement(pose);
+                    }
+                }
+            }
+
+            resetState();
+        }
+        #endregion
+
+        #region 紀錄玩家關節數據(開始時間相同，結束時間不盡相同)
         public void startRecord()
         {
             Debug.Log(string.Format("[DetectManager] startRecord"));
@@ -780,16 +803,19 @@ namespace ETLab
             }
         }
 
-        // 個別玩家結束偵測
+        // "個別玩家偵測"結束
         public void stopRecord(Player player, string root = "", string dir = "")
         {
             player.stoptRecord(file_id, root, dir);
         }
 
-        // 整體偵測結束
+        // "整體偵測"結束
         public void stopRecord()
         {
             is_skeleton_recording = false;
+
+            // 全部通過時，同時也會觸發"結束配對"的事件
+            onMatchEnded.Invoke();
         } 
         #endregion
     }

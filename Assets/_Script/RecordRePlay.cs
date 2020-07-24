@@ -84,8 +84,8 @@ namespace ETLab
                 switch (mode)
                 {
                     case Mode.Record:
-                        player.setPose(pose);
-                        player.setStage(GameStage.Test);
+                        player.setThresholds(pose, thres: null);
+                        player.setGameStage(GameStage.Test);
                         mode = Mode.Stop;
                         Debug.Log(string.Format("[RecordRePlay] Mode.Record | setPose: {0}, setStage: {1}",
                             pose, GameStage.Test));

@@ -95,12 +95,12 @@ namespace ETLab
         {
             if (root.Equals(""))
             {
-                root = Path.Combine(GameInfo.record_root, "Somatosensory\\Data");
+                root = Path.Combine(GameInfo.record_root, "Somatosensory", "Data");
             }
 
             if (dir.Equals(""))
             {
-                dir = Path.Combine(root, string.Format("{0}\\{1}", id, DateTime.Now.ToString("yyyy-MM-dd")));
+                dir = Path.Combine(root, id, DateTime.Now.ToString("yyyy-MM-dd"));
             }
 
             if (!Directory.Exists(dir))
