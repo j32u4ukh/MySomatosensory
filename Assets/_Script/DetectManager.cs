@@ -167,6 +167,9 @@ namespace ETLab
                     // 移除偵測函式
                     releaseDetectDelegate();
 
+                    // 移除 flag 函式
+                    releaseFlagDelegate();
+
                     // 因全部通過而結束配對的情形
                     if (all_matched)
                     {

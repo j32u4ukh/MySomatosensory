@@ -165,6 +165,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dm: {fileID: 816244104}
   pm: {fileID: 1621270818}
+  pose: 17
+  n_player: 2
+  initialize_to_one: 1
 --- !u!1 &634744349
 GameObject:
   m_ObjectHideFlags: 0

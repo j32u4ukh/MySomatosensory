@@ -8,7 +8,12 @@ namespace ETLab
     {
         public DetectManager dm;
         public PlayerManager pm;
+        [Header("偵測動作類型")]
         public Pose pose = Pose.RaiseTwoHands;
+        [Header("玩家人數")]
+        public int n_player = 2;
+        [Header("是否皆初始化門檻值為 1")]
+        public bool initialize_to_one = false;
 
         string gui = "", msg1 = "", msg2 = "";
         bool matched1 = false, matched2 = false;
@@ -21,19 +26,28 @@ namespace ETLab
         // Start is called before the first frame update
         void Start()
         {
+            pm.init(n_player: n_player);
             pm.getPlayer(0).setId("9527");
-            pm.getPlayer(1).setId("你要不要吃哈密瓜");
-            float[] temp = new float[30];
-            for(int i = 0; i < 30; i++)
+            if(n_player == 2)
             {
-                temp[i] = 1f;
+                pm.getPlayer(1).setId("你要不要吃哈密瓜");
             }
-
-            foreach(Player player in pm.getPlayers())
+            
+            
+            if (initialize_to_one)
             {
-                foreach(Pose p in Utils.poses)
+                float[] temp = new float[30];
+                for (int i = 0; i < 30; i++)
                 {
-                    player.setThresholds(p, temp);
+                    temp[i] = 1f;
+                }
+
+                foreach (Player player in pm.getPlayers())
+                {
+                    foreach (Pose p in Utils.poses)
+                    {
+                        player.setThresholds(p, temp);
+                    }
                 }
             }
 
@@ -63,18 +77,22 @@ namespace ETLab
             dm.addOnMatchEndedFinishedListener(() =>
             {
                 Debug.Log(string.Format("[IrtDemo] onMatchEnded Listener"));
+
                 Player player = pm.getPlayer(0);
                 Movement movement = player.getMovement(pose);
                 float[] ac1 = movement.getAccuracy();
                 //FloatList fl1 = new FloatList(ac1);
                 //acc1 = fl1.mean();
                 Debug.Log(string.Format("[IrtDemo] Accuracy1: {0}", Utils.arrayToString(ac1)));
-                Debug.Log(string.Format("[IrtDemo] Accuracy1: {0}", Utils.arrayToString(movement.getThresholds())));
+                Debug.Log(string.Format("[IrtDemo] Threshold1: {0}", Utils.arrayToString(movement.getThresholds())));
 
-                player = pm.getPlayer(1);
-                movement = player.getMovement(pose);
-                Debug.Log(string.Format("[IrtDemo] Accuracy2: {0}", Utils.arrayToString(movement.getAccuracy())));
-                Debug.Log(string.Format("[IrtDemo] Accuracy2: {0}", Utils.arrayToString(movement.getThresholds())));
+                if (pm.getPlayerNumber() > 1)
+                {
+                    player = pm.getPlayer(1);
+                    movement = player.getMovement(pose);
+                    Debug.Log(string.Format("[IrtDemo] Accuracy2: {0}", Utils.arrayToString(movement.getAccuracy())));
+                    Debug.Log(string.Format("[IrtDemo] Threshold2: {0}", Utils.arrayToString(movement.getThresholds())));
+                }
 
                 // 還原配對過程中的暫存資訊
                 dm.resetState(Pose.RaiseTwoHands);
@@ -87,7 +105,10 @@ namespace ETLab
         // Update is called once per frame
         void Update()
         {
-
+            if(Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Q))
+            {
+                Application.Quit();
+            }
         }
 
         private void OnGUI()
@@ -131,6 +152,11 @@ namespace ETLab
                 GUILayout.Height(Screen.height / 2f));
         }
 
+        private void OnDestroy()
+        {
+
+        }
+
         // ====================================================
         Flag modifingFlag(float f)
         {
@@ -168,24 +194,31 @@ namespace ETLab
                 movement = player.getMovement(pose);
                 float_list = new FloatList(movement.getAccuracy());
 
-                if(idx == 0 && !matched1)
+                if (float_list.length() != 0)
                 {
-                    acc1 = float_list.mean();
+                    if (idx == 0 && !matched1)
+                    {
+                        acc1 = float_list.mean();
+                    }
+                    else if (idx == 1 && !matched2)
+                    {
+                        acc2 = float_list.mean();
+                    }
                 }
-                else if(idx == 1 && !matched2)
-                {
-                    acc2 = float_list.mean();
-                }
+                
 
                 float_list = new FloatList(movement.getThresholds());
 
-                if (idx == 0 && !matched1)
+                if(float_list.length() != 0)
                 {
-                    thres1 = float_list.mean();
-                }
-                else if (idx == 1 && !matched2)
-                {
-                    thres2 = float_list.mean();
+                    if (idx == 0 && !matched1)
+                    {
+                        thres1 = float_list.mean();
+                    }
+                    else if (idx == 1 && !matched2)
+                    {
+                        thres2 = float_list.mean();
+                    }
                 }
             }
         }
@@ -195,14 +228,32 @@ namespace ETLab
             //Debug.Log(string.Format("[IrtDemo] onMatched Listener: player {0} matched.", index));
             Pose pose = pm.getPlayer(index).getMatchedPose();
             Debug.Log(string.Format("[IrtDemo] onMatched Listener: player {0} matched pose: {1}.", index, pose));
+            Player player;
+            Movement movement;
 
-            if(index == 0)
+            if (index == 0)
             {
                 matched1 = true;
+                player = pm.getPlayer(0);
+                movement = player.getMovement(pose);
 
-            }else if(index == 1)
+                float_list = new FloatList(movement.getAccuracy());
+                acc1 = float_list.mean();
+
+                float_list = new FloatList(movement.getThresholds());
+                thres1 = float_list.mean();
+            }
+            else if(index == 1 && pm.getPlayerNumber() > 1)
             {
                 matched2 = true;
+                player = pm.getPlayer(1);
+                movement = player.getMovement(pose);
+
+                float_list = new FloatList(movement.getAccuracy());
+                acc2 = float_list.mean();
+
+                float_list = new FloatList(movement.getThresholds());
+                thres2 = float_list.mean();
             }
         }
 
