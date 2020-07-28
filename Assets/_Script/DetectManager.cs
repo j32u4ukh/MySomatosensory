@@ -80,11 +80,7 @@ namespace ETLab
 
         private void Awake()
         {
-            // 應該在同一個場景時，該文件共用同一個 file_id，才能將紀錄寫到同一個檔案中
-            file_id = DateTime.Now.ToString("HH-mm-ss-ffff");
-            Debug.Log(string.Format("[DetectManager] Scene: {0}, file_id: {1}",
-                SceneManager.GetActiveScene().name, file_id));
-
+            initFileId();
             resetListener();
 
             // TODO: 實際偵測時才會用到，但應設置個監聽，當載入完成時通知主程式
@@ -103,7 +99,7 @@ namespace ETLab
                 dm_instance = this;
 
                 pm = GameObject.Find("PlayerManager").GetComponent<PlayerManager>();
-                n_player = pm.getPlayerNumber();
+                initPlayer();
 
                 // 建構當下不會讀取數據，實際需要使用到前再讀取就好
                 mp = new MultiPosture();
@@ -113,10 +109,10 @@ namespace ETLab
                 
                 });
 
-                all_matching_state = new bool[n_player];
                 resetState();
                 Debug.Log(string.Format("[DetectManager] Start | init all_matching_state, n_player: {0}", n_player));
 
+                // TODO: 記錄個動作在無動作狀態下的正確率，至少要大於該數值才能算通過
                 bool all_matched = false;
                 onMatched.AddListener((int index) => {
                     Debug.Log(string.Format("[DetectManager] onMatched Listener player {0} matched.", index));
@@ -126,7 +122,6 @@ namespace ETLab
                         all_matching_state[index] = true;
                         Player player = pm.getPlayer(index);
                         Pose matched_pose = player.getMatchedPose();
-                        //player.setPose(pose: matched_pose);
                         Movement movement = player.getMovement(pose: matched_pose);
                         player.setAccuracy(movement.getAccuracy());
                         player.setThresholds(pose: matched_pose, thres: movement.getThresholds());
@@ -164,6 +159,8 @@ namespace ETLab
                     {
                         e.Invoke();
                     }
+
+                    // 不由 onAllMatched 直接呼叫 onMatchEnded，避免與外部腳本重複呼叫
                 });
 
                 // 結束配對
@@ -191,10 +188,14 @@ namespace ETLab
                     // 因超時而結束配對的情形
                     else
                     {
-                        // TODO: 動作門檻值會隨著玩家表現而調整，在此情況下若未通過，則直接紀錄未通過這件事，而不去推測是做哪個動作但未成功
-                        foreach(Player player in pm.getPlayers())
+                        int i, len = all_matching_state.Length;
+                        for(i = 0; i < len; i++)
                         {
-
+                            if (!all_matching_state[i])
+                            {
+                                Player player = pm.getPlayer(i);
+                                recordFailed(player);
+                            }
                         }
                     }
                 });
@@ -260,11 +261,6 @@ namespace ETLab
                     }
                 }
             }
-        }
-
-        void Update()
-        {
-            
         }
 
         private void OnDestroy()
@@ -344,7 +340,7 @@ namespace ETLab
             }
             else
             {
-                Debug.LogError(string.Format("[DetectManager] getAccuracy | No {0} in comparing_parts_dict.", target_pose));
+                Debug.LogError(string.Format("[DetectManager] compareMovement | No {0} in comparing_parts_dict.", target_pose));
                 return;
             }
 
@@ -352,7 +348,7 @@ namespace ETLab
 
             if (multi_postures == null)
             {
-                Debug.LogError(string.Format("[DetectManager] getAccuracy | Can't load multi_postures of {0}.", target_pose));
+                Debug.LogError(string.Format("[DetectManager] compareMovement | Can't load multi_postures of {0}.", target_pose));
                 return;
             }
 
@@ -382,7 +378,7 @@ namespace ETLab
 
                 //if (player.getId() == "9527")
                 //{
-                //    Debug.Log(string.Format("[DetectManager] getAccuracy | {0}, acc: {1:F8}, pose: {2}",
+                //    Debug.Log(string.Format("[DetectManager] compareMovement | {0}, acc: {1:F8}, pose: {2}",
                 //        player.getId(), acc, target_pose));
                 //}
 
@@ -415,6 +411,7 @@ namespace ETLab
                                 if (!movement.isMatched(posture_idx))
                                 {
                                     // 動態調整門檻值 movement.setThreshold(posture_idx)
+                                    //Debug.Log(string.Format("[DetectManager] compareMovement | {0} setThreshold", target_pose));
                                     movement.setThreshold(posture_idx, acc);
 
                                     //if (player.getId().Equals("9527"))
@@ -564,17 +561,31 @@ namespace ETLab
             onMatchedFinished.Add(event_delegate);
         }
 
+        public void releaseOnMatchedListener()
+        {
+            onMatchedFinished = new List<IntegerEventDelegate>();
+        }
+
         public void addOnAllMatchedFinishedListener(VoidEventDelegate event_delegate)
         {
             onAllMatchedFinished.Add(event_delegate);
+        }
+        public void releaseOnAllMatchedFinishedListener()
+        {
+            onAllMatchedFinished = new List<VoidEventDelegate>();
         }
 
         public void addOnMatchEndedFinishedListener(VoidEventDelegate event_delegate)
         {
             onMatchEndedFinished.Add(event_delegate);
         }
+
+        public void releaseOnMatchEndedFinishedListener()
+        {
+            onMatchEndedFinished = new List<VoidEventDelegate>();
+        }
         #endregion
-        
+
         #region 動作偵測函式委託
         // 遊戲場景才實作偵測函式(也可統一寫到其他地方)
         public void setDetectDelegate(DetectDelegate detect_delegate)
@@ -718,6 +729,7 @@ namespace ETLab
                 mp.loadMultiPosture(pose);
 
                 // 玩家各自初始化
+                Debug.Log(string.Format("[DetectManager] loadMultiPosture | 玩家各自初始化"));
                 foreach (Player player in pm.getPlayers())
                 {
                     // 初始化各個 pose 的 Movement
@@ -751,6 +763,12 @@ namespace ETLab
         #endregion
 
         #region 還原配對資訊
+        public void initPlayer()
+        {
+            n_player = pm.getPlayerNumber();
+            all_matching_state = new bool[n_player];
+        }
+
         public void resetState()
         {
             // 玩家是否全部通過之資訊重置
@@ -792,6 +810,14 @@ namespace ETLab
         #endregion
 
         #region 紀錄玩家關節數據(開始時間相同，結束時間不盡相同)
+        public void initFileId()
+        {
+            // 應該在同一個場景時，該文件共用同一個 file_id，才能將紀錄寫到同一個檔案中
+            file_id = DateTime.Now.ToString("HH-mm-ss-ffff");
+            Debug.Log(string.Format("[DetectManager] Scene: {0}, file_id: {1}",
+                SceneManager.GetActiveScene().name, file_id));
+        }
+
         public void startRecord()
         {
             Debug.Log(string.Format("[DetectManager] startRecord"));
@@ -812,11 +838,44 @@ namespace ETLab
         // "整體偵測"結束
         public void stopRecord()
         {
+            Debug.Log(string.Format("[DetectManager] stopRecord"));
+
             is_skeleton_recording = false;
 
             // 全部通過時，同時也會觸發"結束配對"的事件
+            Debug.Log(string.Format("[DetectManager] stopRecord | invoke onMatchEnded"));
             onMatchEnded.Invoke();
-        } 
+        }
+
+        // TODO: 之後要考慮無動作正確率高低差異
+        public void recordFailed(Player player)
+        {
+            Pose target_pose = player.getTargetPose();
+            Debug.Log(string.Format("[DetectManager] recordFailed, target_pose: {0}", target_pose));
+            List<Pose> poses = getPoses(pose: target_pose);
+            Movement movement;
+
+            int i, len = poses.Count, idx = 0;
+            float min_gap = 100f, gap;
+
+            for (i = 0; i < len; i++)
+            {
+                movement = player.getMovement(pose: poses[i]);
+                gap = movement.getGap();
+
+                if(gap < min_gap)
+                {
+                    min_gap = gap;
+                    idx = i;
+                }
+            }
+
+            Pose failed_pose = poses[idx];
+            movement = player.getMovement(pose: failed_pose);
+            player.setAccuracy(movement.getAccuracy());
+            player.setThresholds(pose: failed_pose, thres: movement.getThresholds());
+            player.stoptRecord(file_id: file_id);
+        }
         #endregion
     }
 }

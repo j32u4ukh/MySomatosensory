@@ -18,6 +18,7 @@ namespace ETLab
         private Dictionary<Pose, Movement> movement_dict;
         public RecordData record;
         bool is_recording;
+        private Pose target_pose = Pose.None;
         private Pose matched_pose = Pose.None;
         #endregion
 
@@ -42,6 +43,7 @@ namespace ETLab
         #region Player
         public void setId(string id)
         {
+            Debug.Log(string.Format("[Player] setId(id: {0})", id));
             this.id = id;
             record.setId(id);
             player_data = new PlayerData(id);
@@ -114,14 +116,17 @@ namespace ETLab
         #region movement_dict
         public void setMovement(Pose pose)
         {
+            Debug.Log(string.Format("[Player] setMovement(pose: {0})", pose));
+
             if (!movement_dict.ContainsKey(pose))
             {
                 Movement movement = new Movement(pose);
 
                 // 透過 player_data 取得該動作的門檻值(數值因人而異)
                 float[] thresholds = player_data.getThresholds(pose);
-                Debug.Log(string.Format("[Player] setMovement | Player {0} load {1} thresholds: {2}",
-                    id, pose, Utils.arrayToString(thresholds)));
+
+                //Debug.Log(string.Format("[Player] setMovement | Player {0} load {1} thresholds: {2}",
+                //    id, pose, Utils.arrayToString(thresholds)));
                 movement.setThresholds(thresholds);
 
                 movement_dict.Add(pose, movement);
@@ -158,11 +163,21 @@ namespace ETLab
         } 
         #endregion
 
-        #region 存取配對完成的動作
+        #region 存取配對的動作
+        public void setTargetPose(Pose pose)
+        {
+            target_pose = pose;
+        }
+
         // 紀錄配對完成的動作
         public void setMatchedPose(Pose pose)
         {
             matched_pose = pose;
+        }
+
+        public Pose getTargetPose()
+        {
+            return target_pose;
         }
 
         /// <summary>

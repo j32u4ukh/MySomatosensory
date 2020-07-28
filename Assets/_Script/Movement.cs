@@ -112,7 +112,7 @@ namespace ETLab
                 // 更新門檻值(至少大於 ConfigData.min_threshold)
                 thresholds[index] = Mathf.Max(Utils.alphaToP(beta), ConfigData.min_threshold);
                 Debug.Log(string.Format("[Movement] setThreshold | update value -> " +
-                    "P : {0:F4}, beta: {1:F4}, thresholds: {2:F8}", P, beta, thresholds[index]));
+                    "P : {0:F4}, beta: {1:F4}, thresholds: {2:F8}, acc: {3:F8}", P, beta, thresholds[index], acc));
             }
             catch (IndexOutOfRangeException)
             {
@@ -174,6 +174,28 @@ namespace ETLab
             {
                 return 0f;
             }
+        }
+
+        /// <summary>
+        /// 計算正確率與門檻值之間的落差，還差多少才會超過門檻值
+        /// </summary>
+        /// <returns>正確率與門檻值之間的平均落差</returns>
+        public float getGap()
+        {
+            int i, len = accuracys.Length;
+            float total_gap = 0, gap;
+
+            for(i = 0; i < len; i++)
+            {
+                gap = thresholds[i] - accuracys[i];
+
+                if(gap > 0)
+                {
+                    total_gap += gap;
+                }
+            }
+
+            return total_gap / len;
         }
 
         public Pose getPose()

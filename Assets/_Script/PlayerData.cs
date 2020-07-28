@@ -30,6 +30,7 @@ namespace ETLab
 
         public PlayerData(string id)
         {
+            Debug.Log(string.Format("[PlayerData] PlayerData(id: {0})", id));
             this.id = id;
             path = Path.Combine(Application.streamingAssetsPath, "PlayerData", string.Format("{0}.txt", id));
 
@@ -50,6 +51,8 @@ namespace ETLab
                 PlayerData data = JsonConvert.DeserializeObject<PlayerData>(load_data);
                 game_stage = data.game_stage;
                 thresholds = data.thresholds;
+
+
             }
             else
             {

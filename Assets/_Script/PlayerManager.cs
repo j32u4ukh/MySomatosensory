@@ -39,6 +39,7 @@ namespace ETLab
         // 根據實際人數，調整出現的模型數量 
         public void init(int n_player)
         {
+            Debug.Log(string.Format("[PlayerManager] init(n_player: {0})", n_player));
             this.n_player = n_player;
             read_players = new Player[n_player];
             for (int i = 0; i < n_player; i++)
