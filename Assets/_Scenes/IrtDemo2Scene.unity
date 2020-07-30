@@ -491,7 +491,7 @@ RectTransform:
   m_GameObject: {fileID: 933351024}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children: []
   m_Father: {fileID: 1268210965}
   m_RootOrder: 3
@@ -565,7 +565,7 @@ RectTransform:
   m_GameObject: {fileID: 1001486055}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children: []
   m_Father: {fileID: 1268210965}
   m_RootOrder: 2
@@ -1217,7 +1217,6 @@ MonoBehaviour:
   pm: {fileID: 873537849}
   pose: 17
   audio_manager: {fileID: 899718291}
-  number_images: []
   success_image: {fileID: 1001486055}
   fail_image: {fileID: 933351024}
   question_image: {fileID: 1118049380}

@@ -78,7 +78,7 @@ namespace ETLab
         /// <param name="file_id"></param>
         /// <param name="root"></param>
         /// <param name="dir"></param>
-        public void stoptRecord(string file_id, string root = "", string dir = "")
+        public void stopRecord(string file_id, string root = "", string dir = "")
         {
             is_recording = false;
             record.setEndTime();

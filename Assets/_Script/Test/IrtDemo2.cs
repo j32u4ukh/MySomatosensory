@@ -86,8 +86,17 @@ namespace ETLab
         int success;
 
         float round_time;
+
+        // 用於平滑緩衝時間的不協調感
+        float buffer_time;
+
         float detect_time = 0f;
         bool matched = false;
+
+        // 呈現當前動作正確率與門檻值
+        Movement movement;
+        FloatList float_list;
+        float acc = 0f, thres = 0f;
 
         private void Awake()
         {
@@ -123,7 +132,7 @@ namespace ETLab
             ROUND = 3;
 
             // 調控小輪時間，次數越多，小輪時間越長
-            SCALE_TIME = 3.0f;
+            SCALE_TIME = 5.0f;
 
             // 兩次動作之間的間隔時間
             INTERVAL_TIME = 0.8f;
@@ -197,14 +206,15 @@ namespace ETLab
         {
             GUI.color = Color.red;
             GUI.skin.label.fontSize = 60;
-            gui = string.Format("ROUND_TIME: {0:F4}, round_time: {1:F4}\ndetect_time: {2:F4}", ROUND_TIME, round_time, detect_time);
+            gui = string.Format("\n\n\n\n\n\n\nROUND_TIME: {0}, pose: {1}\nround_time: {2:F4}\ndetect_time: {3:F4}\n" +
+                "acc: {4:F4}\nthres: {5:F4}", ROUND_TIME, pose, round_time, detect_time, acc, thres);
 
             GUILayout.Label(
                 // text on gui
                 gui,
                 // start to define gui layout
-                GUILayout.Width(Screen.width / 2f),
-                GUILayout.Height(Screen.height / 2f));
+                GUILayout.Width(Screen.width),
+                GUILayout.Height(Screen.height));
         }
 
         private void OnDestroy()
@@ -224,13 +234,13 @@ namespace ETLab
                 Pose.HopLeft, 
                 Pose.HopRight
             });
-            yield return new WaitForSecondsRealtime(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
 
             // 載入各動作數據(會根據標籤動作取得內含的多動作)
             dm.loadMultiPosture(Pose.RaiseTwoHands);
             dm.loadMultiPosture(Pose.Squat);
             dm.loadMultiPosture(Pose.Hop);
-            yield return new WaitForSecondsRealtime(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
 
             StartCoroutine(gamePlaying());
         }
@@ -240,7 +250,7 @@ namespace ETLab
             Debug.Log(string.Format("[IrtDemo2] gamePlaying"));
             
             string question;
-            yield return new WaitForSecondsRealtime(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
 
             // 第幾輪
             while(round < ROUND)
@@ -277,8 +287,6 @@ namespace ETLab
                         break;
                 }
 
-                pose = Pose.Squat;
-                question = "Blue";
                 Debug.Log(string.Format("[IrtDemo2] gamePlaying | question: {0}, pose: {1}", question, pose));
 
                 foreach (Player player in pm.getPlayers())
@@ -304,19 +312,22 @@ namespace ETLab
                     // 計數更新
                     ui_count.sprite = Resources.Load<Sprite>(string.Format("number{0}", number));
 
-                    round_time += Time.deltaTime;
-                    yield return new WaitForSecondsRealtime(Time.deltaTime);
-
                     while (round_time < ROUND_TIME && 0 < number && !matched)
                     {
                         round_time += Time.deltaTime;
                         gui = string.Format("ROUND_TIME: {0:F4}, round_time: {1:F4}", ROUND_TIME, round_time);
-                        yield return new WaitForSecondsRealtime(Time.deltaTime);
+                        yield return new WaitForSeconds(Time.deltaTime);
                     }
 
                     // invoke onMatchEnded
                     dm.stopRecord();
-                    yield return new WaitForSeconds(INTERVAL_TIME);
+
+                    buffer_time = 0f;
+                    while(buffer_time < INTERVAL_TIME)
+                    {
+                        buffer_time += Time.deltaTime;
+                        yield return new WaitForSeconds(Time.deltaTime);
+                    }
                 }
                 #endregion
 
@@ -336,7 +347,12 @@ namespace ETLab
                 }
 
                 // 呈現回饋 FEEDBACK_DISPLAY_TIME 秒後關閉
-                yield return new WaitForSeconds(FEEDBACK_DISPLAY_TIME);
+                buffer_time = 0f;
+                while (buffer_time < FEEDBACK_DISPLAY_TIME)
+                {
+                    buffer_time += Time.deltaTime;
+                    yield return new WaitForSeconds(Time.deltaTime);
+                }
 
                 // 確保為關閉狀態
                 success_image.SetActive(false);
@@ -346,7 +362,12 @@ namespace ETLab
                 round++;
 
                 // Buffer time ROUND_INTERVAL_TIME
-                yield return new WaitForSeconds(ROUND_INTERVAL_TIME);
+                buffer_time = 0f;
+                while (buffer_time < ROUND_INTERVAL_TIME)
+                {
+                    buffer_time += Time.deltaTime;
+                    yield return new WaitForSeconds(Time.deltaTime);
+                }
             }
 
             audio_manager.fadeOut();
@@ -368,6 +389,22 @@ namespace ETLab
             {
                 // 比對動作
                 dm.compareMovement(player, pose);
+
+                // 呈現當前動作正確率與門檻值
+                movement = player.getMovement(pose);
+                float_list = new FloatList(movement.getAccuracy());
+
+                if(float_list.length() != 0)
+                {
+                    acc = float_list.mean();
+                }
+
+                float_list = new FloatList(movement.getThresholds());
+
+                if (float_list.length() != 0)
+                {
+                    thres = float_list.mean();
+                }
             }
         }
 
@@ -395,14 +432,14 @@ namespace ETLab
             score_borad.setCorrect(success);
             score_borad.setWrong(ROUND - success);
             score_borad.display(SCORE_DISPLAY_TIME);
-            yield return new WaitForSecondsRealtime(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
         }
 
         void onMatchedListener(int index)
         {
             Debug.Log(string.Format("[IrtDemo2] onMatched(index: {0})", index));
 
-            detect_time = 0f;
+            detect_time = 0f;            
             matched = true;
 
             // 因此 number - 1
@@ -411,13 +448,30 @@ namespace ETLab
             // 更新 UI 計數
             ui_count.sprite = Resources.Load<Sprite>(string.Format("number{0}", number));
 
+            // 呈現當前動作正確率與門檻值
+            // TODO: pose 要確保為實際動作，而不是標籤動作，目前是錯的
+            movement = pm.getPlayer(0).getMovement(pose);
+            float_list = new FloatList(movement.getAccuracy());
+
+            if (float_list.length() != 0)
+            {
+                acc = float_list.mean();
+            }
+
+            float_list = new FloatList(movement.getThresholds());
+
+            if (float_list.length() != 0)
+            {
+                thres = float_list.mean();
+            }
+
             // 正確音效
             audio_manager.modifyVolumn(CORRECT_VOL, 2);
             audio_manager.play(AudioManager.AudioName.Correct, 2);
 
             // Debug.Log(string.Format("[IrtDemo2] onMatched Listener: player {0} matched.", index));
-            Pose pose = pm.getPlayer(index).getMatchedPose();
-            Debug.Log(string.Format("[IrtDemo2] onMatched Listener: player {0} matched pose: {1}.", index, pose));
+            Pose matched_pose = pm.getPlayer(index).getMatchedPose();
+            Debug.Log(string.Format("[IrtDemo2] onMatched Listener: player {0} matched pose: {1}.", index, matched_pose));
         }
 
         void onAllMatchedFinishedListener()

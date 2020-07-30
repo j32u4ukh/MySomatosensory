@@ -121,11 +121,9 @@ namespace ETLab
                     {
                         all_matching_state[index] = true;
                         Player player = pm.getPlayer(index);
-                        Pose matched_pose = player.getMatchedPose();
-                        Movement movement = player.getMovement(pose: matched_pose);
-                        player.setAccuracy(movement.getAccuracy());
-                        player.setThresholds(pose: matched_pose, thres: movement.getThresholds());
-
+                        Debug.Log(string.Format("[DetectManager] onMatched Listener | stopRecord"));
+                        player.stopRecord(file_id);
+                        
                     }
                     catch (IndexOutOfRangeException)
                     {
@@ -376,12 +374,6 @@ namespace ETLab
                 // 計算與多標準比對後的正確率
                 acc = acc_list.geometricMean();
 
-                //if (player.getId() == "9527")
-                //{
-                //    Debug.Log(string.Format("[DetectManager] compareMovement | {0}, acc: {1:F8}, pose: {2}",
-                //        player.getId(), acc, target_pose));
-                //}
-
                 // 記錄各個分解動作的最高值
                 // 目前可返回最高值，是否利用這個最高值來對門檻值進行比較呢？>> 應該不行，不然通過的時間點會很奇怪
                 movement.setHighestAccuracy(posture_idx, acc);
@@ -444,6 +436,9 @@ namespace ETLab
 
                 // 更新門檻值
                 player.setThresholds(target_pose, movement.getAccuracy());
+
+                // 更新正確率
+                player.setAccuracy(movement.getAccuracy());
 
                 Debug.Log(string.Format("[DetectManager] compareMovement | ID: {0}", player.getId()));
                 Debug.Log(string.Format("[DetectManager] compareMovement | Final accuracy: {0}",
@@ -832,7 +827,7 @@ namespace ETLab
         // "個別玩家偵測"結束
         public void stopRecord(Player player, string root = "", string dir = "")
         {
-            player.stoptRecord(file_id, root, dir);
+            player.stopRecord(file_id, root, dir);
         }
 
         // "整體偵測"結束
@@ -871,10 +866,12 @@ namespace ETLab
             }
 
             Pose failed_pose = poses[idx];
+            Debug.Log(string.Format("[DetectManager] recordFailed, failed_pose: {0}", failed_pose));
             movement = player.getMovement(pose: failed_pose);
             player.setAccuracy(movement.getAccuracy());
             player.setThresholds(pose: failed_pose, thres: movement.getThresholds());
-            player.stoptRecord(file_id: file_id);
+            Debug.Log(string.Format("[DetectManager] recordFailed, stopRecord"));
+            player.stopRecord(file_id: file_id);
         }
         #endregion
     }

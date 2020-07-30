@@ -111,8 +111,8 @@ namespace ETLab
 
                 // 更新門檻值(至少大於 ConfigData.min_threshold)
                 thresholds[index] = Mathf.Max(Utils.alphaToP(beta), ConfigData.min_threshold);
-                Debug.Log(string.Format("[Movement] setThreshold | update value -> " +
-                    "P : {0:F4}, beta: {1:F4}, thresholds: {2:F8}, acc: {3:F8}", P, beta, thresholds[index], acc));
+                //Debug.Log(string.Format("[Movement] setThreshold | update value -> " +
+                //    "P : {0:F4}, beta: {1:F4}, thresholds: {2:F8}, acc: {3:F8}", P, beta, thresholds[index], acc));
             }
             catch (IndexOutOfRangeException)
             {
