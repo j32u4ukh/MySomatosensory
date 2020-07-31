@@ -80,6 +80,7 @@ namespace ETLab
         /// <param name="dir"></param>
         public void stopRecord(string file_id, string root = "", string dir = "")
         {
+            Debug.Log(string.Format("[Player] stopRecord | file_id: {0}", file_id));
             is_recording = false;
             record.setEndTime();
             record.save(file_id, root, dir);

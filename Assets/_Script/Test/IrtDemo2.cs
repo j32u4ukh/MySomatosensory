@@ -34,6 +34,7 @@ namespace ETLab
 
         // 呈現最後得分
         public ScoreBoard score_borad;
+        public Image hint;
         #endregion
 
         #region Game Config
@@ -287,6 +288,7 @@ namespace ETLab
                         break;
                 }
 
+                hint.sprite = Resources.Load<Sprite>(pose.ToString());
                 Debug.Log(string.Format("[IrtDemo2] gamePlaying | question: {0}, pose: {1}", question, pose));
 
                 foreach (Player player in pm.getPlayers())
@@ -447,10 +449,14 @@ namespace ETLab
 
             // 更新 UI 計數
             ui_count.sprite = Resources.Load<Sprite>(string.Format("number{0}", number));
+            hint.sprite = null;
 
             // 呈現當前動作正確率與門檻值
-            // TODO: pose 要確保為實際動作，而不是標籤動作，目前是錯的
-            movement = pm.getPlayer(0).getMovement(pose);
+            Player player = pm.getPlayer(index);
+            Pose matched_pose = player.getMatchedPose();
+            Debug.Log(string.Format("[IrtDemo2] onMatched Listener: player {0} matched pose: {1}.", index, matched_pose));
+
+            movement = player.getMovement(matched_pose);
             float_list = new FloatList(movement.getAccuracy());
 
             if (float_list.length() != 0)
@@ -468,10 +474,6 @@ namespace ETLab
             // 正確音效
             audio_manager.modifyVolumn(CORRECT_VOL, 2);
             audio_manager.play(AudioManager.AudioName.Correct, 2);
-
-            // Debug.Log(string.Format("[IrtDemo2] onMatched Listener: player {0} matched.", index));
-            Pose matched_pose = pm.getPlayer(index).getMatchedPose();
-            Debug.Log(string.Format("[IrtDemo2] onMatched Listener: player {0} matched pose: {1}.", index, matched_pose));
         }
 
         void onAllMatchedFinishedListener()
