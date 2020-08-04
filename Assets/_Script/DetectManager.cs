@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -64,6 +65,7 @@ namespace ETLab
         List<VoidEventDelegate> onMatchEndedFinished;
 
         public UnityEvent onComparingPartsLoaded = new UnityEvent();
+        public PoseEvent onMultiPostureLoaded = new PoseEvent();
         bool[] all_matching_state;
 
         #region 紀錄骨架位置
@@ -83,9 +85,9 @@ namespace ETLab
             initFileId();
             resetListener();
 
-            // TODO: 實際偵測時才會用到，但應設置個監聽，當載入完成時通知主程式
+            // 實際偵測時才會用到，當載入完成時 Listener 將通知主程式
             // 載入各個動作要比對的關節
-            loadComparingParts();
+            _ = loadComparingParts();
 
             pose_dict = new Dictionary<Pose, List<Pose>>();
             registMultiPoses(Pose.RaiseTwoHands);
@@ -105,8 +107,12 @@ namespace ETLab
                 mp = new MultiPosture();
 
                 // 當多比對標準載入完成
-                mp.onMultiPostureLoaded.AddListener((Pose pose_type) => { 
-                
+                onMultiPostureLoaded.AddListener((Pose key_pose) => {
+                    Debug.Log(string.Format("[DetectManager] Start | 標籤動作 {0} 多動作比對標準載入完成.", key_pose));
+                });
+
+                mp.onMultiPostureLoaded.AddListener((Pose pose_type) => {
+                    Debug.Log(string.Format("[DetectManager] Start | 實際動作 {0} 多比對標準載入完成", pose_type));
                 });
 
                 resetState();
@@ -176,7 +182,6 @@ namespace ETLab
                     // 移除 flag 函式
                     releaseFlagDelegate();
 
-                    // TODO: 區分 "全部通過而結束配對的情形" 和 "超時而結束配對的情形" -> 全部通過後就不要再額外觸發本事件了?
                     // 因全部通過而結束配對的情形
                     if (all_matched)
                     {
@@ -667,9 +672,9 @@ namespace ETLab
         #endregion
 
         #region 載入動作偵測所需資訊
-        // TODO: loadComparingParts 改為同步讀取
+        // loadComparingParts 改為同步讀取
         // 讀取個動作所需比較關節
-        public void loadComparingParts()
+        public async Task loadComparingParts()
         {
             Debug.Log(string.Format("[DetectManager] loadComparingParts"));
             comparing_parts_dict = new Dictionary<Pose, List<HumanBodyBones>>();
@@ -677,7 +682,8 @@ namespace ETLab
             // MovementDatas 數據儲存路徑(不會因人而異的部分)
             string path = Path.Combine(Application.streamingAssetsPath, "MovementData.txt");
             StreamReader reader = new StreamReader(path);
-            string load_data = reader.ReadToEnd().Trim();
+            string load_data = await reader.ReadToEndAsync();
+            load_data = load_data.Trim();
             reader.Close();
             MovementDatas datas = JsonConvert.DeserializeObject<MovementDatas>(load_data);
             MovementData data;
@@ -704,7 +710,7 @@ namespace ETLab
         }
 
         // 事前該動作或標籤動作要有註冊
-        public void loadMultiPosture(Pose key)
+        public async Task loadMultiPosture(Pose key)
         {
             Debug.Log(string.Format("[DetectManager] loadMultiPosture(key: {0})", key));
 
@@ -722,11 +728,10 @@ namespace ETLab
                 Debug.Log(string.Format("[DetectManager] loadMultiPosture | loading {0}", pose));
 
                 // 載入多動作比對標準
-                // TODO: 實際偵測時才會用到，但應設置個監聽，當載入完成時通知主程式
-                mp.loadMultiPosture(pose);
+                await mp.loadMultiPosture(pose);
 
                 // 玩家各自初始化
-                Debug.Log(string.Format("[DetectManager] loadMultiPosture | 玩家各自初始化"));
+                Debug.Log(string.Format("[DetectManager] loadMultiPosture | 玩家各自初始化 {0}", pose));
                 foreach (Player player in pm.getPlayers())
                 {
                     // 初始化各個 pose 的 Movement
@@ -754,7 +759,7 @@ namespace ETLab
             //} 
             #endregion
 
-            Debug.Log(string.Format("[DetectManager] loadMultiPosture | loading finished."));
+            onMultiPostureLoaded.Invoke(key);
         }
 
         #endregion

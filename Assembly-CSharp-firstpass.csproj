@@ -441,6 +441,9 @@
     <Reference Include="Unity.Analytics.Tracker">
       <HintPath>D:/Unity Projects/MySomatosensory/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Tracker.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime">
+      <HintPath>D:/Unity Projects/MySomatosensory/Assets/_Script/UnityAsync/Plugins/System.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib">
       <HintPath>D:/Unity Projects/Unity Editor/2019.1.4f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
     </Reference>
@@ -795,6 +798,12 @@
     <Reference Include="Boo.Lang">
       <HintPath>D:/Unity Projects/Unity Editor/2019.1.4f1/Editor/Data/MonoBleedingEdge/lib/mono/unityscript/Boo.Lang.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="UnityAsync.csproj">
+      <Project>{213C73AF-555C-5548-6A32-63D1B153AA91}</Project>
+      <Name>UnityAsync</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

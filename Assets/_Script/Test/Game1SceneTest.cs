@@ -34,7 +34,7 @@ namespace ETLab
             if (Input.GetKeyDown(KeyCode.H))
             {
                 Debug.Log(string.Format("[StartSceneTest] Update | loadMultiPosture"));
-                dm.loadMultiPosture(Pose.RaiseTwoHands);
+                _ = dm.loadMultiPosture(Pose.RaiseTwoHands);
             }
 
             if (Input.GetKeyDown(KeyCode.D))

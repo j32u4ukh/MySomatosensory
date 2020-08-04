@@ -246,9 +246,9 @@ namespace ETLab
             yield return new WaitForSeconds(Time.deltaTime);
 
             // 載入各動作數據(會根據標籤動作取得內含的多動作)
-            dm.loadMultiPosture(Pose.RaiseTwoHands);
-            dm.loadMultiPosture(Pose.Squat);
-            dm.loadMultiPosture(Pose.Hop);
+            _ = dm.loadMultiPosture(Pose.RaiseTwoHands);
+            _ = dm.loadMultiPosture(Pose.Squat);
+            _ = dm.loadMultiPosture(Pose.Hop);
             yield return new WaitForSeconds(Time.deltaTime);
 
             StartCoroutine(gamePlaying());
@@ -269,7 +269,7 @@ namespace ETLab
                 // 目前還幾次動作要做
                 number = NUMBER;
 
-                // TODO: 出題 & 根據題目設定偵測的動作
+                // 出題 & 根據題目設定偵測的動作
                 question = questions[round];
                 question_image.sprite = Resources.Load<Sprite>(question);
                 question_text.text = question;
@@ -388,7 +388,7 @@ namespace ETLab
         {
             List<Pose> poses = dm.getPoses(pose);
 
-            // TODO: 這個計時可用於決定是否需要觸發 onMatchEnded 事件
+            // 這個計時可用於決定是否需要觸發 onMatchEnded 事件
             detect_time += Time.deltaTime;
 
             // 透過 updateFlag 將 accumulate_time 傳給 modifingFlag，根據時間調整偵測模式

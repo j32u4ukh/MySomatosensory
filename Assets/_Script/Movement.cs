@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace ETLab
@@ -268,9 +269,9 @@ namespace ETLab
         }
 
         #region 讀取數據
-        // TODO: loadMultiPosture 改為同步讀取
+        // loadMultiPosture 改為同步讀取
         // 需要真人預錄才會有數據
-        public void loadMultiPosture(Pose pose)
+        public async Task loadMultiPosture(Pose pose)
         {
             Debug.Log(string.Format("[MultiPosture] loadMultiPosture(pose: {0})", pose));
             List<List<Posture>> multi_postures = new List<List<Posture>>();
@@ -292,7 +293,8 @@ namespace ETLab
                     if (!file.Contains(".meta"))
                     {
                         reader = new StreamReader(file);
-                        load_data = reader.ReadToEnd().Trim();
+                        load_data = await reader.ReadToEndAsync();
+                        load_data = load_data.Trim();
                         reader.Close();
 
                         record_data = JsonConvert.DeserializeObject<RecordData>(load_data);

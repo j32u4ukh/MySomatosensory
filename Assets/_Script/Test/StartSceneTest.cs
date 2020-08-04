@@ -50,7 +50,7 @@ namespace ETLab
             if (Input.GetKeyDown(KeyCode.L))
             {
                 Debug.Log(string.Format("[StartSceneTest] Update | loadMultiPosture: {0}", pose));
-                dm.loadMultiPosture(pose);
+                _ = dm.loadMultiPosture(pose);
             }
 
             // 跳場景

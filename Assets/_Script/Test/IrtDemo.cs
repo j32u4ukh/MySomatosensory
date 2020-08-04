@@ -258,7 +258,7 @@ namespace ETLab
             dm.registMultiPoses(Pose.RaiseTwoHands);
 
             yield return new WaitForSecondsRealtime(Time.deltaTime);
-            dm.loadMultiPosture(Pose.RaiseTwoHands);
+            _ = dm.loadMultiPosture(Pose.RaiseTwoHands);
             yield return new WaitForSecondsRealtime(Time.deltaTime);
             
         }

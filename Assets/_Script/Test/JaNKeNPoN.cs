@@ -71,7 +71,7 @@ namespace ETLab
         {
             if (Input.GetKeyDown(KeyCode.I))
             {
-                dm.loadMultiPosture(Pose.JaNKeNPoN);
+                _ = dm.loadMultiPosture(Pose.JaNKeNPoN);
             }
 
             if (Input.GetKeyDown(KeyCode.D))
