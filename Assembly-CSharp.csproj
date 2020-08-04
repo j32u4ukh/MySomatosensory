@@ -111,6 +111,7 @@
     <Compile Include="Assets\_Script\Test\StartSceneTest.cs" />
     <Compile Include="Assets\_Script\Test\TwoModelTest.cs" />
     <Compile Include="Assets\_Script\Utils.cs" />
+    <Compile Include="Assets\_Script\UtilScene.cs" />
     <Compile Include="Assets\_Script\Version1\DetectManager.cs" />
     <Compile Include="Assets\_Script\Version1\DetectSkeleton.cs" />
     <Compile Include="Assets\_Script\Version1\GameInfo.cs" />
@@ -260,6 +261,7 @@
     <None Include="Assets\K2Examples\Resources\MedianShader.shader" />
     <None Include="Assets\StreamingAssets\MovementData\Run\RecordRePlay-17-28-20-4802.txt" />
     <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-24-49-9231.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\Squat\RecordRePlay-14-47-09-6046.txt" />
     <None Include="Assets\K2Examples\Resources\DepthShader.shader" />
     <None Include="Assets\K2Examples\Resources\Body2DepthShader.shader" />
     <None Include="Assets\K2Examples\Resources\SpeechGrammar.grxml.txt" />
@@ -267,7 +269,6 @@
     <None Include="Assets\K2Examples\KinectDemos\ProjectorDemo\Scripts\RoomAliveToolkit\Attribution.txt" />
     <None Include="Assets\StreamingAssets\MovementData\StrikeRight\RecordRePlay-17-17-35-5504.txt" />
     <None Include="Assets\StreamingAssets\MovementData\StrikeLeft\RecordRePlay-17-17-00-3077.txt" />
-    <None Include="Assets\StreamingAssets\MovementData\Squat\RecordRePlay-17-26-29-9576.txt" />
     <None Include="Assets\K2Examples\Resources\Body2ColorShader.shader" />
     <None Include="Assets\StreamingAssets\MovementData\Jump\RecordRePlay-17-31-56-1435.txt" />
     <None Include="Assets\K2Examples\Resources\Depth2ColorShaderNN.shader" />
@@ -292,6 +293,7 @@
     <None Include="Assets\K2Examples\Resources\Erode.shader" />
     <None Include="Assets\StreamingAssets\MovementData\HopLeft\RecordRePlay-17-11-30-0455.txt" />
     <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-21-09-3302.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\Squat\RecordRePlay-14-38-16-3086.txt" />
     <None Include="Assets\StreamingAssets\PlayerData\你要不要吃哈密瓜.txt" />
     <None Include="Assets\K2Examples\Resources\BodyShader.shader" />
     <None Include="Assets\StreamingAssets\MovementData\Jump\RecordRePlay-17-30-33-8398.txt" />
@@ -299,6 +301,7 @@
     <None Include="Assets\K2Examples\Resources\Dilate.shader" />
     <None Include="Assets\K2Examples\Resources\Body2DepthShaderNN.shader" />
     <None Include="Assets\StreamingAssets\MovementData\VerticalWave\RecordRePlay-17-21-50-1499.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\Squat\RecordRePlay-14-40-27-3451.txt" />
     <None Include="Assets\K2Examples\KinectDemos\ProjectorDemo\Resources\calibration.xml" />
     <None Include="Assets\K2Examples\Resources\BlurShader5.shader" />
     <None Include="Assets\K2Examples\_Readme\License.txt" />

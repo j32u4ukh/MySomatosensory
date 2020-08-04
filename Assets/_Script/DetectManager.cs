@@ -199,8 +199,8 @@ namespace ETLab
                 });
 
                 // 當比對關節載入完成
-                onComparingPartsLoaded.AddListener(()=> { 
-                
+                onComparingPartsLoaded.AddListener(()=> {
+                    Debug.Log(string.Format("[DetectManager] Start | 比對關節載入完成"));
                 });
 
                 // 取得關節數量
@@ -376,10 +376,11 @@ namespace ETLab
 
                 // 記錄各個分解動作的最高值
                 // 目前可返回最高值，是否利用這個最高值來對門檻值進行比較呢？>> 應該不行，不然通過的時間點會很奇怪
-                movement.setHighestAccuracy(posture_idx, acc);
+                //movement.setHighestAccuracy(posture_idx, acc);
+                player.setHighestAccuracy(pose: target_pose, index: posture_idx, value: acc);
 
                 // 取得當前動作門檻值，將用於比較是否當前正確率超過門檻
-                thres = movement.getThreshold(posture_idx);
+                thres = player.getThreshold(pose: target_pose, index: posture_idx);
 
                 #region 正確率 與 門檻值 之 比較 與 處理
                 if (flag != Flag.None)
@@ -389,7 +390,7 @@ namespace ETLab
                     if (acc >= thres)
                     {
                         // 紀錄"通過資訊"，以利後面判斷動作是否通過
-                        movement.setMatched(posture_idx, true);
+                        player.setMatched(pose: target_pose, index: posture_idx, status:true);
                         //Debug.Log(string.Format("[DetectManager] Matched: palyer: {0}, acc: {1:F8}", player.getId(), acc));
                     }
 
@@ -400,11 +401,12 @@ namespace ETLab
                         {
                             case Flag.Modify:
                                 // 尚未通過的分解動作，才會更新門檻值
-                                if (!movement.isMatched(posture_idx))
+                                if (!player.isMatched(pose: target_pose, index: posture_idx))
                                 {
                                     // 動態調整門檻值 movement.setThreshold(posture_idx)
                                     //Debug.Log(string.Format("[DetectManager] compareMovement | {0} setThreshold", target_pose));
-                                    movement.setThreshold(posture_idx, acc);
+                                    //movement.setThreshold(posture_idx, acc);
+                                    player.setThreshold(pose: target_pose, index: posture_idx, acc: acc, optimization: 2);
 
                                     //if (player.getId().Equals("9527"))
                                     //{
@@ -422,29 +424,29 @@ namespace ETLab
             // 附加額外通關條件
             if (additional_accuracy >= 1f)
             {
-                movement.setAddtionalMatched(true);
+                player.setAddtionalMatched(pose: target_pose, is_matched: true);
             }
 
             // 當所有動作皆通過                       
-            if (movement.isMatched())
+            if (player.isMatched(pose: target_pose))
             {
                 // 紀錄已經完成的資訊，避免重複判斷
-                player.setMatchedPose(target_pose);
+                player.setMatchedPose(pose: target_pose);
 
                 // 使用前一次通過時的正確率，作為下一次的門檻初始值
-                movement.setThresholds(movement.getAccuracy());
-
-                // 更新門檻值
-                player.setThresholds(target_pose, movement.getAccuracy());
+                player.setThreshold(pose: target_pose);
 
                 // 更新正確率
-                player.setAccuracy(movement.getAccuracy());
+                player.setAccuracy(pose: target_pose);
+
+                // 更新門檻值
+                player.writeThreshold(pose: target_pose);
 
                 Debug.Log(string.Format("[DetectManager] compareMovement | ID: {0}", player.getId()));
                 Debug.Log(string.Format("[DetectManager] compareMovement | Final accuracy: {0}",
-                    Utils.arrayToString(movement.getAccuracy())));
+                    Utils.arrayToString(player.getAccuracy(pose: target_pose))));
                 Debug.Log(string.Format("[DetectManager] compareMovement | Final threshold: {0}",
-                    Utils.arrayToString(movement.getThresholds())));
+                    Utils.arrayToString(player.getThreshold(pose: target_pose))));
 
                 // 透過陣列紀錄每個玩家是否通過，個別玩家通過時觸發事件，將此這列紀錄更新，同時檢查是否全部都完成
                 onMatched.Invoke(player.index());
@@ -830,16 +832,22 @@ namespace ETLab
             player.stopRecord(file_id, root, dir);
         }
 
-        // "整體偵測"結束
-        public void stopRecord()
+        /// <summary>
+        /// "整體偵測"結束，新增一參數來區辨動作偵測與單純骨架紀錄
+        /// </summary>
+        /// <param name="invoke_event">是否觸發"結束配對"的事件</param>
+        public void stopRecord(bool invoke_event = true)
         {
             Debug.Log(string.Format("[DetectManager] stopRecord"));
 
             is_skeleton_recording = false;
 
-            // 全部通過時，同時也會觸發"結束配對"的事件
-            Debug.Log(string.Format("[DetectManager] stopRecord | invoke onMatchEnded"));
-            onMatchEnded.Invoke();
+            if (invoke_event)
+            {
+                // 全部通過時，同時也會觸發"結束配對"的事件
+                Debug.Log(string.Format("[DetectManager] stopRecord | invoke onMatchEnded"));
+                onMatchEnded.Invoke();
+            }
         }
 
         // TODO: 之後要考慮無動作正確率高低差異
@@ -869,7 +877,7 @@ namespace ETLab
             Debug.Log(string.Format("[DetectManager] recordFailed, failed_pose: {0}", failed_pose));
             movement = player.getMovement(pose: failed_pose);
             player.setAccuracy(movement.getAccuracy());
-            player.setThresholds(pose: failed_pose, thres: movement.getThresholds());
+            player.writeThreshold(pose: failed_pose, thres: movement.getThreshold());
             Debug.Log(string.Format("[DetectManager] recordFailed, stopRecord"));
             player.stopRecord(file_id: file_id);
         }

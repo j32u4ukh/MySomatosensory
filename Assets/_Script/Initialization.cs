@@ -42,13 +42,13 @@ namespace ETLab
             player.setId(id);
 
             // 修改 game_stage 為 GameStage.Test
-            player.setGameStage(GameStage.Test);
+            player.writeGameStage(GameStage.Test);
 
             float[] thresholds;
             // Utils.poses: 為實際動作，不包含動作標籤
             foreach (Pose pose in Utils.poses)
             {
-                thresholds = player.getThresholds(pose);
+                thresholds = player.readThreshold(pose);
                 Debug.Log(string.Format("[Initialization] initPlayerData | Pose: {0}, thresholds: {1}", 
                     pose.ToString(), Utils.arrayToString(thresholds)));
             }
@@ -308,7 +308,7 @@ namespace ETLab
             player.setId(id);
 
             // 修改 game_stage 為 GameStage.Test
-            player.setGameStage(GameStage.Test);
+            player.writeGameStage(GameStage.Test);
 
             // MovementDatas 數據儲存路徑(不會因人而異的部分)
             string path = Path.Combine(Application.streamingAssetsPath, "MovementData.txt");

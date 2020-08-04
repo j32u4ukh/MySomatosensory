@@ -45,7 +45,7 @@ namespace ETLab
                 {
                     foreach (Pose p in Utils.poses)
                     {
-                        player.setThresholds(p, temp);
+                        player.writeThreshold(p, temp);
                     }
                 }
             }
@@ -70,14 +70,14 @@ namespace ETLab
                 //FloatList fl1 = new FloatList(ac1);
                 //acc1 = fl1.mean();
                 Debug.Log(string.Format("[IrtDemo] Accuracy1: {0}", Utils.arrayToString(ac1)));
-                Debug.Log(string.Format("[IrtDemo] Threshold1: {0}", Utils.arrayToString(movement.getThresholds())));
+                Debug.Log(string.Format("[IrtDemo] Threshold1: {0}", Utils.arrayToString(movement.getThreshold())));
 
                 if (pm.getPlayerNumber() > 1)
                 {
                     player = pm.getPlayer(1);
                     movement = player.getMovement(pose);
                     Debug.Log(string.Format("[IrtDemo] Accuracy2: {0}", Utils.arrayToString(movement.getAccuracy())));
-                    Debug.Log(string.Format("[IrtDemo] Threshold2: {0}", Utils.arrayToString(movement.getThresholds())));
+                    Debug.Log(string.Format("[IrtDemo] Threshold2: {0}", Utils.arrayToString(movement.getThreshold())));
                 }
 
                 // 還原配對過程中的暫存資訊
@@ -195,7 +195,7 @@ namespace ETLab
                 }
                 
 
-                float_list = new FloatList(movement.getThresholds());
+                float_list = new FloatList(movement.getThreshold());
 
                 if(float_list.length() != 0)
                 {
@@ -228,7 +228,7 @@ namespace ETLab
                 float_list = new FloatList(movement.getAccuracy());
                 acc1 = float_list.mean();
 
-                float_list = new FloatList(movement.getThresholds());
+                float_list = new FloatList(movement.getThreshold());
                 thres1 = float_list.mean();
             }
             else if(index == 1 && pm.getPlayerNumber() > 1)
@@ -240,7 +240,7 @@ namespace ETLab
                 float_list = new FloatList(movement.getAccuracy());
                 acc2 = float_list.mean();
 
-                float_list = new FloatList(movement.getThresholds());
+                float_list = new FloatList(movement.getThreshold());
                 thres2 = float_list.mean();
             }
         }

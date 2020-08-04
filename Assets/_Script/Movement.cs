@@ -52,10 +52,11 @@ namespace ETLab
         }
 
         // 以陣列初始化門檻值
-        public void setThresholds(float[] _thresholds)
+        public void setThreshold(float[] _thresholds)
         {
             int _length = _thresholds.Length;
             thresholds = new float[_length];
+
             for (int i = 0; i < _length; i++)
             {
                 thresholds[i] = _thresholds[i];
@@ -67,7 +68,7 @@ namespace ETLab
         /// </summary>
         /// <param name="index">門檻索引值</param>
         /// <param name="acc">玩家正確率</param>
-        public void setThreshold(int index, float acc)
+        public void setThreshold(int index, float acc, int optimization = 0)
         {
             /*
              * theta: 正確率(考生能力)
@@ -111,17 +112,23 @@ namespace ETLab
 
                 // 更新門檻值(至少大於 ConfigData.min_threshold)
                 thresholds[index] = Mathf.Max(Utils.alphaToP(beta), ConfigData.min_threshold);
+
+                if(optimization > 0)
+                {
+                    thresholds[index] = (float)Math.Round(thresholds[index], optimization);
+                }
+
                 //Debug.Log(string.Format("[Movement] setThreshold | update value -> " +
                 //    "P : {0:F4}, beta: {1:F4}, thresholds: {2:F8}, acc: {3:F8}", P, beta, thresholds[index], acc));
             }
             catch (IndexOutOfRangeException)
             {
-                Debug.LogError("[setThreshold] IndexOutOfRangeException");
+                Debug.LogError("[Movement] setThreshold | IndexOutOfRangeException");
             }
         }
 
         // 取得全部門檻值
-        public float[] getThresholds()
+        public float[] getThreshold()
         {
             return thresholds;
         }
@@ -148,12 +155,17 @@ namespace ETLab
                 // 新數值較大才更新
                 if (value > accuracys[index])
                 {
+                    if(index == 0)
+                    {
+                        Debug.Log(string.Format("[Movement] setHighestAccuracy | value: {0:F4} > accuracys[index]: {1:F4}", value, accuracys[index]));
+                    }
+
                     accuracys[index] = value;
                 }
             }
             catch (IndexOutOfRangeException)
             {
-                Debug.LogError(string.Format("[Mo]"));
+                Debug.LogError(string.Format("[Movement]"));
             }
 
             return accuracys[index];

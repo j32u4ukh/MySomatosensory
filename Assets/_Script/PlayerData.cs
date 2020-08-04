@@ -111,7 +111,7 @@ namespace ETLab
             }
         }
 
-        public float[] getThresholds(Pose pose)
+        public float[] readThreshold(Pose pose)
         {
             if (thresholds.ContainsKey(pose))
             {
@@ -123,7 +123,7 @@ namespace ETLab
             }
         }
 
-        public float getThreshold(Pose pose, int index)
+        public float readThreshold(Pose pose, int index)
         {
             if (thresholds.ContainsKey(pose))
             {

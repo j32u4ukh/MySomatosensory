@@ -1223,6 +1223,7 @@ MonoBehaviour:
   question_text: {fileID: 1527495684}
   ui_count: {fileID: 1446750996}
   score_borad: {fileID: 1995599535}
+  hint: {fileID: 1056425191}
 --- !u!4 &1659257832
 Transform:
   m_ObjectHideFlags: 0

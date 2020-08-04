@@ -84,8 +84,8 @@ namespace ETLab
                 switch (mode)
                 {
                     case Mode.Record:
-                        player.setThresholds(pose, thres: null);
-                        player.setGameStage(GameStage.Test);
+                        player.writeThreshold(pose, thres: null);
+                        player.writeGameStage(GameStage.Test);
                         mode = Mode.Stop;
                         Debug.Log(string.Format("[RecordRePlay] Mode.Record | setPose: {0}, setStage: {1}",
                             pose, GameStage.Test));
@@ -114,7 +114,7 @@ namespace ETLab
                             //gm.stopRecord();
                             //gm.save(root, pose.ToString());
                             dm.stopRecord(player, root, dir);
-                            dm.stopRecord();
+                            dm.stopRecord(invoke_event: false);
                             has_initialization = false;
                         }
                         break;

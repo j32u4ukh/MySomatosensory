@@ -205,7 +205,15 @@ namespace ETLab
 
         private void OnGUI()
         {
-            GUI.color = Color.red;
+            if(detect_time < boundary_time)
+            {
+                GUI.color = Color.black;
+            }
+            else
+            {
+                GUI.color = Color.red;
+            }
+            
             GUI.skin.label.fontSize = 60;
             gui = string.Format("\n\n\n\n\n\n\nROUND_TIME: {0}, pose: {1}\nround_time: {2:F4}\ndetect_time: {3:F4}\n" +
                 "acc: {4:F4}\nthres: {5:F4}", ROUND_TIME, pose, round_time, detect_time, acc, thres);
@@ -293,7 +301,7 @@ namespace ETLab
 
                 foreach (Player player in pm.getPlayers())
                 {
-                    player.setGameStage(GameStage.Game1);
+                    player.writeGameStage(GameStage.Game1);
                     player.setTargetPose(pose);
                 }
 
@@ -386,6 +394,8 @@ namespace ETLab
             // 透過 updateFlag 將 accumulate_time 傳給 modifingFlag，根據時間調整偵測模式
             dm.updateFlag(detect_time);
 
+            string acc_string = "", thres_string = "";
+
             // 實作偵測，此形式保留了對個別動作的不同操作空間
             foreach (Pose pose in poses)
             {
@@ -394,14 +404,25 @@ namespace ETLab
 
                 // 呈現當前動作正確率與門檻值
                 movement = player.getMovement(pose);
-                float_list = new FloatList(movement.getAccuracy());
+                float_list = new FloatList(player.getAccuracy(pose));
+
+                if(detect_time <= boundary_time)
+                {
+                    acc_string = float_list.toString();                    
+                }
 
                 if(float_list.length() != 0)
                 {
                     acc = float_list.mean();
                 }
 
-                float_list = new FloatList(movement.getThresholds());
+                float_list = new FloatList(player.getThreshold(pose));
+
+                if (detect_time <= boundary_time)
+                {
+                    thres_string = float_list.toString();
+                    Debug.Log(string.Format("[IrtDemo2] defaultDetect | \nacc: {0}\nthres: {1}", acc_string, thres_string));
+                }
 
                 if (float_list.length() != 0)
                 {
@@ -412,7 +433,7 @@ namespace ETLab
 
         Flag modifingFlag(float f)
         {
-            if (detect_time > boundary_time)
+            if (f > boundary_time)
             {
                 // 配對(O), 修改門檻值(O)
                 return Flag.Modify;
@@ -448,8 +469,7 @@ namespace ETLab
             number--;
 
             // 更新 UI 計數
-            ui_count.sprite = Resources.Load<Sprite>(string.Format("number{0}", number));
-            hint.sprite = null;
+            ui_count.sprite = Resources.Load<Sprite>(string.Format("number{0}", number));            
 
             // 呈現當前動作正確率與門檻值
             Player player = pm.getPlayer(index);
@@ -464,7 +484,7 @@ namespace ETLab
                 acc = float_list.mean();
             }
 
-            float_list = new FloatList(movement.getThresholds());
+            float_list = new FloatList(movement.getThreshold());
 
             if (float_list.length() != 0)
             {
@@ -485,11 +505,8 @@ namespace ETLab
         {
             Debug.Log(string.Format("[IrtDemo2] onMatchEndedFinishedListener"));
 
-            //Player player = pm.getPlayer(0);
-            //Movement movement = player.getMovement(pose);
-            //float[] acc = movement.getAccuracy();
-            //Debug.Log(string.Format("[IrtDemo2] Accuracy: {0}", Utils.arrayToString(acc)));
-            //Debug.Log(string.Format("[IrtDemo2] Threshold: {0}", Utils.arrayToString(movement.getThresholds())));
+            // 清空提示圖案
+            hint.sprite = null;
 
             // 還原配對過程中的暫存資訊
             dm.resetState(pose);
