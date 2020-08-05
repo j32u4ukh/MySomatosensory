@@ -18,6 +18,8 @@ namespace ETLab
         private Dictionary<Pose, Movement> movement_dict;
         public RecordData record;
         bool is_recording;
+        private Pose target_pose = Pose.None;
+        private Pose matched_pose = Pose.None;
         #endregion
 
         #region Component of player
@@ -41,6 +43,7 @@ namespace ETLab
         #region Player
         public void setId(string id)
         {
+            Debug.Log(string.Format("[Player] setId(id: {0})", id));
             this.id = id;
             record.setId(id);
             player_data = new PlayerData(id);
@@ -59,31 +62,39 @@ namespace ETLab
             return player_index;
         }
 
-        public void setPose(Pose pose)
-        {
-            record.setPose(pose);
-        }
-
-        public void setStage(GameStage stage)
-        {
-            record.setStage(stage);
-        }
-
-        // 開始紀錄骨架資訊
+        #region 動作偵測紀錄
+        /// <summary>
+        /// 開始紀錄骨架資訊
+        /// </summary>
         public void startRecord()
         {
             is_recording = true;
             record.setStartTime();
         }
 
-        public void setEndTime()
+        /// <summary>
+        /// 停止紀錄骨架資訊
+        /// </summary>
+        /// <param name="file_id"></param>
+        /// <param name="root"></param>
+        /// <param name="dir"></param>
+        public void stopRecord(string file_id, string root = "", string dir = "")
         {
+            Debug.Log(string.Format("[Player] stopRecord | file_id: {0}", file_id));
+            is_recording = false;
             record.setEndTime();
+            record.save(file_id, root, dir);
+            record = new RecordData();
+            record.setId(id);
         }
 
-        public void setThreshold(float[] threshold)
+        /// <summary>
+        /// 特化為直接根據動作標籤取得正確率並記錄
+        /// </summary>
+        /// <param name="pose">要紀錄正確率的動作</param>
+        public void setAccuracy(Pose pose)
         {
-            record.setThreshold(threshold);
+            record.setAccuracy(getAccuracy(pose));
         }
 
         public void setAccuracy(float[] accuracy)
@@ -100,14 +111,6 @@ namespace ETLab
         {
             record.addPosture(skeletons, rotations);
         }
-        
-        public void stoptRecord(string file_id, string root = "", string dir = "")
-        {
-            is_recording = false;
-            record.save(file_id, root, dir);
-            record = new RecordData();
-            record.setId(id);
-        }
 
         public void saveRecordData(string file_id)
         {
@@ -118,18 +121,23 @@ namespace ETLab
         {
             return is_recording;
         }
+        #endregion
 
+        #region movement_dict
         public void setMovement(Pose pose)
         {
+            Debug.Log(string.Format("[Player] setMovement(pose: {0})", pose));
+
             if (!movement_dict.ContainsKey(pose))
             {
                 Movement movement = new Movement(pose);
 
                 // 透過 player_data 取得該動作的門檻值(數值因人而異)
-                float[] thresholds = player_data.getThresholds(pose);
-                Debug.Log(string.Format("[Player] setMovement | Player {0} load {1} thresholds: {2}",
-                    id, pose, Utils.arrayToString(thresholds)));
-                movement.setThresholds(thresholds);
+                float[] thresholds = player_data.readThreshold(pose);
+
+                //Debug.Log(string.Format("[Player] setMovement | Player {0} load {1} thresholds: {2}",
+                //    id, pose, Utils.arrayToString(thresholds)));
+                movement.setThreshold(thresholds);
 
                 movement_dict.Add(pose, movement);
             }
@@ -150,40 +158,167 @@ namespace ETLab
             return null;
         }
 
+        // 配對成功後，呼叫此函式，將配對過程中的暫存資訊還原
         public void resetMovement(Pose pose)
         {
             if (movement_dict.ContainsKey(pose))
             {
+                // 玩家該動作是否通過及正確率等資訊的重置
                 movement_dict[pose].resetState();
             }
             else
             {
                 Debug.LogWarning(string.Format("[Player] resetMovement | No {0} in movement_dict.", pose));
             }
+        } 
+        #endregion
+
+        #region 存取配對的動作
+        public void setTargetPose(Pose pose)
+        {
+            target_pose = pose;
+        }
+
+        // 紀錄配對完成的動作
+        public void setMatchedPose(Pose pose)
+        {
+            matched_pose = pose;
+        }
+
+        public Pose getTargetPose()
+        {
+            return target_pose;
+        }
+
+        /// <summary>
+        /// 提供偵測腳本判斷是否已經偵測完成，以及事後根據配對到的動作給予回饋的函式，因為現在大多改成事件監聽，無法配對成功後馬上將結果回傳，需要有變數將結果存起來
+        /// </summary>
+        /// <returns>已配對到的動作</returns>
+        public Pose getMatchedPose()
+        {
+            return matched_pose;
+        }
+
+        public void resetMatchedPose()
+        {
+            matched_pose = Pose.None;
+        }
+        #endregion
+        #endregion
+
+        #region Movement
+        // 紀錄正確率的最高值
+        public void setHighestAccuracy(Pose pose, int index, float value)
+        {
+            try
+            {
+                // 新數值較大才更新                
+                if (value > movement_dict[pose].getAccuracy(index: index))
+                {
+                    movement_dict[pose].setHighestAccuracy(index: index, value: value);
+                }
+            }
+            catch (IndexOutOfRangeException iooe)
+            {
+                Debug.LogError(string.Format("[Player] setHighestAccuracy | {0}", iooe.Message));
+            }
+        }
+
+        public float[] getAccuracy(Pose pose)
+        {
+            return movement_dict[pose].getAccuracy();
+        }
+
+        public float getAccuracy(Pose pose, int index)
+        {
+            return movement_dict[pose].getAccuracy(index);
+        }
+
+        public void setThreshold(Pose pose)
+        {
+            movement_dict[pose].setThreshold(getAccuracy(pose));
+        }
+
+        public void setThreshold(Pose pose, float[] thresholds)
+        {
+            movement_dict[pose].setThreshold(thresholds);
+        }
+
+        public void setThreshold(Pose pose, int index, float acc, int optimization = 0)
+        {
+            movement_dict[pose].setThreshold(index: index, acc: acc, optimization: optimization);
+        }
+
+        public float[] getThreshold(Pose pose)
+        {
+            return movement_dict[pose].getThreshold();
+        }
+
+        public float getThreshold(Pose pose, int index)
+        {
+            return movement_dict[pose].getThreshold(index);
+        }
+
+        public void setMatched(Pose pose, int index, bool status)
+        {
+            movement_dict[pose].setMatched(index: index, status: status);
+        }
+
+        public void setAddtionalMatched(Pose pose, bool is_matched)
+        {
+            movement_dict[pose].setAddtionalMatched(is_matched: is_matched);
+        }
+
+        public bool isMatched(Pose pose)
+        {
+            return movement_dict[pose].isMatched();
+        }
+
+        public bool isMatched(Pose pose, int index)
+        {
+            return movement_dict[pose].isMatched(index: index);
         }
         #endregion
 
-        #region PlayerData
-        public void setGameStage(GameStage game_stage)
+        #region PlayerData: write/read 為 PlayerData 特化之 set/get，和相似功能的其他函式做區分
+        public void writeGameStage(GameStage game_stage)
         {
             player_data.setGameStage(game_stage);
+
+            // 動作偵測紀錄
+            record.setStage(game_stage);
         }
 
-        public void setThresholds(Pose pose, float[] thres)
+        public void writeThreshold(Pose pose)
         {
-            player_data.setThresholds(pose, thres);
+            // 動作偵測紀錄，用於紀錄玩家遊戲過程
+            record.setPose(pose);
+
+            float[] values = getAccuracy(pose);
+            record.setThreshold(values);
+            player_data.setThresholds(pose, values);
         }
 
-        public void setThreshold(Pose pose, int index, float thres)
+        public void writeThreshold(Pose pose, float[] thres)
         {
-            player_data.setThreshold(pose, index, thres);
+            // 動作偵測紀錄，用於紀錄玩家遊戲過程
+            record.setPose(pose);
+            record.setThreshold(thres);
+
+            if(thres != null)
+            {
+                player_data.setThresholds(pose, thres);
+            }
         }
 
-        public float[] getThresholds(Pose pose)
+        public float[] readThreshold(Pose pose)
         {
-            return player_data.getThresholds(pose);
+            return player_data.readThreshold(pose);
         }
 
+        /// <summary>
+        /// 儲存玩家數據(PlayerData)
+        /// </summary>
         public void save()
         {
             Debug.Log(string.Format("[Player] save"));
@@ -191,7 +326,7 @@ namespace ETLab
         }
         #endregion
 
-        #region 計算玩家位移
+        #region 玩家位移
         public void resetInitPos()
         {
             init_pos = model_helper.transform.position;

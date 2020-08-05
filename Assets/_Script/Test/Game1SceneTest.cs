@@ -23,9 +23,9 @@ namespace ETLab
                     player.index(), player.getId()));
             }
 
-            dm.onMatched.AddListener((int index) => {
-                Debug.Log(string.Format("[Game1SceneTest] onMatched Listener: player {0} matched.", index));
-            });
+            //dm.onMatched.AddListener((int index) => {
+            //    Debug.Log(string.Format("[Game1SceneTest] onMatched Listener: player {0} matched.", index));
+            //});
         }
 
         // Update is called once per frame
@@ -34,17 +34,12 @@ namespace ETLab
             if (Input.GetKeyDown(KeyCode.H))
             {
                 Debug.Log(string.Format("[StartSceneTest] Update | loadMultiPosture"));
-                dm.loadMultiPosture(Pose.RaiseTwoHands);
+                _ = dm.loadMultiPosture(Pose.RaiseTwoHands);
             }
 
             if (Input.GetKeyDown(KeyCode.D))
             {
                 dm.setDetectDelegate(detectRaiseTwoHands);
-            }
-
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                dm.releaseDetectDelegate();
             }
 
             // 跳場景

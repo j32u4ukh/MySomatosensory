@@ -28,20 +28,20 @@ namespace ETLab
             dm.registMultiPoses(Pose.Dribble);
             dm.registMultiPoses(Pose.RaiseHand, new List<Pose> { Pose.RaiseLeftHand, Pose.RaiseRightHand });
 
-            dm.onMatched.AddListener((int index) => {
-                Debug.Log(string.Format("[StartSceneTest] onMatched Listener: player {0} matched.", index));
-            });
+            //dm.onMatched.AddListener((int index) => {
+            //    Debug.Log(string.Format("[StartSceneTest] onMatched Listener: player {0} matched.", index));
+            //});
        
-            dm.onAllMatched.AddListener(()=> {
-                Debug.Log(string.Format("[StartSceneTest] onAllMatched Listener"));
-                //dm.releaseDetectDelegate();                
-            });
+            //dm.onAllMatched.AddListener(()=> {
+            //    Debug.Log(string.Format("[StartSceneTest] onAllMatched Listener"));
+            //    //dm.releaseDetectDelegate();                
+            //});
 
-            // 處理因超時而結束偵測的情況
-            dm.onMatchEnded.AddListener(()=> {
-                Debug.Log(string.Format("[StartSceneTest] onMatchEnded Listener"));
-                accumulate_time = 0f;
-            });
+            //// 處理因超時而結束偵測的情況
+            //dm.onMatchEnded.AddListener(()=> {
+            //    Debug.Log(string.Format("[StartSceneTest] onMatchEnded Listener"));
+            //    accumulate_time = 0f;
+            //});
         }
 
         // Update is called once per frame
@@ -50,7 +50,7 @@ namespace ETLab
             if (Input.GetKeyDown(KeyCode.L))
             {
                 Debug.Log(string.Format("[StartSceneTest] Update | loadMultiPosture: {0}", pose));
-                dm.loadMultiPosture(pose);
+                _ = dm.loadMultiPosture(pose);
             }
 
             // 跳場景

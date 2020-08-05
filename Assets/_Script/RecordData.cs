@@ -20,7 +20,7 @@ namespace ETLab
         public string end_time;
         public float[] threshold;
         public float[] accuracy;
-        public string remark;
+        public string remark = "";
         public List<Posture> posture_list;
         #endregion
 
@@ -90,17 +90,28 @@ namespace ETLab
             posture_list.Add(posture);
         }
 
+        public string toString()
+        {
+            FloatList float_list = new FloatList(threshold);
+            float threshold_mean = float_list.geometricMean();
+            float_list = new FloatList(accuracy);
+            float accuracy_mean = float_list.geometricMean();
+            return string.Format("id: {0}, date: {1}, pose: {2}, stage: {3}, start_time: {4}, end_time: {5}, " +
+                "threshold: {6:F4}, accuracy: {7:F4}, remark: {8}", 
+                id, date, pose, stage, start_time, end_time, threshold_mean, accuracy_mean, remark);
+        }
+
         #region 紀錄記錄
         public string save(string file_id, string root = "", string dir = "")
         {
             if (root.Equals(""))
             {
-                root = Path.Combine(GameInfo.record_root, "Somatosensory\\Data");
+                root = Path.Combine(GameInfo.record_root, "Somatosensory", "Data");
             }
 
             if (dir.Equals(""))
             {
-                dir = Path.Combine(root, string.Format("{0}\\{1}", id, DateTime.Now.ToString("yyyy-MM-dd")));
+                dir = Path.Combine(root, id, DateTime.Now.ToString("yyyy-MM-dd"));
             }
 
             if (!Directory.Exists(dir))
@@ -150,6 +161,24 @@ namespace ETLab
             reader.Close();
 
             return JsonConvert.DeserializeObject<RecordData>(load_data);
+        }
+
+        public static List<RecordData> loadRecordDatas(string path)
+        {
+            List<RecordData> records = new List<RecordData>();
+            StreamReader reader = new StreamReader(path);
+            RecordData record;
+            string line;
+
+            while ((line = reader.ReadLine()) != null)
+            {
+                line = line.Trim();
+                record = JsonConvert.DeserializeObject<RecordData>(line);
+                records.Add(record);
+            }
+
+            reader.Close();
+            return records;
         }
 
         public List<Posture> getPostureList()

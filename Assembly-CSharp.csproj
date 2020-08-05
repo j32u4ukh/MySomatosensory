@@ -100,10 +100,18 @@
     <Compile Include="Assets\_Script\S3\Test\Scene1.cs" />
     <Compile Include="Assets\_Script\S3\Test\Scene2.cs" />
     <Compile Include="Assets\_Script\S3\Utils.cs" />
+    <Compile Include="Assets\_Script\Test\AudioManager.cs" />
     <Compile Include="Assets\_Script\Test\Game1SceneTest.cs" />
+    <Compile Include="Assets\_Script\Test\IrtDemo.cs" />
+    <Compile Include="Assets\_Script\Test\IrtDemo2.cs" />
+    <Compile Include="Assets\_Script\Test\JaNKeNPoN.cs" />
+    <Compile Include="Assets\_Script\Test\MultiTest1.cs" />
+    <Compile Include="Assets\_Script\Test\MultiTest2.cs" />
+    <Compile Include="Assets\_Script\Test\ScoreBoard.cs" />
     <Compile Include="Assets\_Script\Test\StartSceneTest.cs" />
     <Compile Include="Assets\_Script\Test\TwoModelTest.cs" />
     <Compile Include="Assets\_Script\Utils.cs" />
+    <Compile Include="Assets\_Script\UtilScene.cs" />
     <Compile Include="Assets\_Script\Version1\DetectManager.cs" />
     <Compile Include="Assets\_Script\Version1\DetectSkeleton.cs" />
     <Compile Include="Assets\_Script\Version1\GameInfo.cs" />
@@ -252,7 +260,8 @@
     <None Include="Assets\K2Examples\Resources\AstraCoordMapper.compute" />
     <None Include="Assets\K2Examples\Resources\MedianShader.shader" />
     <None Include="Assets\StreamingAssets\MovementData\Run\RecordRePlay-17-28-20-4802.txt" />
-    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-11-50-24-4417.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-24-49-9231.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\Squat\RecordRePlay-14-47-09-6046.txt" />
     <None Include="Assets\K2Examples\Resources\DepthShader.shader" />
     <None Include="Assets\K2Examples\Resources\Body2DepthShader.shader" />
     <None Include="Assets\K2Examples\Resources\SpeechGrammar.grxml.txt" />
@@ -260,7 +269,6 @@
     <None Include="Assets\K2Examples\KinectDemos\ProjectorDemo\Scripts\RoomAliveToolkit\Attribution.txt" />
     <None Include="Assets\StreamingAssets\MovementData\StrikeRight\RecordRePlay-17-17-35-5504.txt" />
     <None Include="Assets\StreamingAssets\MovementData\StrikeLeft\RecordRePlay-17-17-00-3077.txt" />
-    <None Include="Assets\StreamingAssets\MovementData\Squat\RecordRePlay-17-26-29-9576.txt" />
     <None Include="Assets\K2Examples\Resources\Body2ColorShader.shader" />
     <None Include="Assets\StreamingAssets\MovementData\Jump\RecordRePlay-17-31-56-1435.txt" />
     <None Include="Assets\K2Examples\Resources\Depth2ColorShaderNN.shader" />
@@ -275,6 +283,7 @@
     <None Include="Assets\K2Examples\Resources\Body2DepthShaderInv.shader" />
     <None Include="Assets\K2Examples\KinectDemos\RecorderDemo\Resources\PlayerGrammar.grxml.txt" />
     <None Include="Assets\K2Examples\Resources\CoordMapper.compute" />
+    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-20-40-1913.txt" />
     <None Include="Assets\StreamingAssets\MovementData\HopRight\RecordRePlay-17-12-15-2232.txt" />
     <None Include="Assets\K2Examples\Resources\Depth2ColorShader.shader" />
     <None Include="Assets\StreamingAssets\MovementData\Walk\RecordRePlay-17-27-36-8563.txt" />
@@ -283,7 +292,8 @@
     <None Include="Assets\StreamingAssets\MovementData.txt" />
     <None Include="Assets\K2Examples\Resources\Erode.shader" />
     <None Include="Assets\StreamingAssets\MovementData\HopLeft\RecordRePlay-17-11-30-0455.txt" />
-    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-52-31-2503.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-21-09-3302.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\Squat\RecordRePlay-14-38-16-3086.txt" />
     <None Include="Assets\StreamingAssets\PlayerData\你要不要吃哈密瓜.txt" />
     <None Include="Assets\K2Examples\Resources\BodyShader.shader" />
     <None Include="Assets\StreamingAssets\MovementData\Jump\RecordRePlay-17-30-33-8398.txt" />
@@ -291,8 +301,8 @@
     <None Include="Assets\K2Examples\Resources\Dilate.shader" />
     <None Include="Assets\K2Examples\Resources\Body2DepthShaderNN.shader" />
     <None Include="Assets\StreamingAssets\MovementData\VerticalWave\RecordRePlay-17-21-50-1499.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\Squat\RecordRePlay-14-40-27-3451.txt" />
     <None Include="Assets\K2Examples\KinectDemos\ProjectorDemo\Resources\calibration.xml" />
-    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands.txt" />
     <None Include="Assets\K2Examples\Resources\BlurShader5.shader" />
     <None Include="Assets\K2Examples\_Readme\License.txt" />
     <None Include="Assets\K2Examples\KinectDemos\FittingRoomDemo\Resources\Shaders\UserBlendShader.shader" />
@@ -304,7 +314,6 @@
     <None Include="Assets\K2Examples\KinectDemos\VisualizerDemo\Attribution.txt" />
     <None Include="Assets\K2Examples\Resources\AstraSpaceMapper.compute" />
     <None Include="Assets\K2Examples\_Readme\致盗版使用者-ToPiracyUsers.txt" />
-    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-11-46-17-9336.txt" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/Unity Projects/MySomatosensory/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
@@ -550,6 +559,9 @@
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
       <HintPath>D:/Unity Projects/MySomatosensory/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Tracker.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime">
+      <HintPath>D:/Unity Projects/MySomatosensory/Assets/_Script/UnityAsync/Plugins/System.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>D:/Unity Projects/Unity Editor/2019.1.4f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
@@ -910,6 +922,10 @@
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
       <Project>{2A02521A-641B-1F4E-ED9C-BAEEBE7AA90E}</Project>
       <Name>Assembly-CSharp-firstpass</Name>
+    </ProjectReference>
+    <ProjectReference Include="UnityAsync.csproj">
+      <Project>{213C73AF-555C-5548-6A32-63D1B153AA91}</Project>
+      <Name>UnityAsync</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

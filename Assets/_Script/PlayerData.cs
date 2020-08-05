@@ -30,6 +30,7 @@ namespace ETLab
 
         public PlayerData(string id)
         {
+            Debug.Log(string.Format("[PlayerData] PlayerData(id: {0})", id));
             this.id = id;
             path = Path.Combine(Application.streamingAssetsPath, "PlayerData", string.Format("{0}.txt", id));
 
@@ -50,6 +51,8 @@ namespace ETLab
                 PlayerData data = JsonConvert.DeserializeObject<PlayerData>(load_data);
                 game_stage = data.game_stage;
                 thresholds = data.thresholds;
+
+
             }
             else
             {
@@ -66,6 +69,7 @@ namespace ETLab
                     thres = new float[ConfigData.n_posture];
                     for (res = 0; res < ConfigData.n_posture; res++)
                     {
+                        // 給予初始門檻值
                         thres[res] = ConfigData.init_threshold;
                     }
                     thresholds.Add(pose, thres);
@@ -107,7 +111,7 @@ namespace ETLab
             }
         }
 
-        public float[] getThresholds(Pose pose)
+        public float[] readThreshold(Pose pose)
         {
             if (thresholds.ContainsKey(pose))
             {
@@ -119,7 +123,7 @@ namespace ETLab
             }
         }
 
-        public float getThreshold(Pose pose, int index)
+        public float readThreshold(Pose pose, int index)
         {
             if (thresholds.ContainsKey(pose))
             {
@@ -132,6 +136,9 @@ namespace ETLab
             }
         }
 
+        /// <summary>
+        /// 儲存玩家的 PlayerData，根據場景名稱判斷目前的 game_stage
+        /// </summary>
         public void save()
         {
             string scene = SceneManager.GetActiveScene().name;

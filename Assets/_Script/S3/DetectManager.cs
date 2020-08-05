@@ -167,7 +167,7 @@ namespace S3
         // 取得單一姿勢正確率
         float getAccuracy(Player player, Posture posture)
         {
-            // 從 comparing_parts_dict 讀取比較關節，不需由 player 來提供
+            // : 從 comparing_parts_dict 讀取比較關節，不需由 player 來提供
             List<HumanBodyBones> comparing_parts = player.getComparingParts(pose);
             HumanBodyBones bone;
             Vector3 player_vector, standrad_vector, s1, s2, p1, p2;

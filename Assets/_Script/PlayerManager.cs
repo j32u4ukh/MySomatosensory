@@ -13,18 +13,21 @@ namespace ETLab
         private int n_player;
         Player[] read_players;
 
+        private void Awake()
+        {
+            // 根據實際人數，調整出現的模型數量 
+            n_player = players.Length;
+            read_players = new Player[n_player];
+            for (int i = 0; i < n_player; i++)
+            {
+                read_players[i] = players[i];
+            }
+        }
+
         // Start is called before the first frame update
         void Start()
         {
             DontDestroyOnLoad(this);
-
-            // 根據實際人數，調整出現的模型數量 
-            n_player = players.Length;
-            read_players = new Player[n_player];
-            for(int i = 0; i < n_player; i++)
-            {
-                read_players[i] = players[i];
-            }
         }
 
         // Update is called once per frame
@@ -36,11 +39,17 @@ namespace ETLab
         // 根據實際人數，調整出現的模型數量 
         public void init(int n_player)
         {
+            Debug.Log(string.Format("[PlayerManager] init(n_player: {0})", n_player));
             this.n_player = n_player;
             read_players = new Player[n_player];
             for (int i = 0; i < n_player; i++)
             {
                 read_players[i] = players[i];
+            }
+
+            for (int i = n_player; i < players.Length; i++)
+            {
+                players[i].gameObject.SetActive(false);
             }
         }
 

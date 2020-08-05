@@ -371,6 +371,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pm: {fileID: 620061710}
   id: 9527
+  pose: 0
 --- !u!1 &1731354965
 GameObject:
   m_ObjectHideFlags: 0

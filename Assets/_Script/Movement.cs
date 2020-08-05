@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace ETLab
@@ -42,8 +43,6 @@ namespace ETLab
         // 姿勢匹配是否通過
         private bool[] is_matched;
 
-        public bool has_matched;
-
         // 額外條件是否通過
         private bool is_additional_matched;
 
@@ -54,10 +53,11 @@ namespace ETLab
         }
 
         // 以陣列初始化門檻值
-        public void setThresholds(float[] _thresholds)
+        public void setThreshold(float[] _thresholds)
         {
             int _length = _thresholds.Length;
             thresholds = new float[_length];
+
             for (int i = 0; i < _length; i++)
             {
                 thresholds[i] = _thresholds[i];
@@ -69,9 +69,12 @@ namespace ETLab
         /// </summary>
         /// <param name="index">門檻索引值</param>
         /// <param name="acc">玩家正確率</param>
-        public void setThreshold(int index, float acc)
+        public void setThreshold(int index, float acc, int optimization = 0)
         {
             /*
+             * theta: 正確率(考生能力)
+             * beta: 門檻值(考題難度)
+             * P: 通過機率
              P = e^(theta - beta) / (1 + e^(theta - beta))
              P + P * e^(theta - beta) = e^(theta - beta)
              P = (1 - P) * e^(theta - beta)
@@ -90,14 +93,17 @@ namespace ETLab
                 float P = Utils.getIrtValue(theta, beta);
 
                 // 0.5f 的情況為 theta == beta，與門檻值的下限無關
-                if(P > 0.5f)
+                // P > 0.5f: 能力較門檻高，需要上調門檻值
+                if (P > 0.5f)
                 {
                     Debug.Log(string.Format("[Movement] setThreshold | index: {0}, theta: {1:F8}, beta: {2:F8}, P: {3:F8}",
                                             index, theta, beta, P));
 
                     P = Mathf.Max(0.5f, P - ConfigData.learning_rate);
                 }
-                else if(P < 0.5f)
+
+                // P < 0.5f: 能力較門檻低，需要下調門檻值
+                else if (P < 0.5f)
                 {
                     P = Mathf.Min(0.5f, P + ConfigData.learning_rate);
                 }
@@ -107,15 +113,23 @@ namespace ETLab
 
                 // 更新門檻值(至少大於 ConfigData.min_threshold)
                 thresholds[index] = Mathf.Max(Utils.alphaToP(beta), ConfigData.min_threshold);
+
+                if(optimization > 0)
+                {
+                    thresholds[index] = (float)Math.Round(thresholds[index], optimization);
+                }
+
+                Debug.Log(string.Format("[Movement] setThreshold | update value -> " +
+                    "P : {0:F4}, beta: {1:F4}, thresholds: {2:F8}, acc: {3:F8}", P, beta, thresholds[index], acc));
             }
             catch (IndexOutOfRangeException)
             {
-                Debug.LogError("[setThreshold] IndexOutOfRangeException");
+                Debug.LogError("[Movement] setThreshold | IndexOutOfRangeException");
             }
         }
 
         // 取得全部門檻值
-        public float[] getThresholds()
+        public float[] getThreshold()
         {
             return thresholds;
         }
@@ -142,12 +156,17 @@ namespace ETLab
                 // 新數值較大才更新
                 if (value > accuracys[index])
                 {
+                    if(index == 0)
+                    {
+                        Debug.Log(string.Format("[Movement] setHighestAccuracy | value: {0:F4} > accuracys[index]: {1:F4}", value, accuracys[index]));
+                    }
+
                     accuracys[index] = value;
                 }
             }
             catch (IndexOutOfRangeException)
             {
-                Debug.LogError(string.Format("[Mo]"));
+                Debug.LogError(string.Format("[Movement]"));
             }
 
             return accuracys[index];
@@ -168,6 +187,28 @@ namespace ETLab
             {
                 return 0f;
             }
+        }
+
+        /// <summary>
+        /// 計算正確率與門檻值之間的落差，還差多少才會超過門檻值
+        /// </summary>
+        /// <returns>正確率與門檻值之間的平均落差</returns>
+        public float getGap()
+        {
+            int i, len = accuracys.Length;
+            float total_gap = 0, gap;
+
+            for(i = 0; i < len; i++)
+            {
+                gap = thresholds[i] - accuracys[i];
+
+                if(gap > 0)
+                {
+                    total_gap += gap;
+                }
+            }
+
+            return total_gap / len;
         }
 
         public Pose getPose()
@@ -212,8 +253,6 @@ namespace ETLab
             // 是否通過
             is_matched = new bool[ConfigData.n_posture];
 
-            has_matched = false;
-
             // 初始化正確率
             accuracys = new float[ConfigData.n_posture];
         }
@@ -222,6 +261,7 @@ namespace ETLab
     public class MultiPosture
     {
         Dictionary<Pose, List<List<Posture>>> index_oriented_dict;
+        public PoseEvent onMultiPostureLoaded = new PoseEvent();
 
         public MultiPosture()
         {
@@ -229,9 +269,9 @@ namespace ETLab
         }
 
         #region 讀取數據
-        // TODO: loadMultiPosture 改為同步讀取
+        // loadMultiPosture 改為同步讀取
         // 需要真人預錄才會有數據
-        public void loadMultiPosture(Pose pose)
+        public async Task loadMultiPosture(Pose pose)
         {
             Debug.Log(string.Format("[MultiPosture] loadMultiPosture(pose: {0})", pose));
             List<List<Posture>> multi_postures = new List<List<Posture>>();
@@ -253,7 +293,8 @@ namespace ETLab
                     if (!file.Contains(".meta"))
                     {
                         reader = new StreamReader(file);
-                        load_data = reader.ReadToEnd().Trim();
+                        load_data = await reader.ReadToEndAsync();
+                        load_data = load_data.Trim();
                         reader.Close();
 
                         record_data = JsonConvert.DeserializeObject<RecordData>(load_data);
@@ -274,6 +315,8 @@ namespace ETLab
             // 依照分解動作的順序，存取比對標準
             Debug.Log(string.Format("[MultiPosture] loadMultiPosture | transform to index oriented"));
             index_oriented_dict.Add(pose, transformIndexOriented(multi_postures));
+
+            onMultiPostureLoaded.Invoke(pose);
         }
 
         // 需要真人預錄才會有數據

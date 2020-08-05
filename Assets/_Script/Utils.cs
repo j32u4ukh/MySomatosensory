@@ -143,12 +143,14 @@ namespace ETLab
             return e / (1f + e);
         }
 
-        #region alpha 將 0 ~ 1 的機率映射到 -3 ~ +3
+        #region alpha: 能力估計函數 的 X 軸數值
+        // 將 0 ~ 1 的機率映射到 -3 ~ +3
         public static float pToAlpha(float p)
         {
             return (p * 6f) - 3f;
         }
 
+        // 將 -3 ~ +3 的機率映射到 0 ~ 1
         public static float alphaToP(float alpha)
         {
             return (alpha + 3f) / 6f;
