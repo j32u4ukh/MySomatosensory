@@ -391,8 +391,8 @@ namespace ETLab
                 if (flag != Flag.None)
                 {
                     // Matching / Modify 都會執行配對的判斷
-                    // 正確率 大於等於 門檻值
-                    if (acc >= thres)
+                    // 取得最高的正確率 大於等於 門檻值
+                    if (player.getAccuracy(pose: target_pose, index: posture_idx) >= thres)
                     {
                         // 紀錄"通過資訊"，以利後面判斷動作是否通過
                         player.setMatched(pose: target_pose, index: posture_idx, status:true);
@@ -411,7 +411,7 @@ namespace ETLab
                                     // 動態調整門檻值 movement.setThreshold(posture_idx)
                                     //Debug.Log(string.Format("[DetectManager] compareMovement | {0} setThreshold", target_pose));
                                     //movement.setThreshold(posture_idx, acc);
-                                    player.setThreshold(pose: target_pose, index: posture_idx, acc: acc, optimization: 2);
+                                    player.modifyThreshold(pose: target_pose, index: posture_idx, acc: acc, optimization: 2);
 
                                     //if (player.getId().Equals("9527"))
                                     //{
@@ -572,6 +572,7 @@ namespace ETLab
         {
             onAllMatchedFinished.Add(event_delegate);
         }
+        
         public void releaseOnAllMatchedFinishedListener()
         {
             onAllMatchedFinished = new List<VoidEventDelegate>();
@@ -585,6 +586,14 @@ namespace ETLab
         public void releaseOnMatchEndedFinishedListener()
         {
             onMatchEndedFinished = new List<VoidEventDelegate>();
+        }
+
+        public void modifyThresholds(Pose pose)
+        {
+            foreach(Player player in pm.getPlayers())
+            {
+                player.modifyThreshold(pose);
+            }
         }
         #endregion
 

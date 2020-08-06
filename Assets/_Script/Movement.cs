@@ -53,23 +53,24 @@ namespace ETLab
         }
 
         // 以陣列初始化門檻值
-        public void setThreshold(float[] _thresholds)
+        public void setThreshold(float[] thresholds)
         {
-            int _length = _thresholds.Length;
-            thresholds = new float[_length];
+            int i, len = thresholds.Length;
+            this.thresholds = new float[len];
 
-            for (int i = 0; i < _length; i++)
+            for (i = 0; i < len; i++)
             {
-                thresholds[i] = _thresholds[i];
+                this.thresholds[i] = thresholds[i];
             }
         }
 
+        // TODO: IRT 改為一次性呼叫，而非切換模式
         /// <summary>
         /// 利用能力估計函數，調整門檻值
         /// </summary>
         /// <param name="index">門檻索引值</param>
         /// <param name="acc">玩家正確率</param>
-        public void setThreshold(int index, float acc, int optimization = 0)
+        public void setThreshold(int index, float acc, int optimization = 2)
         {
             /*
              * theta: 正確率(考生能力)
@@ -116,11 +117,13 @@ namespace ETLab
 
                 if(optimization > 0)
                 {
-                    thresholds[index] = (float)Math.Round(thresholds[index], optimization);
+                    double power = Math.Pow(10.0, optimization);
+                    float opt = thresholds[index];
+                    thresholds[index] = (float)(Math.Floor(opt * power) / power);
                 }
 
-                Debug.Log(string.Format("[Movement] setThreshold | update value -> " +
-                    "P : {0:F4}, beta: {1:F4}, thresholds: {2:F8}, acc: {3:F8}", P, beta, thresholds[index], acc));
+                //Debug.Log(string.Format("[Movement] setThreshold | update value -> " +
+                //    "P : {0:F4}, beta: {1:F4}, thresholds: {2:F8}, acc: {3:F8}", P, beta, thresholds[index], acc));
             }
             catch (IndexOutOfRangeException)
             {
@@ -156,6 +159,7 @@ namespace ETLab
                 // 新數值較大才更新
                 if (value > accuracys[index])
                 {
+                    // TODO: remove this log output
                     if(index == 0)
                     {
                         Debug.Log(string.Format("[Movement] setHighestAccuracy | value: {0:F4} > accuracys[index]: {1:F4}", value, accuracys[index]));
@@ -195,7 +199,7 @@ namespace ETLab
         /// <returns>正確率與門檻值之間的平均落差</returns>
         public float getGap()
         {
-            int i, len = accuracys.Length;
+            int i, len = accuracys.Length, n_gap = 0;
             float total_gap = 0, gap;
 
             for(i = 0; i < len; i++)
@@ -205,10 +209,11 @@ namespace ETLab
                 if(gap > 0)
                 {
                     total_gap += gap;
+                    n_gap++;
                 }
             }
 
-            return total_gap / len;
+            return total_gap / n_gap;
         }
 
         public Pose getPose()
@@ -220,8 +225,8 @@ namespace ETLab
         public bool isMatched()
         {
             bool pass = true;
-
             int i;
+
             for (i = 0; i < ConfigData.n_posture; i++)
             {
                 pass &= is_matched[i];
@@ -319,7 +324,12 @@ namespace ETLab
             onMultiPostureLoaded.Invoke(pose);
         }
 
-        // 需要真人預錄才會有數據
+        /// <summary>
+        /// 將依檔案加入的各分解動作，轉換成依分解動作順序加入各檔案的標準，第一筆數據為各個檔案的第一個分解動作
+        /// 需要真人預錄才會有數據。
+        /// </summary>
+        /// <param name="multi_postures">多動作標準</param>
+        /// <returns></returns>
         public List<List<Posture>> transformIndexOriented(List<List<Posture>> multi_postures)
         {
             Debug.Log(string.Format("[MultiPosture] transformIndexOriented | n_model: {0}", multi_postures.Count));

@@ -234,6 +234,10 @@ namespace ETLab
             return movement_dict[pose].getAccuracy(index);
         }
 
+        /// <summary>
+        /// 使用前一次通過時的正確率，作為下一次的門檻初始值
+        /// </summary>
+        /// <param name="pose">要設置門檻值的動作</param>
         public void setThreshold(Pose pose)
         {
             movement_dict[pose].setThreshold(getAccuracy(pose));
@@ -244,9 +248,36 @@ namespace ETLab
             movement_dict[pose].setThreshold(thresholds);
         }
 
-        public void setThreshold(Pose pose, int index, float acc, int optimization = 0)
+        public void modifyThreshold(Pose pose, int index, float acc, int optimization = 2)
         {
             movement_dict[pose].setThreshold(index: index, acc: acc, optimization: optimization);
+        }
+
+        public void modifyThreshold(Pose pose, int optimization = 2)
+        {
+            Debug.Log(string.Format("[Player] modifyThreshold(pose: {0}, optimization: {1})", pose, optimization));
+            StartCoroutine(modifyThresholdCoroutine(pose, optimization));
+        }
+
+        public IEnumerator modifyThresholdCoroutine(Pose pose, int optimization = 2)
+        {
+            int i, len = ConfigData.n_posture;
+            float[] accuracys = getAccuracy(pose);
+            float[] thresholds = getThreshold(pose);
+
+            for (i = 0; i < len; i++)
+            {
+                // 當最高正確率仍小於門檻值(尚未通過)
+                if(accuracys[i] < thresholds[i])
+                {
+                    // accuracys[i]: 取得該分解動作的最高正確率
+                    modifyThreshold(pose: pose, index: i, acc: accuracys[i], optimization: optimization);
+                    yield return null;
+                }
+            }
+
+            Debug.Log(string.Format("[Player] modifyThresholdCoroutine | Finish modification of {0}\naccuracy: {1}\nthreshold: {2}", 
+                pose, Utils.arrayToString(getAccuracy(pose)), Utils.arrayToString(getThreshold(pose))));
         }
 
         public float[] getThreshold(Pose pose)

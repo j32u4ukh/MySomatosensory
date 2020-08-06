@@ -14,6 +14,7 @@ namespace ETLab
 
         string gui = "";
         float boundary_time = 5f;
+        int modify_time = 3;
 
         // ====================================================================================================
         // 音效管理
@@ -57,10 +58,7 @@ namespace ETLab
         // 分數呈現時間
         float SCORE_DISPLAY_TIME;
 
-        // 音樂大小設定
-        // 背景音量
-        float BG_VOL;
-
+        // ===== 音樂大小設定 =====
         // 正確回饋音量
         float CORRECT_VOL;
 
@@ -86,7 +84,7 @@ namespace ETLab
         // 答對多少題
         int success;
 
-        float round_time;
+        float round_time = 0f;
 
         // 用於平滑緩衝時間的不協調感
         float buffer_time;
@@ -95,15 +93,14 @@ namespace ETLab
         bool matched = false;
 
         // 呈現當前動作正確率與門檻值
-        Movement movement;
-        FloatList float_list;
-        float acc = 0f, thres = 0f;
+        FloatList acc_list, thres_list, gap_list;
 
         private void Awake()
         {
             pm.init(n_player: 1);
             pm.getPlayer(0).setId("9527");
-
+            gap_list = new FloatList(new float[] { 0 });
+            thres_list = new FloatList(new float[] { 0 });
         }
 
         // Start is called before the first frame update
@@ -153,9 +150,6 @@ namespace ETLab
             ROUND_TIME = NUMBER * SCALE_TIME + 5f;
 
             #region 音樂大小設定
-            // 背景音量
-            BG_VOL = 60.0f;
-
             // 正確回饋音量
             CORRECT_VOL = 30.0f;
 
@@ -197,26 +191,21 @@ namespace ETLab
         // Update is called once per frame
         void Update()
         {
-            if(Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Q))
+            if(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
-                Application.Quit();
+                if (Input.GetKeyDown(KeyCode.Q))
+                {
+                    Application.Quit();
+                }
             }
         }
 
         private void OnGUI()
         {
-            if(detect_time < boundary_time)
-            {
-                GUI.color = Color.black;
-            }
-            else
-            {
-                GUI.color = Color.red;
-            }
-            
             GUI.skin.label.fontSize = 60;
             gui = string.Format("\n\n\n\n\n\n\nROUND_TIME: {0}, pose: {1}\nround_time: {2:F4}\ndetect_time: {3:F4}\n" +
-                "acc: {4:F4}\nthres: {5:F4}", ROUND_TIME, pose, round_time, detect_time, acc, thres);
+                "Gap(acc - thres): {4:F4}\nthreshold: {5:F4}", ROUND_TIME, pose, round_time, detect_time, 
+                gap_list.sum(), thres_list.mean());
 
             GUILayout.Label(
                 // text on gui
@@ -317,7 +306,7 @@ namespace ETLab
                     dm.setDetectDelegate(defaultDetect);
 
                     // modify flag
-                    dm.setFlagDelegate(modifingFlag);
+                    //dm.setFlagDelegate(modifingFlag);
 
                     // 計數更新
                     ui_count.sprite = Resources.Load<Sprite>(string.Format("number{0}", number));
@@ -325,7 +314,6 @@ namespace ETLab
                     while (round_time < ROUND_TIME && 0 < number && !matched)
                     {
                         round_time += Time.deltaTime;
-                        gui = string.Format("ROUND_TIME: {0:F4}, round_time: {1:F4}", ROUND_TIME, round_time);
                         yield return new WaitForSeconds(Time.deltaTime);
                     }
 
@@ -355,6 +343,9 @@ namespace ETLab
                     audio_manager.modifyVolumn(FAIL_VOL, 2);
                     audio_manager.play(AudioManager.AudioName.Fail, 2);
                 }
+
+                // 清空提示圖案
+                hint.sprite = null;
 
                 // 呈現回饋 FEEDBACK_DISPLAY_TIME 秒後關閉
                 buffer_time = 0f;
@@ -392,9 +383,8 @@ namespace ETLab
             detect_time += Time.deltaTime;
 
             // 透過 updateFlag 將 accumulate_time 傳給 modifingFlag，根據時間調整偵測模式
-            dm.updateFlag(detect_time);
-
-            string acc_string = "", thres_string = "";
+            //dm.updateFlag(detect_time);
+            float delta_time;
 
             // 實作偵測，此形式保留了對個別動作的不同操作空間
             foreach (Pose pose in poses)
@@ -402,47 +392,43 @@ namespace ETLab
                 // 比對動作
                 dm.compareMovement(player, pose);
 
+                delta_time = Time.deltaTime;
+
+                if ((detect_time < modify_time) && (detect_time + delta_time > modify_time))
+                {
+                    player.modifyThreshold(pose: pose);
+                    Debug.Log(string.Format("[IrtDemo2] defaultDetect | modify_time: {0}", modify_time));
+                    modify_time++;
+                    
+                    GUI.color = Color.red;
+                }
+                else
+                {
+                    GUI.color = Color.black;
+                }
+
                 // 呈現當前動作正確率與門檻值
-                movement = player.getMovement(pose);
-                float_list = new FloatList(player.getAccuracy(pose));
-
-                if(detect_time <= boundary_time)
+                //movement = player.getMovement(pose);
+                acc_list = new FloatList(player.getAccuracy(pose));
+                thres_list = new FloatList(player.getThreshold(pose));
+                gap_list = acc_list - thres_list;
+                int i, len = gap_list.length();
+                for(i = 0; i < len; i++)
                 {
-                    acc_string = float_list.toString();                    
+                    if(gap_list[i] > 0.0f)
+                    {
+                        gap_list[i] = 0.0f;
+                    }
                 }
-
-                if(float_list.length() != 0)
-                {
-                    acc = float_list.mean();
-                }
-
-                float_list = new FloatList(player.getThreshold(pose));
-
-                if (detect_time <= boundary_time)
-                {
-                    thres_string = float_list.toString();
-                    //Debug.Log(string.Format("[IrtDemo2] defaultDetect | \nacc: {0}\nthres: {1}", acc_string, thres_string));
-                }
-
-                if (float_list.length() != 0)
-                {
-                    thres = float_list.mean();
-                }
+                Debug.Log(string.Format("[IrtDemo2] defaultDetect | \nacc: {0}\nthres: {1}", 
+                    acc_list.toString(), thres_list.toString()));
             }
         }
 
         Flag modifingFlag(float f)
         {
-            if (f > boundary_time)
-            {
-                // 配對(O), 修改門檻值(O)
-                return Flag.Modify;
-            }
-            else
-            {
-                // 配對(O), 修改門檻值(X)
-                return Flag.Matching;
-            }
+            // 配對(O), 修改門檻值(X)
+            return Flag.Matching;
         }
 
         IEnumerator gameEnd()
@@ -476,19 +462,17 @@ namespace ETLab
             Pose matched_pose = player.getMatchedPose();
             Debug.Log(string.Format("[IrtDemo2] onMatched Listener: player {0} matched pose: {1}.", index, matched_pose));
 
-            movement = player.getMovement(matched_pose);
-            float_list = new FloatList(movement.getAccuracy());
+            acc_list = new FloatList(player.getAccuracy(matched_pose));
+            thres_list = new FloatList(player.getThreshold(matched_pose));
+            gap_list = acc_list - thres_list;
+            int i, len = gap_list.length();
 
-            if (float_list.length() != 0)
+            for (i = 0; i < len; i++)
             {
-                acc = float_list.mean();
-            }
-
-            float_list = new FloatList(movement.getThreshold());
-
-            if (float_list.length() != 0)
-            {
-                thres = float_list.mean();
+                if (gap_list[i] > 0.0f)
+                {
+                    gap_list[i] = 0.0f;
+                }
             }
 
             // 正確音效
@@ -504,9 +488,6 @@ namespace ETLab
         void onMatchEndedFinishedListener()
         {
             Debug.Log(string.Format("[IrtDemo2] onMatchEndedFinishedListener"));
-
-            // 清空提示圖案
-            hint.sprite = null;
 
             // 還原配對過程中的暫存資訊
             dm.resetState(pose);

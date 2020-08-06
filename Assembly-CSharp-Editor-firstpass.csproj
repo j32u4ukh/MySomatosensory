@@ -326,6 +326,9 @@
     <Reference Include="ConsoleE">
       <HintPath>D:/Unity Projects/MySomatosensory/Assets/Plugins/ConsoleE/Editor/ConsoleE.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime">
+      <HintPath>D:/Unity Projects/MySomatosensory/Assets/_Script/UnityAsync/Plugins/System.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEditor.Advertisements">
       <HintPath>D:/Unity Projects/MySomatosensory/Library/PackageCache/com.unity.ads@2.0.8/Editor/UnityEditor.Advertisements.dll</HintPath>
     </Reference>
@@ -340,9 +343,6 @@
     </Reference>
     <Reference Include="UnityEditor.Purchasing">
       <HintPath>D:/Unity Projects/MySomatosensory/Library/PackageCache/com.unity.purchasing@2.0.6/Editor/UnityEditor.Purchasing.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime">
-      <HintPath>D:/Unity Projects/MySomatosensory/Assets/_Script/UnityAsync/Plugins/System.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>D:/Unity Projects/Unity Editor/2019.1.4f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>

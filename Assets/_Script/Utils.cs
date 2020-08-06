@@ -48,6 +48,7 @@ namespace ETLab
                 n_sample = length;
             }
 
+            // 每一個區塊的大小(將 length=100 區分為 n_sample=5 區，每一區的大小為 sample_size=20)
             float sample_size = (float)length / n_sample;
             System.Random random = new System.Random();
             for (i = 0; i < n_sample; i++)
