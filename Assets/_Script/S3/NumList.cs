@@ -133,7 +133,7 @@ public class FloatList : INumList<float>
             {
                 sb.Append(string.Format("{0:F4}, ", numbers[i]));
             }
-            sb.Append(string.Format("{0:F4}, ", numbers[i]));
+            sb.Append(string.Format("{0:F4}", numbers[i]));
         }
 
         sb.Append("]");

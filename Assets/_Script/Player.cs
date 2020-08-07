@@ -271,10 +271,10 @@ namespace ETLab
                 if(accuracys[i] < thresholds[i])
                 {
                     // accuracys[i]: 取得該分解動作的最高正確率
-                    modifyThreshold(pose: pose, index: i, acc: accuracys[i], optimization: optimization);
-                    yield return null;
+                    modifyThreshold(pose: pose, index: i, acc: accuracys[i], optimization: optimization);                    
                 }
             }
+            yield return null;
 
             Debug.Log(string.Format("[Player] modifyThresholdCoroutine | Finish modification of {0}\naccuracy: {1}\nthreshold: {2}", 
                 pose, Utils.arrayToString(getAccuracy(pose)), Utils.arrayToString(getThreshold(pose))));

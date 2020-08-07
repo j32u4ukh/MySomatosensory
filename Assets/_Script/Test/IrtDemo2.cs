@@ -14,7 +14,10 @@ namespace ETLab
 
         string gui = "";
         float boundary_time = 5f;
-        int modify_time = 3;
+
+        // 單位為毫秒(‎millisecond)
+        float modify_milli = 3.0f;
+        float interval_milli = 0.1f;
 
         // ====================================================================================================
         // 音效管理
@@ -185,6 +188,10 @@ namespace ETLab
             // 可以處理因超時而結束偵測的情況
             dm.addOnMatchEndedFinishedListener(onMatchEndedFinishedListener);
 
+            dm.onAllResourcesLoaded.AddListener(()=> {
+                StartCoroutine(gamePlaying());
+            });
+
             StartCoroutine(gameStart());
         }
 
@@ -237,10 +244,10 @@ namespace ETLab
             // 載入各動作數據(會根據標籤動作取得內含的多動作)
             _ = dm.loadMultiPosture(Pose.RaiseTwoHands);
             _ = dm.loadMultiPosture(Pose.Squat);
-            _ = dm.loadMultiPosture(Pose.Hop);
+            _ = dm.loadMultiPosture(Pose.Hop, invoke: true);
             yield return new WaitForSeconds(Time.deltaTime);
 
-            StartCoroutine(gamePlaying());
+            //StartCoroutine(gamePlaying());
         }
 
         IEnumerator gamePlaying()
@@ -394,11 +401,14 @@ namespace ETLab
 
                 delta_time = Time.deltaTime;
 
-                if ((detect_time < modify_time) && (detect_time + delta_time > modify_time))
+                if ((detect_time < modify_milli) && (detect_time + delta_time > modify_milli))
                 {
                     player.modifyThreshold(pose: pose);
-                    Debug.Log(string.Format("[IrtDemo2] defaultDetect | modify_time: {0}", modify_time));
-                    modify_time++;
+                    Debug.Log(string.Format("[IrtDemo2] defaultDetect | modify_milli: {0}, detect_time: {1:F4}, round_time: {2:F4}", 
+                        modify_milli, detect_time, round_time));
+
+                    // 間隔 interval_milli 毫秒再次呼叫調整門檻值的函式
+                    modify_milli += interval_milli;
                     
                     GUI.color = Color.red;
                 }
@@ -448,7 +458,8 @@ namespace ETLab
         {
             Debug.Log(string.Format("[IrtDemo2] onMatched(index: {0})", index));
 
-            detect_time = 0f;            
+            detect_time = 0f;
+            modify_milli = 3.0f;
             matched = true;
 
             // 因此 number - 1

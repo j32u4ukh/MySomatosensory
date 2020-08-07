@@ -64,8 +64,14 @@ namespace ETLab
         // 鑲嵌在偵測結束事件監聽器當中的函式們
         List<VoidEventDelegate> onMatchEndedFinished;
 
+        #region 資源載入相關
+        public UnityEvent onAllResourcesLoaded = new UnityEvent();
         public UnityEvent onComparingPartsLoaded = new UnityEvent();
-        public PoseEvent onMultiPostureLoaded = new PoseEvent();
+        bool is_comparing_parts_loaded = false;
+        public UnityEvent onMultiPostureLoaded = new UnityEvent();
+        bool is_multi_posture_loaded = false;
+        #endregion
+
         bool[] all_matching_state;
 
         #region 紀錄骨架位置
@@ -106,9 +112,25 @@ namespace ETLab
                 // 建構當下不會讀取數據，實際需要使用到前再讀取就好
                 mp = new MultiPosture();
 
+                // 當比對關節載入完成
+                onComparingPartsLoaded.AddListener(() => {
+                    Debug.Log(string.Format("[DetectManager] Start | 比對關節載入完成"));
+                    is_comparing_parts_loaded = true;
+
+                    if (is_multi_posture_loaded)
+                    {
+                        onAllResourcesLoaded.Invoke();
+                    }
+                });
+
                 // 當多比對標準載入完成
-                onMultiPostureLoaded.AddListener((Pose key_pose) => {
-                    Debug.Log(string.Format("[DetectManager] Start | 標籤動作 {0} 多動作比對標準載入完成.", key_pose));
+                onMultiPostureLoaded.AddListener(() => {                    
+                    is_multi_posture_loaded = true;
+
+                    if (is_comparing_parts_loaded)
+                    {
+                        onAllResourcesLoaded.Invoke();
+                    }
                 });
 
                 mp.onMultiPostureLoaded.AddListener((Pose pose_type) => {
@@ -201,11 +223,6 @@ namespace ETLab
                             }
                         }
                     }
-                });
-
-                // 當比對關節載入完成
-                onComparingPartsLoaded.AddListener(()=> {
-                    Debug.Log(string.Format("[DetectManager] Start | 比對關節載入完成"));
                 });
 
                 // 取得關節數量
@@ -719,7 +736,7 @@ namespace ETLab
         }
 
         // 事前該動作或標籤動作要有註冊
-        public async Task loadMultiPosture(Pose key)
+        public async Task loadMultiPosture(Pose key, bool invoke = false)
         {
             Debug.Log(string.Format("[DetectManager] loadMultiPosture(key: {0})", key));
 
@@ -768,7 +785,12 @@ namespace ETLab
             //} 
             #endregion
 
-            onMultiPostureLoaded.Invoke(key);
+            Debug.Log(string.Format("[DetectManager] Start | 標籤動作 {0} 多動作比對標準載入完成.", key));
+
+            if (invoke)
+            {
+                onMultiPostureLoaded.Invoke();
+            }
         }
 
         #endregion

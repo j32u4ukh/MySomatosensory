@@ -93,6 +93,7 @@ namespace ETLab
                 // 計算 P 值(玩家在當前 beta 值的條件下，通過的機率)
                 float P = Utils.getIrtValue(theta, beta);
 
+                // TODO: 應該可忽略正確率較高的情形，因為通過後會將門檻值設為最高正確率
                 // 0.5f 的情況為 theta == beta，與門檻值的下限無關
                 // P > 0.5f: 能力較門檻高，需要上調門檻值
                 if (P > 0.5f)
@@ -159,12 +160,6 @@ namespace ETLab
                 // 新數值較大才更新
                 if (value > accuracys[index])
                 {
-                    // TODO: remove this log output
-                    if(index == 0)
-                    {
-                        Debug.Log(string.Format("[Movement] setHighestAccuracy | value: {0:F4} > accuracys[index]: {1:F4}", value, accuracys[index]));
-                    }
-
                     accuracys[index] = value;
                 }
             }
