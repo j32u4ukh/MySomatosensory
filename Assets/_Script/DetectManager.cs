@@ -119,6 +119,7 @@ namespace ETLab
 
                     if (is_multi_posture_loaded)
                     {
+                        Debug.Log(string.Format("[DetectManager] Start | 所需資源皆載入完成"));
                         onAllResourcesLoaded.Invoke();
                     }
                 });
@@ -126,9 +127,11 @@ namespace ETLab
                 // 當多比對標準載入完成
                 onMultiPostureLoaded.AddListener(() => {                    
                     is_multi_posture_loaded = true;
+                    Debug.Log(string.Format("[DetectManager] Start | 各動作之多比對標準載入完成"));
 
                     if (is_comparing_parts_loaded)
                     {
+                        Debug.Log(string.Format("[DetectManager] Start | 所需資源皆載入完成"));
                         onAllResourcesLoaded.Invoke();
                     }
                 });
@@ -736,7 +739,7 @@ namespace ETLab
         }
 
         // 事前該動作或標籤動作要有註冊
-        public async Task loadMultiPosture(Pose key, bool invoke = false)
+        public async Task loadMultiPosture(Pose key)
         {
             Debug.Log(string.Format("[DetectManager] loadMultiPosture(key: {0})", key));
 
@@ -786,13 +789,18 @@ namespace ETLab
             #endregion
 
             Debug.Log(string.Format("[DetectManager] Start | 標籤動作 {0} 多動作比對標準載入完成.", key));
-
-            if (invoke)
-            {
-                onMultiPostureLoaded.Invoke();
-            }
         }
 
+        public async Task loadMultiPostures(params Pose[] poses)
+        {
+            foreach(Pose pose in poses)
+            {
+                await loadMultiPosture(pose);
+            }
+
+            // 全部都載入完成才會觸發
+            onMultiPostureLoaded.Invoke();
+        }
         #endregion
 
         #region 還原配對資訊

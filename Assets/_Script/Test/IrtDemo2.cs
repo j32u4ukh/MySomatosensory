@@ -242,9 +242,7 @@ namespace ETLab
             yield return new WaitForSeconds(Time.deltaTime);
 
             // 載入各動作數據(會根據標籤動作取得內含的多動作)
-            _ = dm.loadMultiPosture(Pose.RaiseTwoHands);
-            _ = dm.loadMultiPosture(Pose.Squat);
-            _ = dm.loadMultiPosture(Pose.Hop, invoke: true);
+            _ = dm.loadMultiPostures(Pose.RaiseTwoHands, Pose.Squat, Pose.Hop);
             yield return new WaitForSeconds(Time.deltaTime);
 
             //StartCoroutine(gamePlaying());
@@ -430,8 +428,8 @@ namespace ETLab
                         gap_list[i] = 0.0f;
                     }
                 }
-                Debug.Log(string.Format("[IrtDemo2] defaultDetect | \nacc: {0}\nthres: {1}", 
-                    acc_list.toString(), thres_list.toString()));
+                Debug.Log(string.Format("[IrtDemo2] defaultDetect | pose: {0}\nacc: {1}\nthres: {2}", 
+                    pose, acc_list.toString(), thres_list.toString()));
             }
         }
 
