@@ -210,6 +210,8 @@ namespace ETLab
         private void OnGUI()
         {
             GUI.skin.label.fontSize = 60;
+            GUI.color = Color.black;
+
             gui = string.Format("\n\n\n\n\n\n\nROUND_TIME: {0}, pose: {1}\nround_time: {2:F4}\ndetect_time: {3:F4}\n" +
                 "Gap(acc - thres): {4:F4}\nthreshold: {5:F4}", ROUND_TIME, pose, round_time, detect_time, 
                 gap_list.sum(), thres_list.mean());
@@ -399,21 +401,15 @@ namespace ETLab
 
                 delta_time = Time.deltaTime;
 
-                if ((detect_time < modify_milli) && (detect_time + delta_time > modify_milli))
-                {
-                    player.modifyThreshold(pose: pose);
-                    Debug.Log(string.Format("[IrtDemo2] defaultDetect | modify_milli: {0}, detect_time: {1:F4}, round_time: {2:F4}", 
-                        modify_milli, detect_time, round_time));
+                //if ((detect_time < modify_milli) && (detect_time + delta_time > modify_milli))
+                //{
+                //    player.modifyThreshold(pose: pose);
+                //    Debug.Log(string.Format("[IrtDemo2] defaultDetect | modify_milli: {0}, detect_time: {1:F4}, round_time: {2:F4}", 
+                //        modify_milli, detect_time, round_time));
 
-                    // 間隔 interval_milli 毫秒再次呼叫調整門檻值的函式
-                    modify_milli += interval_milli;
-                    
-                    GUI.color = Color.red;
-                }
-                else
-                {
-                    GUI.color = Color.black;
-                }
+                //    // 間隔 interval_milli 毫秒再次呼叫調整門檻值的函式
+                //    modify_milli += interval_milli;
+                //}
 
                 // 呈現當前動作正確率與門檻值
                 //movement = player.getMovement(pose);

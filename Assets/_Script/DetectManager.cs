@@ -459,7 +459,7 @@ namespace ETLab
                 player.setMatchedPose(pose: target_pose);
 
                 // 使用前一次通過時的正確率，作為下一次的門檻初始值
-                player.setThreshold(pose: target_pose);
+                //player.setThreshold(pose: target_pose);
 
                 // 更新正確率
                 player.setAccuracy(pose: target_pose);

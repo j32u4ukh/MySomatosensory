@@ -64,7 +64,6 @@ namespace ETLab
             }
         }
 
-        // TODO: IRT 改為一次性呼叫，而非切換模式
         /// <summary>
         /// 利用能力估計函數，調整門檻值
         /// </summary>
@@ -411,8 +410,6 @@ namespace ETLab
 
     public class MovementDatas
     {
-        // TODO: x, y, z 方向距離門檻值等其他不會因人而異的數據
-
         // 比對關節相關資訊
         public Dictionary<Pose, MovementData> datas;
 

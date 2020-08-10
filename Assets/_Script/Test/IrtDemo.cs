@@ -165,7 +165,6 @@ namespace ETLab
             int idx = player.index();
             List<Pose> poses = dm.getPoses(Pose.RaiseTwoHands);
 
-            // TODO: 這個計時可用於決定是否需要觸發 onMatchEnded 事件
             time += Time.deltaTime;
             round_time += Time.deltaTime * 10f;
 

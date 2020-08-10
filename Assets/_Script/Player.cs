@@ -112,9 +112,9 @@ namespace ETLab
             record.addPosture(skeletons, rotations);
         }
 
-        public void saveRecordData(string file_id)
+        public void samplePosture(int n_sample)
         {
-            record.save(file_id);
+            record.posture_list = Utils.sampleList(record.posture_list, n_sample: n_sample);
         }
 
         public bool isRecording()
@@ -327,7 +327,7 @@ namespace ETLab
 
             float[] values = getAccuracy(pose);
             record.setThreshold(values);
-            player_data.setThresholds(pose, values);
+            //player_data.setThresholds(pose, values);
         }
 
         public void writeThreshold(Pose pose, float[] thres)

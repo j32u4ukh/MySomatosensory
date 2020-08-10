@@ -111,8 +111,7 @@ namespace ETLab
                         if (Input.GetKeyDown(KeyCode.S) || Input.GetMouseButtonDown(0))
                         {
                             mode = Mode.Stop;
-                            //gm.stopRecord();
-                            //gm.save(root, pose.ToString());
+                            player.samplePosture(n_sample: ConfigData.n_posture);
                             dm.stopRecord(player, root, dir);
                             dm.stopRecord(invoke_event: false);
                             has_initialization = false;
