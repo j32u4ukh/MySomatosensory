@@ -13,9 +13,6 @@ namespace ETLab
         public Pose pose = Pose.RaiseTwoHands;
 
         string gui = "";
-        float boundary_time = 5f;
-
-        // 單位為毫秒(‎millisecond)
         float modify_milli = 3.0f;
         float interval_milli = 0.1f;
 
@@ -234,18 +231,21 @@ namespace ETLab
         {
             Debug.Log(string.Format("[IrtDemo2] gameStart"));
 
+            #region regist 和 load 或許可以合併
             // 註冊標籤動作和實際動作之間的鏈結
             dm.registMultiPoses(Pose.RaiseTwoHands);
             dm.registMultiPoses(Pose.Squat);
-            dm.registMultiPoses(Pose.Hop, new List<Pose> {
-                Pose.HopLeft, 
-                Pose.HopRight
-            });
+            //dm.registMultiPoses(Pose.Hop, new List<Pose> {
+            //    Pose.HopLeft, 
+            //    Pose.HopRight
+            //});
+            dm.registMultiPoses(Pose.HopRight);
             yield return new WaitForSeconds(Time.deltaTime);
 
             // 載入各動作數據(會根據標籤動作取得內含的多動作)
-            _ = dm.loadMultiPostures(Pose.RaiseTwoHands, Pose.Squat, Pose.Hop);
-            yield return new WaitForSeconds(Time.deltaTime);
+            _ = dm.loadMultiPostures(Pose.RaiseTwoHands, Pose.Squat, Pose.HopRight);
+            yield return new WaitForSeconds(Time.deltaTime); 
+            #endregion
 
             //StartCoroutine(gamePlaying());
         }
@@ -282,7 +282,7 @@ namespace ETLab
                         pose = Pose.Squat;
                         break;
                     case "Red":
-                        pose = Pose.Hop;
+                        pose = Pose.HopRight;
                         break;
                     case "Yellow":
                         pose = Pose.RaiseTwoHands;
@@ -401,18 +401,17 @@ namespace ETLab
 
                 delta_time = Time.deltaTime;
 
-                //if ((detect_time < modify_milli) && (detect_time + delta_time > modify_milli))
-                //{
-                //    player.modifyThreshold(pose: pose);
-                //    Debug.Log(string.Format("[IrtDemo2] defaultDetect | modify_milli: {0}, detect_time: {1:F4}, round_time: {2:F4}", 
-                //        modify_milli, detect_time, round_time));
+                if ((detect_time < modify_milli) && (detect_time + delta_time > modify_milli))
+                {
+                    player.modifyThreshold(pose: pose);
+                    Debug.Log(string.Format("[IrtDemo2] defaultDetect | modify_milli: {0}, detect_time: {1:F4}, round_time: {2:F4}",
+                        modify_milli, detect_time, round_time));
 
-                //    // 間隔 interval_milli 毫秒再次呼叫調整門檻值的函式
-                //    modify_milli += interval_milli;
-                //}
+                    // 間隔 interval_milli 毫秒再次呼叫調整門檻值的函式
+                    modify_milli += interval_milli;
+                }
 
                 // 呈現當前動作正確率與門檻值
-                //movement = player.getMovement(pose);
                 acc_list = new FloatList(player.getAccuracy(pose));
                 thres_list = new FloatList(player.getThreshold(pose));
                 gap_list = acc_list - thres_list;
@@ -497,6 +496,8 @@ namespace ETLab
             // 還原配對過程中的暫存資訊
             dm.resetState(pose);
             matched = false;
+            detect_time = 0f;
+            modify_milli = 3.0f;
         }
     }
 }

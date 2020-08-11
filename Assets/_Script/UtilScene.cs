@@ -11,7 +11,7 @@ namespace ETLab
         // Start is called before the first frame update
         void Start()
         {
-            //displayRecordData(@"C:\Users\ETlab\Documents\Somatosensory\Data\9527\2020-08-10\IrtDemo2Scene-13-27-11-8341.txt");
+            displayRecordData(@"C:\Users\ETlab\Documents\Somatosensory\Data\9527\2020-08-11\IrtDemo2Scene-11-09-58-8691.txt");
             //displayStandardData(@"D:\Unity Projects\MySomatosensory\Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-21-09-3302.txt");
             //sampleStandardData(Pose.RaiseTwoHands);
         }

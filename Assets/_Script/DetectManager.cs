@@ -458,8 +458,9 @@ namespace ETLab
                 // 紀錄已經完成的資訊，避免重複判斷
                 player.setMatchedPose(pose: target_pose);
 
+                // TODO: 改用通過時的正確率取到小數點後 N 位
                 // 使用前一次通過時的正確率，作為下一次的門檻初始值
-                //player.setThreshold(pose: target_pose);
+                player.setThreshold(pose: target_pose);
 
                 // 更新正確率
                 player.setAccuracy(pose: target_pose);
@@ -898,7 +899,7 @@ namespace ETLab
         public void recordFailed(Player player)
         {
             Pose target_pose = player.getTargetPose();
-            Debug.Log(string.Format("[DetectManager] recordFailed, target_pose: {0}", target_pose));
+            Debug.Log(string.Format("[DetectManager] recordFailed | target_pose: {0}", target_pose));
             List<Pose> poses = getPoses(pose: target_pose);
             Movement movement;
 
@@ -918,7 +919,7 @@ namespace ETLab
             }
 
             Pose failed_pose = poses[idx];
-            Debug.Log(string.Format("[DetectManager] recordFailed, failed_pose: {0}", failed_pose));
+            Debug.Log(string.Format("[DetectManager] recordFailed | failed_pose: {0}", failed_pose));
             movement = player.getMovement(pose: failed_pose);
             player.setAccuracy(movement.getAccuracy());
             player.writeThreshold(pose: failed_pose, thres: movement.getThreshold());

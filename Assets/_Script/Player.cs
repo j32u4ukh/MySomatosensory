@@ -263,16 +263,11 @@ namespace ETLab
         {
             int i, len = ConfigData.n_posture;
             float[] accuracys = getAccuracy(pose);
-            float[] thresholds = getThreshold(pose);
 
             for (i = 0; i < len; i++)
             {
-                // 當最高正確率仍小於門檻值(尚未通過)
-                if(accuracys[i] < thresholds[i])
-                {
-                    // accuracys[i]: 取得該分解動作的最高正確率
-                    modifyThreshold(pose: pose, index: i, acc: accuracys[i], optimization: optimization);                    
-                }
+                // accuracys[i]: 取得該分解動作的最高正確率
+                modifyThreshold(pose: pose, index: i, acc: accuracys[i], optimization: optimization);
             }
             yield return null;
 
@@ -327,7 +322,7 @@ namespace ETLab
 
             float[] values = getAccuracy(pose);
             record.setThreshold(values);
-            //player_data.setThresholds(pose, values);
+            player_data.setThresholds(pose, values);
         }
 
         public void writeThreshold(Pose pose, float[] thres)
