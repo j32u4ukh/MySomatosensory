@@ -69,7 +69,7 @@ namespace ETLab
         /// </summary>
         /// <param name="index">門檻索引值</param>
         /// <param name="acc">玩家正確率</param>
-        public void setThreshold(int index, float acc, int optimization = 2)
+        public void setThreshold(int index, float acc, int optimization = 0)
         {
             /*
              * theta: 正確率(考生能力)

@@ -17,16 +17,16 @@ namespace ETLab
         {
             pm.getPlayer(0).setId("9527");
             pm.getPlayer(1).setId("你要不要吃哈密瓜");
-            dm.setFlagDelegate(modifingFlag);
-            dm.registMultiPoses(Pose.VerticalWave);
-            dm.registMultiPoses(Pose.Squat);
-            dm.registMultiPoses(Pose.Walk);
-            dm.registMultiPoses(Pose.Run);
-            dm.registMultiPoses(Pose.Hop, new List<Pose> { Pose.HopLeft, Pose.HopRight });
-            dm.registMultiPoses(Pose.Jump);
-            dm.registMultiPoses(Pose.Strike, new List<Pose> { Pose.StrikeLeft, Pose.StrikeRight });
-            dm.registMultiPoses(Pose.Dribble);
-            dm.registMultiPoses(Pose.RaiseHand, new List<Pose> { Pose.RaiseLeftHand, Pose.RaiseRightHand });
+            //dm.setFlagDelegate(modifingFlag);
+            //dm.registMultiPoses(Pose.VerticalWave);
+            //dm.registMultiPoses(Pose.Squat);
+            //dm.registMultiPoses(Pose.Walk);
+            //dm.registMultiPoses(Pose.Run);
+            //dm.registMultiPoses(Pose.Hop, new List<Pose> { Pose.HopLeft, Pose.HopRight });
+            //dm.registMultiPoses(Pose.Jump);
+            //dm.registMultiPoses(Pose.Strike, new List<Pose> { Pose.StrikeLeft, Pose.StrikeRight });
+            //dm.registMultiPoses(Pose.Dribble);
+            //dm.registMultiPoses(Pose.RaiseHand, new List<Pose> { Pose.RaiseLeftHand, Pose.RaiseRightHand });
 
             //dm.onMatched.AddListener((int index) => {
             //    Debug.Log(string.Format("[StartSceneTest] onMatched Listener: player {0} matched.", index));

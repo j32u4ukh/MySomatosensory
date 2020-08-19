@@ -248,25 +248,26 @@ namespace ETLab
             movement_dict[pose].setThreshold(thresholds);
         }
 
-        public void modifyThreshold(Pose pose, int index, float acc, int optimization = 2)
+        public void modifyThreshold(Pose pose, int index, float acc, int optimization = 0)
         {
             movement_dict[pose].setThreshold(index: index, acc: acc, optimization: optimization);
         }
 
-        public void modifyThreshold(Pose pose, int optimization = 2)
+        public void modifyThreshold(Pose pose, int optimization = 0)
         {
             Debug.Log(string.Format("[Player] modifyThreshold(pose: {0}, optimization: {1})", pose, optimization));
             StartCoroutine(modifyThresholdCoroutine(pose, optimization));
         }
 
-        public IEnumerator modifyThresholdCoroutine(Pose pose, int optimization = 2)
+        public IEnumerator modifyThresholdCoroutine(Pose pose, int optimization = 0)
         {
             int i, len = ConfigData.n_posture;
+
+            // accuracys: 取得該動作的最高正確率
             float[] accuracys = getAccuracy(pose);
 
             for (i = 0; i < len; i++)
-            {
-                // accuracys[i]: 取得該分解動作的最高正確率
+            {                
                 modifyThreshold(pose: pose, index: i, acc: accuracys[i], optimization: optimization);
             }
             yield return null;

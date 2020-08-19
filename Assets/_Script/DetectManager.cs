@@ -458,9 +458,8 @@ namespace ETLab
                 // 紀錄已經完成的資訊，避免重複判斷
                 player.setMatchedPose(pose: target_pose);
 
-                // TODO: 改用通過時的正確率取到小數點後 N 位
-                // 使用前一次通過時的正確率，作為下一次的門檻初始值
-                player.setThreshold(pose: target_pose);
+                // TODO: 目前改為即使通過也會對門檻值做調整，以逼近通過時的正確率，觀察該數值是否一如預期地做了調整，再考慮是否要事後進行更新
+                //player.setThreshold(pose: target_pose);
 
                 // 更新正確率
                 player.setAccuracy(pose: target_pose);
