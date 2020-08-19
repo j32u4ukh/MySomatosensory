@@ -14,5 +14,14 @@ namespace ETLab
         //public static float init_threshold = (min_threshold + max_threshold) / 2.0f;
         public static float init_threshold = 1.0f;
         public static float learning_rate = 0.05f;
+
+        public readonly static string config_path = @"D:\Unity Projects\AzureFaceConfig.txt";
+
+        // 金鑰
+        public static string FACE_SUBSCRIPTION_KEY1;
+        public static string FACE_SUBSCRIPTION_KEY2;
+
+        // 服務端點
+        public static string FACE_ENDPOINT;
     }
 }

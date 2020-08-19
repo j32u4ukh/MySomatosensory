@@ -155,7 +155,38 @@ namespace ETLab
         public static float alphaToP(float alpha)
         {
             return (alpha + 3f) / 6f;
-        } 
+        }
         #endregion
+
+        // ============================================================
+        public static void initConfigData(int config_code = 0)
+        {
+            using (StreamReader reader = new StreamReader(ConfigData.config_path))
+            {
+                string line;
+                string[] content;
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    content = line.Split(' ');
+
+                    switch (content[0])
+                    {
+                        case "FACE_SUBSCRIPTION_KEY1":
+                            ConfigData.FACE_SUBSCRIPTION_KEY1 = content[1];
+                            break;
+                        case "FACE_SUBSCRIPTION_KEY2":
+                            ConfigData.FACE_SUBSCRIPTION_KEY2 = content[1];
+                            break;
+                        case "FACE_ENDPOINT":
+                            ConfigData.FACE_ENDPOINT = content[1];
+                            break;
+                        default:
+                            Debug.LogError(string.Format("[Utils] loadConfigData | key: {0}, value: {1}", content[0], content[1]));
+                            break;
+                    }
+                }
+            }
+        }
     }
 }
