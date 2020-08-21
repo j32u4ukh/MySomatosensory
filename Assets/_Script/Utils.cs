@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -123,12 +125,17 @@ namespace ETLab
             int i, len = array.Length;
             for (i = 0; i < len - 1; i++)
             {
-                sb.Append(string.Format("{0:F4}, ", array[i]));
+                sb.Append(string.Format("{0:F4}, ", array[i].ToString()));
             }
 
-            sb.Append(string.Format("{0:F4}]", array[len - 1]));
+            sb.Append(string.Format("{0:F4}]", array[len - 1].ToString()));
 
             return sb.ToString();
+        }
+
+        public static string listToString<T>(List<T> list)
+        {
+            return arrayToString(list.ToArray());
         }
 
         /// <summary>
@@ -159,34 +166,33 @@ namespace ETLab
         #endregion
 
         // ============================================================
-        public static void initConfigData(int config_code = 0)
+        
+        public static string getDescription(string value, Type type)
         {
-            using (StreamReader reader = new StreamReader(ConfigData.config_path))
+            string name = Enum.GetNames(type).Where(f => f.Equals(value, StringComparison.CurrentCultureIgnoreCase))
+                                             .Select(d => d)
+                                             .FirstOrDefault();
+
+            //// 找無相對應的列舉
+            if (name == null)
             {
-                string line;
-                string[] content;
-
-                while ((line = reader.ReadLine()) != null)
-                {
-                    content = line.Split(' ');
-
-                    switch (content[0])
-                    {
-                        case "FACE_SUBSCRIPTION_KEY1":
-                            ConfigData.FACE_SUBSCRIPTION_KEY1 = content[1];
-                            break;
-                        case "FACE_SUBSCRIPTION_KEY2":
-                            ConfigData.FACE_SUBSCRIPTION_KEY2 = content[1];
-                            break;
-                        case "FACE_ENDPOINT":
-                            ConfigData.FACE_ENDPOINT = content[1];
-                            break;
-                        default:
-                            Debug.LogError(string.Format("[Utils] loadConfigData | key: {0}, value: {1}", content[0], content[1]));
-                            break;
-                    }
-                }
+                return string.Empty;
             }
+
+            // 利用反射找出相對應的欄位
+            var field = type.GetField(name);
+
+            // 取得欄位設定DescriptionAttribute的值
+            var attribute = field.GetCustomAttributes(typeof(DescriptionAttribute), false);
+
+            //// 無設定Description Attribute, 回傳Enum欄位名稱
+            if (attribute == null || attribute.Length == 0)
+            {
+                return name;
+            }
+
+            //// 回傳Description Attribute的設定
+            return ((DescriptionAttribute)attribute[0]).Description;
         }
     }
 }

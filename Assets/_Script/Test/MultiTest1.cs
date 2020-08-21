@@ -13,24 +13,42 @@ using UnityAsync;
 
 namespace ETLab
 {
+    public class StringTest
+    {
+        int val;
+
+        public StringTest(int value)
+        {
+            val = value;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Value = {0}", val);
+        }
+    }
+
     public class MultiTest1 : MonoBehaviour
     {
         // Start is called before the first frame update
         void Start()
         {
-            Utils.initConfigData();
+            StringTest st = new StringTest(6);
+            Debug.Log(st.ToString());
 
-            string file_name = "detection1.jpg";
-            Debug.Log(string.Format("[JsonAzure] Start | file_name: {0}", file_name));
+            //Azure.initConfigData();
 
-            try
-            {
-                makeAnalysisRequest(file_name);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(string.Format("[JsonAzure] Start | {0}: {1}", e.GetType(), e.Message));
-            }
+            //string file_name = "detection1.jpg";
+            //Debug.Log(string.Format("[JsonAzure] Start | file_name: {0}", file_name));
+
+            //try
+            //{
+            //    makeAnalysisRequest(file_name);
+            //}
+            //catch (Exception e)
+            //{
+            //    Debug.LogError(string.Format("[JsonAzure] Start | {0}: {1}", e.GetType(), e.Message));
+            //}
 
         }
 
@@ -86,44 +104,35 @@ namespace ETLab
 
         async Task<byte[]> getImageBytes(string file_name)
         {
-            string path;
-            byte[] bytes;
-
-#if UNITY_EDITOR
-            path = Path.Combine(Application.streamingAssetsPath, "image", file_name);
+            string path = Path.Combine(Application.streamingAssetsPath, "image", file_name);
             Debug.Log(string.Format("[JsonAzure] getImageBytes(path: {0})", path));
 
+            byte[] bytes;
             using (FileStream file_stream = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
                 bytes = new byte[file_stream.Length];
                 await file_stream.ReadAsync(bytes, 0, (int)file_stream.Length);
             }
 
-#elif UNITY_ANDROID
-        path = string.Format("jar:file://{0}!/assets/image/{1}", Application.dataPath, file_name);
-        Debug.Log(string.Format("[JsonAzure] getImageBytes(path: {0})", path));
-        bytes = await androidLoadImageAsync(path);
-#endif
-
             return bytes;
         }
 
-        async Task<byte[]> androidLoadImageAsync(string path)
-        {
-            UnityWebRequest request = UnityWebRequest.Get(path);
-            Debug.Log(string.Format("[LocalTest] androidLoadImageAsync | path: {0}", path));
-            await request.SendWebRequest();
-            Debug.Log("[LocalTest] androidLoadImageAsync | request sent.");
+        //async Task<byte[]> androidLoadImageAsync(string path)
+        //{
+        //    UnityWebRequest request = UnityWebRequest.Get(path);
+        //    Debug.Log(string.Format("[LocalTest] androidLoadImageAsync | path: {0}", path));
+        //    await request.SendWebRequest();
+        //    Debug.Log("[LocalTest] androidLoadImageAsync | request sent.");
 
-            while (!request.isDone && !request.isNetworkError && !request.isHttpError) { }
+        //    while (!request.isDone && !request.isNetworkError && !request.isHttpError) { }
 
-            if (!request.isNetworkError && !request.isHttpError)
-            {
-                return request.downloadHandler.data;
-            }
+        //    if (!request.isNetworkError && !request.isHttpError)
+        //    {
+        //        return request.downloadHandler.data;
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
 
         string jsonParser(string json)
         {

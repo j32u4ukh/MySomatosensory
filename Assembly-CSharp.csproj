@@ -63,6 +63,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\_Script\Azure\Azure.cs" />
+    <Compile Include="Assets\_Script\Azure\FaceDetect.cs" />
+    <Compile Include="Assets\_Script\Azure\FaceIdentify.cs" />
+    <Compile Include="Assets\_Script\Azure\PersonGroup.cs" />
     <Compile Include="Assets\_Script\ConfigData.cs" />
     <Compile Include="Assets\_Script\DetectManager.cs" />
     <Compile Include="Assets\_Script\EnumClass.cs" />
@@ -74,6 +78,7 @@
     <Compile Include="Assets\_Script\Kinect\PoseModelHelper.cs" />
     <Compile Include="Assets\_Script\Kinect\SimpleGestureListener.cs" />
     <Compile Include="Assets\_Script\Movement.cs" />
+    <Compile Include="Assets\_Script\MyAsync.cs" />
     <Compile Include="Assets\_Script\Player.cs" />
     <Compile Include="Assets\_Script\PlayerData.cs" />
     <Compile Include="Assets\_Script\PlayerManager.cs" />

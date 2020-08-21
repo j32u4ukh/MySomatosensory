@@ -424,7 +424,7 @@ namespace ETLab
                     }
                 }
                 Debug.Log(string.Format("[IrtDemo2] defaultDetect | pose: {0}\nacc: {1}\nthres: {2}", 
-                    pose, acc_list.toString(), thres_list.toString()));
+                    pose, acc_list.ToString(), thres_list.ToString()));
             }
         }
 

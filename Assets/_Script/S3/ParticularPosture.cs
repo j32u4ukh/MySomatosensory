@@ -79,7 +79,7 @@ namespace S3
                 if (acc > 0.7f)
                 {
                     posture_idx++;
-                    print(string.Format("{0} {1}", posture_idx, acc_list.toString()));
+                    print(string.Format("{0} {1}", posture_idx, acc_list.ToString()));
                     print(string.Format("mean: {0}, geometricMean: {1}", acc_list.mean(), acc_list.geometricMean()));
                 }
             }

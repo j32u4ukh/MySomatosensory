@@ -121,7 +121,7 @@ public class FloatList : INumList<float>
         return (float)Math.Round(Math.Pow(geometric, 1f / length()), digit);
     }
 
-    public string toString()
+    public override string ToString()
     {
         StringBuilder sb = new StringBuilder();
         sb.Append("[");

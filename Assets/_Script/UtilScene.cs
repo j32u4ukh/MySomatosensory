@@ -33,7 +33,7 @@ namespace ETLab
             foreach(RecordData record in records)
             {
                 poses.Add(record.pose);
-                //Debug.Log(record.toString());
+                //Debug.Log(record.ToString());
             }
 
             List<Pose> pose_list = new List<Pose>(poses);

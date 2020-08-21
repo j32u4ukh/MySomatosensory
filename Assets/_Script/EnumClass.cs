@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
 namespace ETLab
@@ -59,5 +60,18 @@ namespace ETLab
         Game1,
         Game2,
         Game3,
+    }
+
+    public enum AzureService
+    {
+        [Description("detect")]
+        Detect,
+        [Description("persongroups")]
+        PersonGroupList,
+        [Description("identify")]
+        Identify,
+        [Description("persongroups")]
+        Person,
+
     }
 }

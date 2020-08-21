@@ -90,7 +90,7 @@ namespace ETLab
             posture_list.Add(posture);
         }
 
-        public string toString()
+        public override string ToString()
         {
             FloatList float_list = new FloatList(threshold);
             float threshold_mean = float_list.geometricMean();
