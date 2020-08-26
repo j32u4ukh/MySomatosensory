@@ -13,29 +13,15 @@ using UnityAsync;
 
 namespace ETLab
 {
-    public class StringTest
-    {
-        int val;
-
-        public StringTest(int value)
-        {
-            val = value;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("Value = {0}", val);
-        }
-    }
-
     public class MultiTest1 : MonoBehaviour
     {
         // Start is called before the first frame update
         void Start()
         {
-            StringTest st = new StringTest(6);
-            Debug.Log(st.ToString());
-
+            //string json_data = "{'people': [{\"personId\":\"0336c22a-cba0-4bb4-b8ac-b31321dcf7ff\",\"persistedFaceIds\":['id1'],\"name\":\"miyu1\"},{\"personId\":\"4c2f25f3-3191-4430-bdcf-65c56cd97535\",\"persistedFaceIds\":['id2'],\"name\":\"miyu2\"}]}";
+            string json_data = "[{\"personId\":\"0336c22a-cba0-4bb4-b8ac-b31321dcf7ff\",\"persistedFaceIds\":[],\"name\":\"miyu1\"},{\"personId\":\"4c2f25f3-3191-4430-bdcf-65c56cd97535\",\"persistedFaceIds\":[],\"name\":\"miyu2\"}]";
+            PersonList list = PersonList.loadData(json_data);
+            Debug.Log(list.ToString());
             //Azure.initConfigData();
 
             //string file_name = "detection1.jpg";

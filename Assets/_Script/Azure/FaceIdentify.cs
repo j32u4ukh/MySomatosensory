@@ -190,6 +190,11 @@ namespace ETLab
                 faceIds.Add(face_id);
             }
         }
+
+        public string toJson()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 
 }

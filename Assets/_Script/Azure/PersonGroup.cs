@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace ETLab
@@ -64,15 +65,104 @@ namespace ETLab
         }
     }
 
+    public class PersonList
+    {
+        public List<Person> people;
+
+        public Person getPerson(string name = "", string person_id = "")
+        {
+            if (!name.Equals(""))
+            {
+                foreach(Person person in people)
+                {
+                    if (name.Equals(person.name))
+                    {
+                        return person;
+                    }
+                }
+            }
+            else
+            {
+                foreach (Person person in people)
+                {
+                    if (person_id.Equals(person.personId))
+                    {
+                        return person;
+                    }
+                }
+            }
+
+            Debug.LogError(string.Format("[PersonList] getPerson | 沒有該 Person, name: {0}, person_id: {1}", name, person_id));
+            return null;
+        }
+
+        /// <summary>
+        /// 原始輸入的 Json 數據沒有 people 標籤，但這是套件轉換時所必須的，故自行添加
+        /// </summary>
+        /// <param name="json_data"></param>
+        /// <returns></returns>
+        public static PersonList loadData(string json_data)
+        {
+            json_data = string.Format("{{'people': {0}}}", json_data);
+            return JsonConvert.DeserializeObject<PersonList>(json_data);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder(string.Format("找到 {0} 名 Person\n", people.Count));
+
+            foreach(Person person in people)
+            {
+                sb.AppendLine(person.ToString());
+            }
+
+            return sb.ToString();
+        }
+    }
+
     public class Person
     {
         public string personId;
         public string name;
-        public List<string> persistedFaceIds;
+        public List<string> persistedFaceIds = new List<string>();
 
         public override string ToString()
         {
-            return string.Format("person_id: {0}, name: {1}\npersisted face ids: {2}", personId, name, Utils.listToString(persistedFaceIds));
+            return string.Format("name: {0}, person_id: {1}\npersisted face ids: {2}", name, personId, Utils.listToString(persistedFaceIds));
+        }
+    }
+
+    public class PersonGroupRequestBody
+    {
+        public string name;
+        public string recognitionModel = Azure.RecognitionModel01;
+        
+        public string toJson()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+        
+        public byte[] toBytes()
+        {
+            string json_data = JsonConvert.SerializeObject(this);
+            return Encoding.UTF8.GetBytes(json_data);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("PersonGroupRequestBody(name: {0}, recognitionModel: {1})", name, recognitionModel);
+        }
+    }
+
+    public class PersonCreateRequestBody
+    {
+        public string name;
+        public string userData = "";
+
+        public byte[] toBytes()
+        {
+            string json_data = JsonConvert.SerializeObject(this);
+            return Encoding.UTF8.GetBytes(json_data);
         }
     }
 }

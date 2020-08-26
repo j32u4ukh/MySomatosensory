@@ -72,6 +72,22 @@ namespace ETLab
         Identify,
         [Description("persongroups")]
         Person,
+        [Description("persongroups")]
+        CreatePerson,
+        [Description("persongroups")]
+        PersonAddFace,
+        [Description("persongroups")]
+        TrainPersonGroup,
+        [Description("persongroups")]
+        GetTrainingStatus,
+        [Description("persongroups")]
+        DeletePerson,
+        [Description("persongroups")]
+        PersonList,
+        [Description("persongroups")]
+        PersonGroup,
+        [Description("persongroups")]
+        DeletePersonGroup,
 
     }
 }

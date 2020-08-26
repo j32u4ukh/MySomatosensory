@@ -123,12 +123,18 @@ namespace ETLab
             sb.Append("[");
 
             int i, len = array.Length;
-            for (i = 0; i < len - 1; i++)
+
+            if(len > 0)
             {
-                sb.Append(string.Format("{0:F4}, ", array[i].ToString()));
+                for (i = 0; i < len - 1; i++)
+                {
+                    sb.Append(string.Format("{0:F4}, ", array[i].ToString()));
+                }
+
+                sb.Append(string.Format("{0:F4}", array[len - 1].ToString()));
             }
 
-            sb.Append(string.Format("{0:F4}]", array[len - 1].ToString()));
+            sb.Append("]");
 
             return sb.ToString();
         }
