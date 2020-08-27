@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,6 +24,9 @@ namespace ETLab
         List<string> questions;
 
         #region UI
+        public GameObject login_buffer;
+        public Button login_button;
+
         // 回饋圖片
         public GameObject success_image;
         public GameObject fail_image;
@@ -97,6 +101,8 @@ namespace ETLab
 
         private void Awake()
         {
+            Azure.initConfigData();
+
             pm.init(n_player: 1);
             pm.getPlayer(0).setId("9527");
             gap_list = new FloatList(new float[] { 0 });
@@ -189,7 +195,10 @@ namespace ETLab
                 StartCoroutine(gamePlaying());
             });
 
-            StartCoroutine(gameStart());
+            //StartCoroutine(gameStart());
+            login_button.onClick.AddListener(()=> {
+                _ = identifyPlayer(group_id: "noute_and_miyu_group");
+            });
         }
 
         // Update is called once per frame
@@ -202,6 +211,40 @@ namespace ETLab
                     Application.Quit();
                 }
             }
+
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                Debug.Log("開始: 感測器辨識測試");
+                _ = postFaceDetect("orbbec");
+                Debug.Log("結束: 感測器辨識測試");
+            }
+        }
+
+        async Task identifyPlayer(string group_id)
+        {
+            List<Person> people = await Azure.postFaceIdentify(group_id, "orbbec");
+
+            foreach (Person person in people)
+            {
+                if(person.name.Equals("noute")  || person.name.Equals("miyu"))
+                {
+                    Debug.Log(string.Format("{0} login~", person.name));
+                    login_buffer.SetActive(false);
+                    StartCoroutine(gameStart());
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 偵測並返回圖片中的人臉及位置
+        /// </summary>
+        /// <param name="file_name">要偵測的檔案的名稱(含副檔名)</param>
+        /// <returns></returns>
+        async Task postFaceDetect(string file_name)
+        {
+            FaceDetects face_detects = await Azure.postFaceDetect(file_name);
+            Debug.Log(face_detects);
         }
 
         private void OnGUI()
