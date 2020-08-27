@@ -53,16 +53,31 @@ namespace ETLab
             return Guid.NewGuid().ToString();
         }
 
-        public static async Task<byte[]> getImageBytes(string file_name)
+        /// <summary>
+        /// 取得 API 所需的 bytes 數據
+        /// </summary>
+        /// <param name="source_name">要偵測的資源的名稱(若為檔案則須含副檔名；若為 orbbec 則抓取感測器的畫面)</param>
+        /// <returns></returns>
+        public static async Task<byte[]> getImageBytes(string source_name)
         {
-            string path = Path.Combine(Application.streamingAssetsPath, "image", file_name);
-            Debug.Log(string.Format("[Azure] getImageBytes(path: {0})", path));
-
             byte[] bytes;
-            using (FileStream file_stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+
+            if (source_name.ToLower().Equals("orbbec"))
             {
-                bytes = new byte[file_stream.Length];
-                await file_stream.ReadAsync(bytes, 0, (int)file_stream.Length);
+                KinectManager manager = KinectManager.Instance;
+                Texture2D texture = manager.GetUsersClrTex2D();
+                bytes = texture.EncodeToJPG();
+            }
+            else
+            {
+                string path = Path.Combine(Application.streamingAssetsPath, "image", source_name);
+                Debug.Log(string.Format("[Azure] getImageBytes(path: {0})", path));
+
+                using (FileStream file_stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+                {
+                    bytes = new byte[file_stream.Length];
+                    await file_stream.ReadAsync(bytes, 0, (int)file_stream.Length);
+                }
             }
 
             return bytes;
@@ -104,14 +119,14 @@ namespace ETLab
         /// <summary>
         /// 偵測並返回圖片中的人臉及位置 by UnityWebRequest
         /// </summary>
-        /// <param name="file_name">要偵測的檔案的名稱(含副檔名)</param>
+        /// <param name="source_name">要偵測的資源的名稱(若為檔案則須含副檔名；若為 orbbec 則抓取感測器的畫面)</param>
         /// <returns></returns>
-        public static async Task<FaceDetects> postFaceDetect(string file_name)
+        public static async Task<FaceDetects> postFaceDetect(string source_name)
         {
             QueryParameter query = new QueryParameter(service: AzureService.Detect);
             query.add("returnFaceId", true);
             query.add("returnFaceLandmarks", false);
-            //query.add("recognitionModel", RecognitionModel01);
+            query.add("recognitionModel", RecognitionModel01);
             query.add("returnRecognitionModel", false);
             query.add("detectionModel", DetectionModel01);
 
@@ -122,7 +137,7 @@ namespace ETLab
                 request.SetRequestHeader("Ocp-Apim-Subscription-Key", ConfigData.FACE_SUBSCRIPTION_KEY1);
                 request.SetRequestHeader("Content-Type", "application/octet-stream");
 
-                byte[] bytes = await getImageBytes(file_name);
+                byte[] bytes = await getImageBytes(source_name);
                 request.uploadHandler.contentType = "application/octet-stream";
                 request.uploadHandler = new UploadHandlerRaw(bytes);
                 request.downloadHandler = new DownloadHandlerBuffer();
@@ -288,9 +303,9 @@ namespace ETLab
                         found_person = true;
                         person_id = person.personId;
 
-                        foreach(string file_name in people[name])
+                        foreach(string source_name in people[name])
                         {
-                            await postPersonAddFace(group_id: group_id, person_id: person_id, file_name: file_name);
+                            await postPersonAddFace(group_id: group_id, person_id: person_id, source_name: source_name);
 
                             // Limit TPS (避免請求頻率過高) 3000
                             Debug.Log(string.Format("Limit TPS"));
@@ -398,9 +413,9 @@ namespace ETLab
         /// </summary>
         /// <param name="group_id">PersonGroup 的唯一對應碼</param>
         /// <param name="person_id">Person 的唯一對應碼</param>
-        /// <param name="file_name">圖檔名稱</param>
+        /// <param name="source_name">要偵測的資源的名稱(若為檔案則須含副檔名；若為 orbbec 則抓取感測器的畫面)</param>
         /// <returns></returns>
-        public static async Task postPersonAddFace(string group_id, string person_id, string file_name)
+        public static async Task postPersonAddFace(string group_id, string person_id, string source_name)
         {
             QueryParameter query = new QueryParameter(service: AzureService.PersonAddFace, group_id: group_id, person_id: person_id);
             query.add("detectionModel", DetectionModel01);
@@ -413,7 +428,7 @@ namespace ETLab
                 request.SetRequestHeader("Ocp-Apim-Subscription-Key", ConfigData.FACE_SUBSCRIPTION_KEY1);
                 request.SetRequestHeader("Content-Type", "application/octet-stream");
 
-                byte[] bytes = await getImageBytes(file_name);
+                byte[] bytes = await getImageBytes(source_name);
                 request.uploadHandler.contentType = "application/octet-stream";
                 request.uploadHandler = new UploadHandlerRaw(bytes);
                 request.downloadHandler = new DownloadHandlerBuffer();

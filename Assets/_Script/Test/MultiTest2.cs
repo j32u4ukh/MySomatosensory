@@ -15,20 +15,22 @@ namespace ETLab
 {
     public class MultiTest2 : MonoBehaviour
     {
+        string group_id = "noute_and_miyu_group";
+
         // Start is called before the first frame update
         void Start()
         {
             Azure.initConfigData();
-            string group_id = "noute_and_miyu_group";
+            
             string group_name = "noute_and_miyu";
             string person_id = "79492b1f-47e9-4b2a-8a0b-4398c9be8dab";
-            string file_name = "miyu (7).jpg";
+            string file_name = "miyu6.jpg";
 
             // G5-4: "20200821 face id": 93dec0ee-4bcb-43e0-847a-eb66bbec5892  "personId": "bd5acccd-990c-4915-8685-1b80d984960f"
             //_ = getPersonTask(group_id: "c5c2dc65-8bb4-4da8-9da3-707e5184b8a7", person_id: "bd5acccd-990c-4915-8685-1b80d984960f");
             //_ = postFaceDetect(file_name: file_name);
             //_ = postFaceIdentify(group_id: "c5c2dc65-8bb4-4da8-9da3-707e5184b8a7", file_name: "B345-5.PNG");
-            _ = postFaceIdentify(group_id: group_id, file_name: file_name);
+            //_ = postFaceIdentify(group_id: group_id, file_name: file_name);
             //_ = postFaceIdentify2(file_name: "detection1.jpg");
             // detection1: "20200821 face id": 8c4db702-99f1-4e7c-9b58-76e7a7892733
             //_ = postFaceDetect(file_name: "detection1.jpg");
@@ -45,6 +47,31 @@ namespace ETLab
 
             //string group_id = "group_id_is_miyu";
             //_ = deletePersonDelete(group_id, person_id: "4c2f25f3-3191-4430-bdcf-65c56cd97535");
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                postFaceDetectCamera();
+            }
+
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                postFaceIdentifyCamera(group_id);
+            }
+        }
+
+        void postFaceDetectCamera()
+        {
+            Debug.Log("開始: 感測器辨識測試");
+            _ = postFaceDetect("orbbec");
+            Debug.Log("結束: 感測器辨識測試");
+        }
+
+        void postFaceIdentifyCamera(string group_id)
+        {
+            _ = postFaceIdentify(group_id, "orbbec");
         }
 
         async Task createPersonGroup(string group_id, string group_name)
