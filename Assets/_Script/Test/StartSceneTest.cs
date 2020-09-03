@@ -17,16 +17,16 @@ namespace ETLab
         {
             pm.getPlayer(0).setId("9527");
             pm.getPlayer(1).setId("你要不要吃哈密瓜");
-            dm.setFlagDelegate(modifingFlag);
-            dm.registMultiPoses(Pose.VerticalWave);
-            dm.registMultiPoses(Pose.Squat);
-            dm.registMultiPoses(Pose.Walk);
-            dm.registMultiPoses(Pose.Run);
-            dm.registMultiPoses(Pose.Hop, new List<Pose> { Pose.HopLeft, Pose.HopRight });
-            dm.registMultiPoses(Pose.Jump);
-            dm.registMultiPoses(Pose.Strike, new List<Pose> { Pose.StrikeLeft, Pose.StrikeRight });
-            dm.registMultiPoses(Pose.Dribble);
-            dm.registMultiPoses(Pose.RaiseHand, new List<Pose> { Pose.RaiseLeftHand, Pose.RaiseRightHand });
+            //dm.setFlagDelegate(modifingFlag);
+            //dm.registMultiPoses(Pose.VerticalWave);
+            //dm.registMultiPoses(Pose.Squat);
+            //dm.registMultiPoses(Pose.Walk);
+            //dm.registMultiPoses(Pose.Run);
+            //dm.registMultiPoses(Pose.Hop, new List<Pose> { Pose.HopLeft, Pose.HopRight });
+            //dm.registMultiPoses(Pose.Jump);
+            //dm.registMultiPoses(Pose.Strike, new List<Pose> { Pose.StrikeLeft, Pose.StrikeRight });
+            //dm.registMultiPoses(Pose.Dribble);
+            //dm.registMultiPoses(Pose.RaiseHand, new List<Pose> { Pose.RaiseLeftHand, Pose.RaiseRightHand });
 
             //dm.onMatched.AddListener((int index) => {
             //    Debug.Log(string.Format("[StartSceneTest] onMatched Listener: player {0} matched.", index));
@@ -100,9 +100,6 @@ namespace ETLab
             List<Pose> poses = dm.getPoses(pose);
             accumulate_time += Time.deltaTime;
 
-            // 透過 updateFlag 將 accumulate_time 傳給 modifingFlag
-            dm.updateFlag(accumulate_time);
-
             foreach (Pose pose in poses)
             {
                 dm.compareMovement(player, pose);
@@ -113,7 +110,7 @@ namespace ETLab
         {
             List<Pose> poses = dm.getPoses(pose);
             accumulate_time += Time.deltaTime;
-            dm.updateFlag(accumulate_time);
+
             float y_distance = player.getDistanceY();
             float y_threshold = 0.2f;
 
@@ -127,7 +124,6 @@ namespace ETLab
         {
             List<Pose> poses = dm.getPoses(Pose.RaiseTwoHands);
             accumulate_time += Time.deltaTime;
-            dm.updateFlag(accumulate_time);
 
             foreach (Pose pose in poses)
             {

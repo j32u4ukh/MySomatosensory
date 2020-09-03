@@ -53,14 +53,25 @@ namespace ETLab
         }
 
         // 以陣列初始化門檻值
-        public void setThreshold(float[] _thresholds)
+        public void setThreshold(float[] thresholds)
         {
-            int _length = _thresholds.Length;
-            thresholds = new float[_length];
+            int i, len = thresholds.Length;
+            this.thresholds = new float[len];
 
-            for (int i = 0; i < _length; i++)
+            for (i = 0; i < len; i++)
             {
-                thresholds[i] = _thresholds[i];
+                this.thresholds[i] = thresholds[i];
+            }
+        }
+
+        public void setThreshold(float[] thresholds, int digits)
+        {
+            int i, len = thresholds.Length;
+            this.thresholds = new float[len];
+
+            for (i = 0; i < len; i++)
+            {
+                this.thresholds[i] = (float)Math.Round(thresholds[i], digits: digits);
             }
         }
 
@@ -92,6 +103,7 @@ namespace ETLab
                 // 計算 P 值(玩家在當前 beta 值的條件下，通過的機率)
                 float P = Utils.getIrtValue(theta, beta);
 
+                // 正確率較高的情形，即便通過，也應透過 IRT 將門檻值去逼近最高正確率
                 // 0.5f 的情況為 theta == beta，與門檻值的下限無關
                 // P > 0.5f: 能力較門檻高，需要上調門檻值
                 if (P > 0.5f)
@@ -116,11 +128,13 @@ namespace ETLab
 
                 if(optimization > 0)
                 {
-                    thresholds[index] = (float)Math.Round(thresholds[index], optimization);
+                    double power = Math.Pow(10.0, optimization);
+                    float opt = thresholds[index];
+                    thresholds[index] = (float)(Math.Floor(opt * power) / power);
                 }
 
-                Debug.Log(string.Format("[Movement] setThreshold | update value -> " +
-                    "P : {0:F4}, beta: {1:F4}, thresholds: {2:F8}, acc: {3:F8}", P, beta, thresholds[index], acc));
+                //Debug.Log(string.Format("[Movement] setThreshold | update value -> " +
+                //    "P : {0:F4}, beta: {1:F4}, thresholds: {2:F8}, acc: {3:F8}", P, beta, thresholds[index], acc));
             }
             catch (IndexOutOfRangeException)
             {
@@ -156,11 +170,6 @@ namespace ETLab
                 // 新數值較大才更新
                 if (value > accuracys[index])
                 {
-                    if(index == 0)
-                    {
-                        Debug.Log(string.Format("[Movement] setHighestAccuracy | value: {0:F4} > accuracys[index]: {1:F4}", value, accuracys[index]));
-                    }
-
                     accuracys[index] = value;
                 }
             }
@@ -195,7 +204,7 @@ namespace ETLab
         /// <returns>正確率與門檻值之間的平均落差</returns>
         public float getGap()
         {
-            int i, len = accuracys.Length;
+            int i, len = accuracys.Length, n_gap = 0;
             float total_gap = 0, gap;
 
             for(i = 0; i < len; i++)
@@ -205,10 +214,11 @@ namespace ETLab
                 if(gap > 0)
                 {
                     total_gap += gap;
+                    n_gap++;
                 }
             }
 
-            return total_gap / len;
+            return total_gap / n_gap;
         }
 
         public Pose getPose()
@@ -220,8 +230,8 @@ namespace ETLab
         public bool isMatched()
         {
             bool pass = true;
-
             int i;
+
             for (i = 0; i < ConfigData.n_posture; i++)
             {
                 pass &= is_matched[i];
@@ -319,7 +329,12 @@ namespace ETLab
             onMultiPostureLoaded.Invoke(pose);
         }
 
-        // 需要真人預錄才會有數據
+        /// <summary>
+        /// 將依檔案加入的各分解動作，轉換成依分解動作順序加入各檔案的標準，第一筆數據為各個檔案的第一個分解動作
+        /// 需要真人預錄才會有數據。
+        /// </summary>
+        /// <param name="multi_postures">多動作標準</param>
+        /// <returns></returns>
         public List<List<Posture>> transformIndexOriented(List<List<Posture>> multi_postures)
         {
             Debug.Log(string.Format("[MultiPosture] transformIndexOriented | n_model: {0}", multi_postures.Count));
@@ -406,8 +421,6 @@ namespace ETLab
 
     public class MovementDatas
     {
-        // TODO: x, y, z 方向距離門檻值等其他不會因人而異的數據
-
         // 比對關節相關資訊
         public Dictionary<Pose, MovementData> datas;
 

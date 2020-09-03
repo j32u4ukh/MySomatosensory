@@ -17,6 +17,7 @@ namespace ETLab
         public string id;
         public GameStage game_stage;
 
+        // TODO: PlayerData 有必要儲存 thresholds 嗎？其實可根據 ConfigData.n_posture 來初始化玩家各動作的正確率與門檻值陣列
         // 儲存因人而異的數值
         public Dictionary<Pose, float[]> thresholds;
         #endregion
@@ -51,7 +52,6 @@ namespace ETLab
                 PlayerData data = JsonConvert.DeserializeObject<PlayerData>(load_data);
                 game_stage = data.game_stage;
                 thresholds = data.thresholds;
-
 
             }
             else

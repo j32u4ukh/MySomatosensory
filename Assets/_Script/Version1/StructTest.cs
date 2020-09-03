@@ -10,11 +10,11 @@ public class StructTest : MonoBehaviour
     void Start()
     {
         StructData data = StructData.load();
-        print(data.struct1.toString());
+        print(data.struct1.ToString());
 
         foreach(var info in data.structs)
         {
-            print(info.toString());
+            print(info.ToString());
         }
         //StructInfo info1 = new StructInfo() {
         //    name = "one",
@@ -63,7 +63,7 @@ public struct StructInfo
 {
     public string name;
     public Dictionary<int, Vector3> vector3_dict;
-    public string toString() {
+    public override string ToString() {
         string output = string.Format("name: {0}", name);
 
         foreach(var key in vector3_dict.Keys)

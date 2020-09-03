@@ -33,9 +33,6 @@ namespace ETLab
             pm.getPlayer(0).setId("9527");
             pm.getPlayer(1).setId("你要不要吃哈密瓜");
 
-            // modify flag
-            dm.setFlagDelegate(modifingFlag);
-
             // 註冊標籤動作和實際動作之間的鏈結
             dm.registMultiPoses(Pose.JaNKeNPoN, new List<Pose> {
                 Pose.RaiseTwoHands, 
@@ -132,9 +129,6 @@ namespace ETLab
             List<Pose> poses = dm.getPoses(Pose.JaNKeNPoN);
 
             accumulate_time += Time.deltaTime;
-
-            // 透過 updateFlag 將 accumulate_time 傳給 modifingFlag
-            dm.updateFlag(accumulate_time);
 
             foreach (Pose pose in poses)
             {

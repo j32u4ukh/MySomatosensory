@@ -63,6 +63,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\_Script\Azure\Azure.cs" />
+    <Compile Include="Assets\_Script\Azure\FaceDetect.cs" />
+    <Compile Include="Assets\_Script\Azure\FaceIdentify.cs" />
+    <Compile Include="Assets\_Script\Azure\PersonGroup.cs" />
     <Compile Include="Assets\_Script\ConfigData.cs" />
     <Compile Include="Assets\_Script\DetectManager.cs" />
     <Compile Include="Assets\_Script\EnumClass.cs" />
@@ -74,6 +78,7 @@
     <Compile Include="Assets\_Script\Kinect\PoseModelHelper.cs" />
     <Compile Include="Assets\_Script\Kinect\SimpleGestureListener.cs" />
     <Compile Include="Assets\_Script\Movement.cs" />
+    <Compile Include="Assets\_Script\MyAsync.cs" />
     <Compile Include="Assets\_Script\Player.cs" />
     <Compile Include="Assets\_Script\PlayerData.cs" />
     <Compile Include="Assets\_Script\PlayerManager.cs" />
@@ -551,6 +556,9 @@
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>D:/Unity Projects/MySomatosensory/Assets/K2Examples/KinectScripts/SharpZipLib/ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime">
+      <HintPath>D:/Unity Projects/MySomatosensory/Assets/_Script/UnityAsync/Plugins/System.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Analytics.Editor">
       <HintPath>D:/Unity Projects/MySomatosensory/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
@@ -559,9 +567,6 @@
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
       <HintPath>D:/Unity Projects/MySomatosensory/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Tracker.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime">
-      <HintPath>D:/Unity Projects/MySomatosensory/Assets/_Script/UnityAsync/Plugins/System.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>D:/Unity Projects/Unity Editor/2019.1.4f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>

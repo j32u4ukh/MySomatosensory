@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 
@@ -48,6 +51,7 @@ namespace ETLab
                 n_sample = length;
             }
 
+            // 每一個區塊的大小(將 length=100 區分為 n_sample=5 區，每一區的大小為 sample_size=20)
             float sample_size = (float)length / n_sample;
             System.Random random = new System.Random();
             for (i = 0; i < n_sample; i++)
@@ -120,14 +124,25 @@ namespace ETLab
             sb.Append("[");
 
             int i, len = array.Length;
-            for (i = 0; i < len - 1; i++)
+
+            if(len > 0)
             {
-                sb.Append(string.Format("{0:F4}, ", array[i]));
+                for (i = 0; i < len - 1; i++)
+                {
+                    sb.Append(string.Format("{0:F4}, ", array[i].ToString()));
+                }
+
+                sb.Append(string.Format("{0:F4}", array[len - 1].ToString()));
             }
 
-            sb.Append(string.Format("{0:F4}]", array[len - 1]));
+            sb.Append("]");
 
             return sb.ToString();
+        }
+
+        public static string listToString<T>(List<T> list)
+        {
+            return arrayToString(list.ToArray());
         }
 
         /// <summary>
@@ -154,7 +169,57 @@ namespace ETLab
         public static float alphaToP(float alpha)
         {
             return (alpha + 3f) / 6f;
-        } 
+        }
+        #endregion
+
+        // ============================================================
+        
+        public static string getDescription(string value, Type type)
+        {
+            string name = Enum.GetNames(type).Where(f => f.Equals(value, StringComparison.CurrentCultureIgnoreCase))
+                                             .Select(d => d)
+                                             .FirstOrDefault();
+
+            //// 找無相對應的列舉
+            if (name == null)
+            {
+                return string.Empty;
+            }
+
+            // 利用反射找出相對應的欄位
+            var field = type.GetField(name);
+
+            // 取得欄位設定DescriptionAttribute的值
+            var attribute = field.GetCustomAttributes(typeof(DescriptionAttribute), false);
+
+            //// 無設定Description Attribute, 回傳Enum欄位名稱
+            if (attribute == null || attribute.Length == 0)
+            {
+                return name;
+            }
+
+            //// 回傳Description Attribute的設定
+            return ((DescriptionAttribute)attribute[0]).Description;
+        }
+
+        #region 無法藉由點擊 Editor log 跳到實際腳本位置
+        /* 以下屬性只能置於參數位置，不能於函式內呼叫
+         * CallerLineNumber: 實際呼叫的行數位置
+         * CallerMemberName: 實際呼叫的函數名稱
+         * CallerFilePath: 實際呼叫的腳本路徑
+         * 參考網站: https://stackoverflow.com/questions/12556767/how-do-i-get-the-current-line-number
+         */
+        public static void log(string message, [CallerLineNumber] int line_num = 0, [CallerMemberName] string member = "", [CallerFilePath] string file_path = "")
+        {
+            message = string.Format("[{0}] ({1}) {2}\n{3}", member, line_num, message, file_path);
+            Debug.Log(message);
+        }
+
+        public static void error(string message, [CallerLineNumber] int line_num = 0, [CallerMemberName] string member = "", [CallerFilePath] string file_path = "")
+        {
+            message = string.Format("[{0}] ({1}) {2}\n{3}", member, line_num, message, file_path);
+            Debug.LogError(message);
+        }
         #endregion
     }
 }

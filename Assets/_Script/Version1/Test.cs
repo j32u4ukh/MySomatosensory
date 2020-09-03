@@ -11,7 +11,7 @@ public class Test : MonoBehaviour {
 
 	void Start () {
         FloatList nums = new FloatList();
-        print(nums.toString());
+        print(nums.ToString());
         print("sum:" + nums.sum());
         print("mean:" + nums.mean());
     }

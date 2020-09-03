@@ -90,7 +90,7 @@ namespace ETLab
             posture_list.Add(posture);
         }
 
-        public string toString()
+        public override string ToString()
         {
             FloatList float_list = new FloatList(threshold);
             float threshold_mean = float_list.geometricMean();
@@ -144,6 +144,17 @@ namespace ETLab
 
             // 回傳檔案路徑
             return path;
+        }
+
+        public void reSave(string path)
+        {
+            // 檢查檔案是否存在
+            StreamWriter writer = new FileInfo(path).CreateText();
+
+            // JsonConvert.SerializeObject 將 record_data 轉換成json格式的字串
+            writer.WriteLine(JsonConvert.SerializeObject(this));
+            writer.Close();
+            writer.Dispose();
         }
 
         // 一個遊戲的所有紀錄皆寫完後，加上後綴"_done"，告訴其他程式已經可以上傳

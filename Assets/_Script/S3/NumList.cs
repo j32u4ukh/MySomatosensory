@@ -28,6 +28,52 @@ public class FloatList : INumList<float>
         this.numbers = new List<float>(numbers);
     }
 
+    public float this[int index]
+    {
+        set { numbers[index] = value; }
+        get { return numbers[index]; }
+    }
+
+    public static FloatList operator +(FloatList list1, FloatList list2)
+    {
+        if(list1.length() != list2.length())
+        {
+            throw new Exception(string.Format("FloatList 相加的兩物件，個數需相同"));
+        }
+
+        int i, len = list1.length();
+        float val;
+        FloatList list = new FloatList();
+
+        for(i = 0; i < len; i++)
+        {
+            val = list1[i] + list2[i];
+            list.add(val);
+        }
+
+        return list;
+    }
+
+    public static FloatList operator -(FloatList list1, FloatList list2)
+    {
+        if (list1.length() != list2.length())
+        {
+            throw new Exception(string.Format("FloatList 相加的兩物件，個數需相同"));
+        }
+
+        int i, len = list1.length();
+        float val;
+        FloatList list = new FloatList();
+
+        for (i = 0; i < len; i++)
+        {
+            val = list1[i] - list2[i];
+            list.add(val);
+        }
+
+        return list;
+    }
+
     public void add(float val)
     {
         numbers.Add(val);
@@ -75,7 +121,7 @@ public class FloatList : INumList<float>
         return (float)Math.Round(Math.Pow(geometric, 1f / length()), digit);
     }
 
-    public string toString()
+    public override string ToString()
     {
         StringBuilder sb = new StringBuilder();
         sb.Append("[");
@@ -85,9 +131,9 @@ public class FloatList : INumList<float>
             int i;
             for (i = 0; i < length() - 1; i++)
             {
-                sb.Append(numbers[i] + ", ");
+                sb.Append(string.Format("{0:F4}, ", numbers[i]));
             }
-            sb.Append(numbers[i]);
+            sb.Append(string.Format("{0:F4}", numbers[i]));
         }
 
         sb.Append("]");
