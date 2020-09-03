@@ -92,17 +92,17 @@ namespace ETLab
         /// 特化為直接根據動作標籤取得正確率並記錄
         /// </summary>
         /// <param name="pose">要紀錄正確率的動作</param>
-        public void setAccuracy(Pose pose)
+        public void writeAccuracy(Pose pose)
         {
             record.setAccuracy(getAccuracy(pose));
         }
 
-        public void setAccuracy(float[] accuracy)
+        public void writeAccuracy(float[] accuracy)
         {
             record.setAccuracy(accuracy);
         }
 
-        public void setRemark(string remark)
+        public void writeRemark(string remark)
         {
             record.setRemark(remark);
         }
@@ -112,6 +112,10 @@ namespace ETLab
             record.addPosture(skeletons, rotations);
         }
 
+        /// <summary>
+        /// 專為標準紀錄設計
+        /// </summary>
+        /// <param name="n_sample">分解動作取樣數</param>
         public void samplePosture(int n_sample)
         {
             record.posture_list = Utils.sampleList(record.posture_list, n_sample: n_sample);
@@ -243,14 +247,37 @@ namespace ETLab
             movement_dict[pose].setThreshold(getAccuracy(pose));
         }
 
-        public void setThreshold(Pose pose, float[] thresholds)
+        public void setThreshold(Pose pose, float[] thresholds, int digits = -1)
         {
-            movement_dict[pose].setThreshold(thresholds);
+            if(digits >= 0)
+            {
+                movement_dict[pose].setThreshold(thresholds, digits: digits);
+            }
+            else
+            {
+                movement_dict[pose].setThreshold(thresholds);
+            }            
         }
 
         public void modifyThreshold(Pose pose, int index, float acc, int optimization = 0)
         {
             movement_dict[pose].setThreshold(index: index, acc: acc, optimization: optimization);
+        }
+
+        public void modifyAllThreshold(Pose pose, int optimization = 0)
+        {
+            int i, len = ConfigData.n_posture;
+
+            // accuracys: 取得該動作的最高正確率
+            float[] accuracys = getAccuracy(pose);
+
+            for (i = 0; i < len; i++)
+            {
+                modifyThreshold(pose: pose, index: i, acc: accuracys[i], optimization: optimization);
+            }
+
+            Debug.Log(string.Format("[Player] modifyAllThreshold | Finish modification of {0}\naccuracy: {1}\nthreshold: {2}",
+                pose, Utils.arrayToString(getAccuracy(pose)), Utils.arrayToString(getThreshold(pose))));
         }
 
         public void modifyThreshold(Pose pose, int optimization = 0)

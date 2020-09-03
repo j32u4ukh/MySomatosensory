@@ -64,6 +64,17 @@ namespace ETLab
             }
         }
 
+        public void setThreshold(float[] thresholds, int digits)
+        {
+            int i, len = thresholds.Length;
+            this.thresholds = new float[len];
+
+            for (i = 0; i < len; i++)
+            {
+                this.thresholds[i] = (float)Math.Round(thresholds[i], digits: digits);
+            }
+        }
+
         /// <summary>
         /// 利用能力估計函數，調整門檻值
         /// </summary>

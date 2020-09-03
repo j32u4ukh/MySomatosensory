@@ -168,9 +168,6 @@ namespace ETLab
             time += Time.deltaTime;
             round_time += Time.deltaTime * 10f;
 
-            // 透過 updateFlag 將 accumulate_time 傳給 modifingFlag，根據時間調整偵測模式
-            dm.updateFlag(time);
-
             // 實作偵測，此形式保留了對個別動作的不同操作空間
             foreach (Pose pose in poses)
             {
@@ -272,9 +269,6 @@ namespace ETLab
 
                 // detect function
                 dm.setDetectDelegate(defaultDetect);
-
-                // modify flag
-                dm.setFlagDelegate(modifingFlag);
 
                 while (time < 10.0f && !matched)
                 {

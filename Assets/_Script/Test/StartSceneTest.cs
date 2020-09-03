@@ -100,9 +100,6 @@ namespace ETLab
             List<Pose> poses = dm.getPoses(pose);
             accumulate_time += Time.deltaTime;
 
-            // 透過 updateFlag 將 accumulate_time 傳給 modifingFlag
-            dm.updateFlag(accumulate_time);
-
             foreach (Pose pose in poses)
             {
                 dm.compareMovement(player, pose);
@@ -113,7 +110,7 @@ namespace ETLab
         {
             List<Pose> poses = dm.getPoses(pose);
             accumulate_time += Time.deltaTime;
-            dm.updateFlag(accumulate_time);
+
             float y_distance = player.getDistanceY();
             float y_threshold = 0.2f;
 
@@ -127,7 +124,6 @@ namespace ETLab
         {
             List<Pose> poses = dm.getPoses(Pose.RaiseTwoHands);
             accumulate_time += Time.deltaTime;
-            dm.updateFlag(accumulate_time);
 
             foreach (Pose pose in poses)
             {

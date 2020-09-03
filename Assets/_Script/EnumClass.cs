@@ -12,6 +12,13 @@ namespace ETLab
         Modify      // 配對(O), 修改門檻值(O)
     }
 
+    public enum DetectMode
+    {
+        None,
+        Training,   // 單動作配對，尋找最適門檻值
+        Testing     // 多動作配對, 不修改門檻值
+    }
+
     // 包含實際動作 與 多動作的分類標籤(EX: Strike 包含 StrikeLeft 和 StrikeRight，但 Strike 本身不是實際動作)
     public enum Pose
     {

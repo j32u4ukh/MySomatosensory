@@ -133,7 +133,7 @@ namespace ETLab
             }
             else
             {
-                Debug.LogError("候選人數為 0");
+                Debug.LogWarning("候選人數為 0");
                 return "";
             }
         }

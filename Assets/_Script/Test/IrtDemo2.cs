@@ -12,10 +12,12 @@ namespace ETLab
         public PlayerManager pm;
         [Header("偵測動作類型")]
         public Pose pose = Pose.RaiseTwoHands;
+        private Pose training_pose;
 
         string gui = "";
-        float modify_milli = 3.0f;
-        float interval_milli = 0.1f;
+        float modify_buffer = 3.0f;
+        float interval_buffer = 0.1f;
+        bool logged_in = false;
 
         // ====================================================================================================
         // 音效管理
@@ -94,6 +96,8 @@ namespace ETLab
         float buffer_time;
 
         float detect_time = 0f;
+
+        // 當前 demo 為單人遊戲，故，在一位玩家通過後 matched 就改變狀態，結束當下的迴圈
         bool matched = false;
 
         // 呈現當前動作正確率與門檻值
@@ -101,7 +105,7 @@ namespace ETLab
 
         private void Awake()
         {
-            Azure.initConfigData();
+            Azure.initConfigData(config_path: @"D:\Unity Projects\AzureFaceConfig.txt");
 
             pm.init(n_player: 1);
             pm.getPlayer(0).setId("9527");
@@ -195,15 +199,18 @@ namespace ETLab
                 StartCoroutine(gamePlaying());
             });
 
-            //StartCoroutine(gameStart());
             login_button.onClick.AddListener(()=> {
-                _ = identifyPlayer(group_id: "noute_and_miyu_group");
+                //_ = identifyPlayer(group_id: "noute_and_miyu_group");
+                login_buffer.SetActive(false);
+                logged_in = true;
+                StartCoroutine(gameStart());
             });
         }
 
         // Update is called once per frame
         void Update()
         {
+            // 離開遊戲
             if(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
                 if (Input.GetKeyDown(KeyCode.Q))
@@ -212,6 +219,7 @@ namespace ETLab
                 }
             }
 
+            // 感測器辨識測試
             if (Input.GetKeyDown(KeyCode.D))
             {
                 Debug.Log("開始: 感測器辨識測試");
@@ -230,6 +238,7 @@ namespace ETLab
                 {
                     Debug.Log(string.Format("{0} login~", person.name));
                     login_buffer.SetActive(false);
+                    logged_in = true;
                     StartCoroutine(gameStart());
                     break;
                 }
@@ -249,19 +258,22 @@ namespace ETLab
 
         private void OnGUI()
         {
-            GUI.skin.label.fontSize = 60;
-            GUI.color = Color.black;
+            if (logged_in)
+            {
+                GUI.skin.label.fontSize = 60;
+                GUI.color = Color.black;
 
-            gui = string.Format("\n\n\n\n\n\n\nROUND_TIME: {0}, pose: {1}\nround_time: {2:F4}\ndetect_time: {3:F4}\n" +
-                "Gap(acc - thres): {4:F4}\nthreshold: {5:F4}", ROUND_TIME, pose, round_time, detect_time, 
-                gap_list.sum(), thres_list.mean());
+                gui = string.Format("\n\n\n\n\n\n\nROUND_TIME: {0}, pose: {1}\nround_time: {2:F4}\ndetect_time: {3:F4}\n" +
+                    "Gap(acc - thres): {4:F4}\nthreshold: {5:F4}", ROUND_TIME, pose, round_time, detect_time,
+                    gap_list.sum(), thres_list.mean());
 
-            GUILayout.Label(
-                // text on gui
-                gui,
-                // start to define gui layout
-                GUILayout.Width(Screen.width),
-                GUILayout.Height(Screen.height));
+                GUILayout.Label(
+                    // text on gui
+                    gui,
+                    // start to define gui layout
+                    GUILayout.Width(Screen.width),
+                    GUILayout.Height(Screen.height));
+            }
         }
 
         private void OnDestroy()
@@ -279,22 +291,24 @@ namespace ETLab
             dm.registMultiPoses(Pose.RaiseTwoHands);
             dm.registMultiPoses(Pose.Squat);
             //dm.registMultiPoses(Pose.Hop, new List<Pose> {
-            //    Pose.HopLeft, 
+            //    Pose.HopLeft,
             //    Pose.HopRight
             //});
             dm.registMultiPoses(Pose.HopRight);
             yield return new WaitForSeconds(Time.deltaTime);
 
             // 載入各動作數據(會根據標籤動作取得內含的多動作)
+            //_ = dm.loadMultiPostures(Pose.RaiseTwoHands, Pose.Squat, Pose.Hop);
             _ = dm.loadMultiPostures(Pose.RaiseTwoHands, Pose.Squat, Pose.HopRight);
-            yield return new WaitForSeconds(Time.deltaTime); 
+            yield return new WaitForSeconds(Time.deltaTime);
             #endregion
 
-            //StartCoroutine(gamePlaying());
+            // loadComparingParts 和 loadMultiPostures 都載入完成後，會觸發 onAllResourcesLoaded，接著遊戲開始
         }
 
         IEnumerator gamePlaying()
         {
+            dm.detect_mode = DetectMode.Training;
             Debug.Log(string.Format("[IrtDemo2] gamePlaying"));
             
             string question;
@@ -349,14 +363,14 @@ namespace ETLab
                 {
                     Debug.Log(string.Format("[IrtDemo2] gamePlaying | round: {0}, number: {1}", round, number));
 
+                    // 還原配對過程中的暫存資訊: 至於每次開始偵測前，為確保偵測結束後，調整門檻時，有正確率等數據可以使用
+                    dm.resetState(pose);
+
                     // 開始記錄骨架
                     dm.startRecord();
 
                     // detect function
                     dm.setDetectDelegate(defaultDetect);
-
-                    // modify flag
-                    //dm.setFlagDelegate(modifingFlag);
 
                     // 計數更新
                     ui_count.sprite = Resources.Load<Sprite>(string.Format("number{0}", number));
@@ -367,7 +381,7 @@ namespace ETLab
                         yield return new WaitForSeconds(Time.deltaTime);
                     }
 
-                    // invoke onMatchEnded
+                    // stopRecord will invoke onMatchEnded
                     dm.stopRecord();
 
                     buffer_time = 0f;
@@ -432,8 +446,6 @@ namespace ETLab
             // 這個計時可用於決定是否需要觸發 onMatchEnded 事件
             detect_time += Time.deltaTime;
 
-            // 透過 updateFlag 將 accumulate_time 傳給 modifingFlag，根據時間調整偵測模式
-            //dm.updateFlag(detect_time);
             float delta_time;
 
             // 實作偵測，此形式保留了對個別動作的不同操作空間
@@ -444,14 +456,15 @@ namespace ETLab
 
                 delta_time = Time.deltaTime;
 
-                if ((detect_time < modify_milli) && (detect_time + delta_time > modify_milli))
+                if ((detect_time < modify_buffer) && (detect_time + delta_time > modify_buffer))
                 {
+                    // TODO: 練習動作時，最一開始的 嘗試時間 以及 更新間隔時間 都會越來越長
                     player.modifyThreshold(pose: pose);
-                    Debug.Log(string.Format("[IrtDemo2] defaultDetect | modify_milli: {0}, detect_time: {1:F4}, round_time: {2:F4}",
-                        modify_milli, detect_time, round_time));
+                    Debug.Log(string.Format("[IrtDemo2] defaultDetect | modify_buffer: {0}, detect_time: {1:F4}, round_time: {2:F4}",
+                        modify_buffer, detect_time, round_time));
 
                     // 間隔 interval_milli 毫秒再次呼叫調整門檻值的函式
-                    modify_milli += interval_milli;
+                    modify_buffer += interval_buffer;
                 }
 
                 // 呈現當前動作正確率與門檻值
@@ -471,12 +484,6 @@ namespace ETLab
             }
         }
 
-        Flag modifingFlag(float f)
-        {
-            // 配對(O), 修改門檻值(X)
-            return Flag.Matching;
-        }
-
         IEnumerator gameEnd()
         {
             Debug.Log(string.Format("[IrtDemo2] gameEnd"));
@@ -490,19 +497,151 @@ namespace ETLab
             yield return new WaitForSeconds(Time.deltaTime);
         }
 
+        #region 練習動作用
+        IEnumerator poseTraining()
+        {
+            // TODO: 持續練習動作，直到不需要調整門檻值
+            dm.detect_mode = DetectMode.Training;
+
+            foreach (Pose pose in new Pose[] { Pose.RaiseTwoHands, Pose.Squat, Pose.HopRight, Pose.HopLeft })
+            {
+                detect_time = 0f;
+                interval_buffer = 0.1f;
+                training_pose = pose;
+
+                foreach (Player player in pm.getPlayers())
+                {
+                    player.writeGameStage(GameStage.Test);
+                    player.setTargetPose(training_pose);
+                }
+
+                // 開始記錄骨架
+                dm.startRecord();
+
+                // detect function
+                dm.setDetectDelegate(trainingDetect);
+
+                while (!matched)
+                {
+                    yield return new WaitForSeconds(Time.deltaTime);
+                }
+
+                // stopRecord will invoke onMatchEnded
+                dm.stopRecord();
+
+            }
+
+            yield return new WaitForSeconds(Time.deltaTime);
+
+            //dm.resetListener();
+
+            //dm.addOnMatchedListener(onMatchedListener);
+
+            //// 全部配對成功
+            //dm.addOnAllMatchedFinishedListener(onAllMatchedFinishedListener);
+
+            //// 可以處理因超時而結束偵測的情況
+            //dm.addOnMatchEndedFinishedListener(onMatchEndedFinishedListener);
+
+            //StartCoroutine(gamePlaying());
+        }
+
+        void trainingDetect(Player player)
+        {
+            // 這個計時可用於決定是否需要觸發 onMatchEnded 事件
+            detect_time += Time.deltaTime;
+
+            // 比對動作
+            dm.compareMovement(player, training_pose);
+
+            if ((detect_time < modify_buffer) && (detect_time + Time.deltaTime > modify_buffer))
+            {
+                // TODO: 練習動作時，最一開始的 嘗試時間 以及 更新間隔時間 都會越來越長
+                player.modifyThreshold(pose: pose);
+                Debug.Log(string.Format("[IrtDemo2] defaultDetect | modify_milli: {0}, detect_time: {1:F4}, round_time: {2:F4}",
+                    modify_buffer, detect_time, round_time));
+
+                // 間隔 interval_milli 毫秒再次呼叫調整門檻值的函式
+                modify_buffer += interval_buffer;
+                interval_buffer += 0.1f;
+            }
+
+            // 呈現當前動作正確率與門檻值
+            acc_list = new FloatList(player.getAccuracy(pose));
+            thres_list = new FloatList(player.getThreshold(pose));
+            gap_list = acc_list - thres_list;
+            int i, len = gap_list.length();
+            for (i = 0; i < len; i++)
+            {
+                if (gap_list[i] > 0.0f)
+                {
+                    gap_list[i] = 0.0f;
+                }
+            }
+            Debug.Log(string.Format("[IrtDemo2] trainingDetect | pose: {0}\nacc: {1}\nthres: {2}",
+                pose, acc_list.ToString(), thres_list.ToString()));
+        }
+
+        void onTrainingMatchedListener(int index)
+        {
+            Debug.Log(string.Format("[IrtDemo2] onTrainingMatchedListener(index: {0})", index));
+
+            detect_time = 0f;
+            modify_buffer = 3.0f;
+            matched = true;
+
+            // 呈現當前動作正確率與門檻值
+            Player player = pm.getPlayer(index);
+            Pose matched_pose = player.getMatchedPose();
+            Debug.Log(string.Format("[IrtDemo2] onTrainingMatchedListener Listener: player {0} matched pose: {1}.", index, matched_pose));
+
+            acc_list = new FloatList(player.getAccuracy(matched_pose));
+            thres_list = new FloatList(player.getThreshold(matched_pose));
+            gap_list = acc_list - thres_list;
+            int i, len = gap_list.length();
+
+            for (i = 0; i < len; i++)
+            {
+                if (gap_list[i] > 0.0f)
+                {
+                    gap_list[i] = 0.0f;
+                }
+            }
+
+            // 正確音效
+            audio_manager.modifyVolumn(CORRECT_VOL, 2);
+            audio_manager.play(AudioManager.AudioName.Correct, 2);
+        }
+
+        void onTrainingAllMatchedFinishedListener()
+        {
+            Debug.Log(string.Format("[IrtDemo2] onTrainingAllMatchedFinishedListener"));
+        }
+
+        void onTrainingMatchEndedFinishedListener()
+        {
+            Debug.Log(string.Format("[IrtDemo2] onTrainingMatchEndedFinishedListener"));
+
+            matched = false;
+            detect_time = 0f;
+            modify_buffer = 3.0f;
+        } 
+        #endregion
+
+        #region 遊戲中正式配對
         void onMatchedListener(int index)
         {
             Debug.Log(string.Format("[IrtDemo2] onMatched(index: {0})", index));
 
             detect_time = 0f;
-            modify_milli = 3.0f;
+            modify_buffer = 3.0f;
             matched = true;
 
             // 因此 number - 1
             number--;
 
             // 更新 UI 計數
-            ui_count.sprite = Resources.Load<Sprite>(string.Format("number{0}", number));            
+            ui_count.sprite = Resources.Load<Sprite>(string.Format("number{0}", number));
 
             // 呈現當前動作正確率與門檻值
             Player player = pm.getPlayer(index);
@@ -536,11 +675,10 @@ namespace ETLab
         {
             Debug.Log(string.Format("[IrtDemo2] onMatchEndedFinishedListener"));
 
-            // 還原配對過程中的暫存資訊
-            dm.resetState(pose);
             matched = false;
             detect_time = 0f;
-            modify_milli = 3.0f;
-        }
+            modify_buffer = 3.0f;
+        } 
+        #endregion
     }
 }

@@ -18,8 +18,13 @@ namespace ETLab
         public const string DetectionModel01 = "detection_01";
         public const string DetectionModel02 = "detection_02";
 
-        public static void initConfigData()
+        public static void initConfigData(string config_path = "")
         {
+            if (!config_path.Equals(""))
+            {
+                ConfigData.config_path = config_path;
+            }
+
             using (StreamReader reader = new StreamReader(ConfigData.config_path))
             {
                 string line;
