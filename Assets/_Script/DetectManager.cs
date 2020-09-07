@@ -99,7 +99,6 @@ namespace ETLab
             _ = loadComparingParts();
 
             pose_dict = new Dictionary<Pose, List<Pose>>();
-            registMultiPoses(Pose.RaiseTwoHands);
         }
 
         void Start()
@@ -143,7 +142,7 @@ namespace ETLab
                     Debug.Log(string.Format("[DetectManager] Start | 實際動作 {0} 多比對標準載入完成", pose_type));
                 });
 
-                resetState();
+                resetMatchState();
                 Debug.Log(string.Format("[DetectManager] Start | init all_matching_state, n_player: {0}", n_player));
 
                 // TODO: 記錄個動作在無動作狀態下的正確率，至少要大於該數值才能算通過
@@ -335,12 +334,14 @@ namespace ETLab
             // 避免前面的玩家通過後，pose 被修改為 Pose.None 而導致沒有比對之標的
             if (target_pose == Pose.None)
             {
+                Utils.error("target_pose is Pose.None");
                 return;
             }
 
             // 若已經通過則直接 return (等待其他玩家通過的情形)
             if (player.getMatchedPose() != Pose.None)
             {
+                Utils.log(string.Format("Player has been matched with {0}.", player.getMatchedPose()));
                 return;
             }
 
@@ -646,7 +647,7 @@ namespace ETLab
             }
             else
             {
-                Debug.LogError(string.Format("[DetectManager] getPoses | You need regist {0} by registMultiPoses.", pose));
+                Debug.LogWarning(string.Format("[DetectManager] getPoses | {0} is real action, not label action.", pose));
                 return null;
             }
         }
@@ -762,7 +763,7 @@ namespace ETLab
             all_matching_state = new bool[n_player];
         }
 
-        public void resetState()
+        public void resetMatchState()
         {
             // 玩家是否全部通過之資訊重置
             int i;
@@ -779,12 +780,29 @@ namespace ETLab
             }
         }
 
+        // TODO: 若為練習模式，要重置的動作為實際動作而非標籤動作，使用 getPoses 會出錯，需額外替練習模式寫一個
         public void resetState(Pose key)
         {
             // 取得標籤動作下的所有動作
             List<Pose> poses = getPoses(key);
 
-            if (poses != null)
+            // key 為實際動作
+            if (poses == null)
+            {
+                Utils.log(string.Format("實際動作: {0}", key));
+                resetPosesState(key);
+            }
+            // key 為標籤動作，透過 key 來取得實際動作 poses
+            else
+            {
+                Utils.log(string.Format("標籤動作: {0}", key));
+                resetPosesState(poses.ToArray());
+            }            
+        }
+
+        public void resetPosesState(params Pose[] poses)
+        {
+            if (poses != null && poses.Length > 0)
             {
                 // 遍歷每位玩家
                 foreach (Player player in pm.getPlayers())
@@ -798,7 +816,7 @@ namespace ETLab
                 }
             }
 
-            resetState();
+            resetMatchState();
         }
         #endregion
 
