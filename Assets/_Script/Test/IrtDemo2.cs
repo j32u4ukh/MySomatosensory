@@ -660,8 +660,6 @@ namespace ETLab
             detect_time = 0f;
             modify_buffer = 3.0f;
             matched = true;
-
-            // 因此 number - 1
             number--;
 
             // 更新 UI 計數
