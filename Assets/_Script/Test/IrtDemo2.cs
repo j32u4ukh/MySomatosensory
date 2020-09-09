@@ -204,10 +204,10 @@ namespace ETLab
             });
 
             login_button.onClick.AddListener(()=> {
-                //_ = identifyPlayer(group_id: "noute_and_miyu_group");
-                login_buffer.SetActive(false);
-                logged_in = true;
-                StartCoroutine(gameStart());
+                _ = identifyPlayer(group_id: "noute_and_miyu_group");
+                //login_buffer.SetActive(false);
+                //logged_in = true;
+                //StartCoroutine(gameStart());
             });
         }
 

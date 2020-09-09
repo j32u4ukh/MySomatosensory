@@ -546,6 +546,83 @@ namespace ETLab
             return 1f - total_diff;
         }
 
+        public float getAccuracy(Posture posture, Posture standard_posture, List<HumanBodyBones> comparing_parts)
+        {
+            HumanBodyBones bone;
+            Vector3 player_vector, standrad_vector, s1, s2, p1, p2;
+
+            // len: 每個動作所要比對對的關節數量不盡相同
+            int i, len = comparing_parts.Count;
+            float diff, total_diff = 0f;
+
+            // 遍歷要比對的部位
+            for (i = 0; i < len; i++)
+            {
+                bone = comparing_parts[i];
+
+                if (!posture.contain(bone))
+                {
+                    continue;
+                }
+                else
+                {
+                    p1 = posture.getBonePosition(bone);
+                }
+
+                if (!standard_posture.contain(bone))
+                {
+                    continue;
+                }
+                else
+                {
+                    s1 = standard_posture.getBonePosition(bone);
+                }
+
+                if ((i + 1) >= len)
+                {
+                    bone = comparing_parts[0];
+                }
+                else
+                {
+                    bone = comparing_parts[i + 1];
+                }
+
+                if (!posture.contain(bone))
+                {
+                    continue;
+                }
+                else
+                {
+                    p2 = posture.getBonePosition(bone);
+                }
+
+                if (!standard_posture.contain(bone))
+                {
+                    continue;
+                }
+                else
+                {
+                    s2 = standard_posture.getBonePosition(bone);
+                }
+
+                // 取得玩家與標準模型 目前節點(jointType)的向量
+                player_vector = (p2 - p1).normalized;
+                standrad_vector = (s2 - s1).normalized;
+
+                // 計算玩家骨架 與 姿勢骨架角度差距
+                diff = Vector3.Angle(player_vector, standrad_vector);
+                if (diff > 90f)
+                {
+                    diff = 90f;
+                }
+                total_diff += diff / 90f;
+            }
+
+            total_diff /= len;
+
+            return 1f - total_diff;
+        }
+
         public void resetInitPos()
         {
             foreach (Player player in pm.getPlayers())
@@ -696,6 +773,7 @@ namespace ETLab
         {
             Debug.Log(string.Format("[DetectManager] loadMultiPosture(key: {0})", key));
 
+            // TODO: pose_dict?
             if (!pose_dict.ContainsKey(key))
             {
                 Debug.LogError(string.Format("[DetectManager] loadMultiPosture | No {0} in pose_dict, you need to regist first.", key));

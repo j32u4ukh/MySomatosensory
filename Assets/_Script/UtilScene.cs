@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace ETLab
 {
+    // TODO: 紀錄各動作的"無動作正確率" -> 多動作偵測時可推測當前在做何種動作，進而對它調整門檻值
+    // TODO: "無動作正確率"亦可決定各動作的最低門檻調整下限，或許應該高於"無動作正確率"? 才不至於站著不動都通過
+    // TODO: 先以 RecodeReply 場景錄製 Pose.None 的骨架資訊，再計算於其他動作下的正確率
     public class UtilScene : MonoBehaviour
     {
         // Start is called before the first frame update
@@ -100,6 +103,20 @@ namespace ETLab
                     record.reSave(file);
                 }
             }
+        }
+
+        void computeAsymptomaticAccuray(Pose base_pose, Pose compare_pose)
+        {
+            // 建構當下不會讀取數據，實際需要使用到前再讀取就好
+            MultiPosture mp = new MultiPosture();
+
+            mp.onMultiPostureLoaded.AddListener((Pose pose_type) => {
+                Utils.log(string.Format("實際動作 {0} 多比對標準載入完成", pose_type));
+            });
+
+            List<List<Posture>> base_multi_postures = mp.getMultiPostures(base_pose);
+            List<List<Posture>> compare_multi_postures = mp.getMultiPostures(compare_pose);
+
         }
     }
 

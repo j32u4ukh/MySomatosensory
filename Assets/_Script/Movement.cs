@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace ETLab
 {
+    // 一幀內的各關節數據(位置 & 旋轉)
     public struct Posture
     {
         public Dictionary<HumanBodyBones, Vector3> skeletons;
