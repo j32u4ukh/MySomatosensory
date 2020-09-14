@@ -29,15 +29,18 @@ namespace ETLab
 
         private void Awake()
         {
+            Utils.log();
+
             player_index = avatar_controller.playerIndex;
             is_recording = false;
             record = new RecordData();
+            Utils.log("new RecordData()");
         }
 
         // Start is called before the first frame update
         void Start()
         {
-                     
+            Utils.log();
         }
 
         #region Player

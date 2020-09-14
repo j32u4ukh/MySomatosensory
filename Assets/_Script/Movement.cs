@@ -289,10 +289,12 @@ namespace ETLab
 
             // Posture 數據儲存路徑
             string dir = Path.Combine(Application.streamingAssetsPath, "MovementData", pose.ToString());
+            Utils.log(string.Format("dir: {0}", dir));
 
             if (Directory.Exists(dir))
             {
                 string[] files = Directory.GetFiles(dir);
+                int i = 0, n_file = files.Length;
                 StreamReader reader;
                 string load_data;
                 RecordData record_data;
@@ -300,6 +302,9 @@ namespace ETLab
 
                 foreach (string file in files)
                 {
+                    i++;
+                    Utils.log(string.Format("processing {2} {0}/{1}", i, n_file, pose.ToString()));
+
                     // 不包含 .meta 的才是真正的檔案
                     if (!file.Contains(".meta"))
                     {

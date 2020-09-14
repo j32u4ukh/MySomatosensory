@@ -370,7 +370,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pm: {fileID: 620061710}
-  id: "\u4F60\u8981\u4E0D\u8981\u5403\u54C8\u5BC6\u74DC"
+  id: 9527
   pose: 0
 --- !u!1 &1731354965
 GameObject:

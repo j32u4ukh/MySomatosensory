@@ -18,8 +18,8 @@ namespace ETLab
         // Start is called before the first frame update
         void Start()
         {
-            initPlayerData();
-            //initMovementDatas();
+            //initPlayerData();
+            initMovementDatas();
             //checkMovementDatas();
         }
 
@@ -67,6 +67,14 @@ namespace ETLab
             Pose pose;
             MovementData data;
             List<HumanBodyBones> comparing_parts;
+
+            // None
+            pose = Pose.None;
+            comparing_parts = new List<HumanBodyBones>() {
+
+            };
+            data = new MovementData(comparing_parts);
+            datas.set(pose, data);
 
             // 左腳單腳跳
             pose = Pose.HopLeft;

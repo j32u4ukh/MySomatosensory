@@ -91,6 +91,8 @@ namespace ETLab
 
         private void Awake()
         {
+            Utils.log();
+
             initFileId();
             resetListener();
 
@@ -99,20 +101,23 @@ namespace ETLab
             _ = loadComparingParts();
 
             pose_dict = new Dictionary<Pose, List<Pose>>();
+
+            pm = GameObject.Find("PlayerManager").GetComponent<PlayerManager>();
+
+            // 建構當下不會讀取數據，實際需要使用到前再讀取就好
+            Utils.log("new MultiPosture()");
+            mp = new MultiPosture();
         }
 
         void Start()
         {
+            Utils.log();
+
             DontDestroyOnLoad(this);
             if (dm_instance == null)
             {
                 dm_instance = this;
-
-                pm = GameObject.Find("PlayerManager").GetComponent<PlayerManager>();
                 initPlayer();
-
-                // 建構當下不會讀取數據，實際需要使用到前再讀取就好
-                mp = new MultiPosture();
 
                 // 當比對關節載入完成
                 onComparingPartsLoaded.AddListener(() => {
@@ -546,6 +551,82 @@ namespace ETLab
             return 1f - total_diff;
         }
 
+        public float[] computeAsymptomaticAccuray(Player player, Pose base_pose, Pose compare_pose, float additional_accuracy = 1f)
+        {
+            // 從 comparing_parts_dict 讀取比較關節，避免重複讀取
+            List<HumanBodyBones> comparing_parts;
+
+            if (comparing_parts_dict.ContainsKey(compare_pose))
+            {
+                // 讀取比較關節
+                comparing_parts = comparing_parts_dict[compare_pose];
+            }
+            else
+            {
+                Utils.error(string.Format("No {0} in comparing_parts_dict.", compare_pose));
+                return null;
+            }
+
+            List<List<Posture>> base_multi_postures = mp.getMultiPostures(base_pose);
+            List<List<Posture>> compare_multi_postures = mp.getMultiPostures(compare_pose);
+
+            int n_base_frame = base_multi_postures.Count, n_base_model = base_multi_postures[0].Count;
+            int bf, bm;
+            List<Posture> base_postures;
+            Posture base_posture;
+            
+            for (bf = 0; bf < n_base_frame; bf++)
+            {
+                // 無動作之第 bf 幀多模型骨架數據
+                base_postures = base_multi_postures[bf];
+
+                for(bm = 0; bm < n_base_model; bm++)
+                {
+                    // 無動作之第 bf 幀第 bm 個模型的骨架數據
+                    base_posture = base_postures[bm];
+
+                    //Utils.log(string.Format(" 無動作之第 {0} 幀第 {1} 個模型的骨架數據", bf, bm));
+
+                    // 計算各分解動作最高正確率並儲存
+                    getHighestAccuracy(player, compare_pose, base_posture, compare_multi_postures, comparing_parts);
+                }
+            }
+
+            float[] asymptomatic_accuracy = player.getAccuracy(pose: compare_pose);
+
+            return asymptomatic_accuracy;
+        }
+
+        void getHighestAccuracy(Player player, Pose compare_pose, Posture base_posture, 
+            List<List<Posture>> compare_multi_postures, List<HumanBodyBones> comparing_parts)
+        {
+            int model_idx, posture_idx, n_model = compare_multi_postures[0].Count;
+            List<Posture> compare_postures;
+            FloatList acc_list;
+            float acc;
+
+            // 遍歷 ConfigData.n_posture 個分解動作
+            for (posture_idx = 0; posture_idx < ConfigData.n_posture; posture_idx++)
+            {
+                // 多來源的第 posture_idx 個 Posture
+                compare_postures = compare_multi_postures[posture_idx];
+                acc_list = new FloatList();
+
+                // 多標準共同衡量正確率
+                for (model_idx = 0; model_idx < n_model; model_idx++)
+                {
+                    // 第 posture_idx 個分解動作的正確率
+                    acc_list.add(getAccuracy(base_posture, compare_postures[model_idx], comparing_parts));
+                }
+
+                // 計算與多標準比對後的正確率
+                acc = acc_list.geometricMean();
+
+                // 記錄各個分解動作的最高值
+                player.setHighestAccuracy(pose: compare_pose, index: posture_idx, value: acc);
+            }
+        }
+
         public float getAccuracy(Posture posture, Posture standard_posture, List<HumanBodyBones> comparing_parts)
         {
             HumanBodyBones bone;
@@ -768,6 +849,19 @@ namespace ETLab
             onComparingPartsLoaded.Invoke();
         }
 
+        public async Task loadMultiPostures(params Pose[] poses)
+        {
+            Utils.log("start loadMultiPostures");
+
+            foreach (Pose pose in poses)
+            {
+                await loadMultiPosture(pose);
+            }
+
+            // 全部都載入完成才會觸發
+            onMultiPostureLoaded.Invoke();
+        }
+
         // 事前該動作或標籤動作要有註冊
         public async Task loadMultiPosture(Pose key)
         {
@@ -822,21 +916,22 @@ namespace ETLab
             Debug.Log(string.Format("[DetectManager] Start | 標籤動作 {0} 多動作比對標準載入完成.", key));
         }
 
-        public async Task loadMultiPostures(params Pose[] poses)
+        public List<List<Posture>> getMultiPostures(Pose pose)
         {
-            foreach(Pose pose in poses)
-            {
-                await loadMultiPosture(pose);
-            }
+            List<List<Posture>> multi_postures = mp.getMultiPostures(pose);
 
-            // 全部都載入完成才會觸發
-            onMultiPostureLoaded.Invoke();
+            return multi_postures;
         }
         #endregion
 
         #region 還原配對資訊
         public void initPlayer()
         {
+            if(pm == null)
+            {
+                pm = GameObject.Find("PlayerManager").GetComponent<PlayerManager>();
+            }
+
             n_player = pm.getPlayerNumber();
             all_matching_state = new bool[n_player];
         }
@@ -905,8 +1000,7 @@ namespace ETLab
         public void initFileId()
         {
             file_id = DateTime.Now.ToString("HH-mm-ss-ffff");
-            Debug.Log(string.Format("[DetectManager] Scene: {0}, file_id: {1}",
-                SceneManager.GetActiveScene().name, file_id));
+            Debug.Log(string.Format("[DetectManager] Scene: {0}, file_id: {1}", SceneManager.GetActiveScene().name, file_id));
         }
 
         public void startRecord()

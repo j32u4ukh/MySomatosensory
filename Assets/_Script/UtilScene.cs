@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace ETLab
@@ -11,10 +12,40 @@ namespace ETLab
     // TODO: 先以 RecodeReply 場景錄製 Pose.None 的骨架資訊，再計算於其他動作下的正確率
     public class UtilScene : MonoBehaviour
     {
+        public DetectManager dm;
+        public PlayerManager pm;
+
+        Pose base_pose = Pose.None; 
+        Pose compare_pose;
+
+        Player player;
+
+        private void Awake()
+        {
+            Utils.log();
+
+        }
+
         // Start is called before the first frame update
         void Start()
         {
-            displayRecordData(@"C:\Users\ETlab\Documents\Somatosensory\Data\9527\2020-08-11\IrtDemo2Scene-11-09-58-8691.txt");
+            Utils.log();
+            pm.init(n_player: 1);
+            player = pm.getPlayer(0);
+            player.setId("9527");
+
+            dm.initFileId();
+            dm.initPlayer();
+
+            compare_pose = Pose.RaiseTwoHands;
+            computeAsymptomaticAccuray(base_pose, compare_pose);
+
+            dm.onAllResourcesLoaded.AddListener(() => {
+                Utils.log("dm.onAllResourcesLoaded");
+                onAsymptomaticAccurayListener(base_pose, compare_pose);
+            });
+
+            //displayRecordData(@"C:\Users\ETlab\Documents\Somatosensory\Data\9527\2020-08-11\IrtDemo2Scene-11-09-58-8691.txt");
             //displayStandardData(@"D:\Unity Projects\MySomatosensory\Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-21-09-3302.txt");
             //sampleStandardData(Pose.RaiseTwoHands);
         }
@@ -105,19 +136,45 @@ namespace ETLab
             }
         }
 
+        #region AsymptomaticAccuray
         void computeAsymptomaticAccuray(Pose base_pose, Pose compare_pose)
         {
-            // 建構當下不會讀取數據，實際需要使用到前再讀取就好
-            MultiPosture mp = new MultiPosture();
+            Utils.log(string.Format("computeAsymptomaticAccuray(base_pose: {0}, compare_pose: {1})", 
+                base_pose, compare_pose));
+            _ = prepareAsymptomaticAccuray(base_pose, compare_pose);
+        }
+        
+        async Task prepareAsymptomaticAccuray(Pose base_pose, Pose compare_pose)
+        {
+            Utils.log(string.Format("prepareAsymptomaticAccuray(base_pose: {0}, compare_pose: {1})",
+                base_pose, compare_pose));
 
-            mp.onMultiPostureLoaded.AddListener((Pose pose_type) => {
-                Utils.log(string.Format("實際動作 {0} 多比對標準載入完成", pose_type));
-            });
+            // 註冊標籤動作和實際動作之間的鏈結
+            dm.registMultiPoses(base_pose);
+            dm.registMultiPoses(compare_pose);
 
-            List<List<Posture>> base_multi_postures = mp.getMultiPostures(base_pose);
-            List<List<Posture>> compare_multi_postures = mp.getMultiPostures(compare_pose);
+            Utils.log(string.Format("dm.loadMultiPostures({0}, {1})", base_pose, compare_pose));
+            await dm.loadMultiPostures(base_pose, compare_pose);
+
+            // loadComparingParts 和 loadMultiPostures 都載入完成後，會觸發 onAllResourcesLoaded，接著遊戲開始
+        }
+
+        void onAsymptomaticAccurayListener(Pose base_pose, Pose compare_pose)
+        {
+            //List<List<Posture>> base_multi_postures = dm.getMultiPostures(base_pose);
+            //List<List<Posture>> compare_multi_postures = dm.getMultiPostures(compare_pose);
+            //Utils.log(string.Format("frame #base: {0}, #compare: {1}", base_multi_postures.Count, compare_multi_postures.Count));
+            //Utils.log(string.Format("model #base: {0}, #compare: {1}", base_multi_postures[0].Count, compare_multi_postures[0].Count));
+
+            float[] asymptomatic_accuracy = dm.computeAsymptomaticAccuray(player, base_pose, compare_pose);
+            FloatList list = new FloatList(asymptomatic_accuracy);
+
+            Utils.log(list.ToString());
+            Utils.log(string.Format("mean: {0:F4}", list.mean()));
+            Utils.log(string.Format("geometricMean: {0:F4}", list.geometricMean()));
 
         }
+        #endregion
     }
 
 }

@@ -117,6 +117,7 @@ namespace ETLab
         // Start is called before the first frame update
         void Start()
         {
+            Utils.log("Start");
             dm.initFileId();
             dm.initPlayer();
 
@@ -322,6 +323,7 @@ namespace ETLab
 
         IEnumerator gamePlaying()
         {
+            is_training = false;
             dm.detect_mode = DetectMode.Testing;
             Debug.Log(string.Format("[IrtDemo2] gamePlaying"));
             
@@ -473,7 +475,7 @@ namespace ETLab
                 if ((detect_time < modify_buffer) && (detect_time + delta_time > modify_buffer))
                 {
                     // TODO: 遊戲模式中，應該不能調整門檻值
-                    player.modifyThreshold(pose: pose);
+                    player.modifyThreshold(pose: pose, optimization: 2);
                     Debug.Log(string.Format("[IrtDemo2] defaultDetect | modify_buffer: {0}, detect_time: {1:F4}, round_time: {2:F4}",
                         modify_buffer, detect_time, round_time));
 

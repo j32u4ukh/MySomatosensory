@@ -15,6 +15,8 @@ namespace ETLab
 
         private void Awake()
         {
+            Utils.log();
+
             // 根據實際人數，調整出現的模型數量 
             n_player = players.Length;
             read_players = new Player[n_player];
@@ -27,6 +29,7 @@ namespace ETLab
         // Start is called before the first frame update
         void Start()
         {
+            Utils.log();
             DontDestroyOnLoad(this);
         }
 

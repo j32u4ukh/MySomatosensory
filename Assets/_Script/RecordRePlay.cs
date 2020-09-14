@@ -60,6 +60,8 @@ namespace ETLab
         {
             if (Input.GetKeyDown(KeyCode.I))
             {
+                dm.initFileId();
+
                 dir = Path.Combine(root, pose.ToString());
 
                 if (!Directory.Exists(dir))
@@ -111,7 +113,8 @@ namespace ETLab
                         if (Input.GetKeyDown(KeyCode.S) || Input.GetMouseButtonDown(0))
                         {
                             mode = Mode.Stop;
-                            player.samplePosture(n_sample: ConfigData.n_posture);
+                            //player.samplePosture(n_sample: ConfigData.n_posture);
+                            player.samplePosture(n_sample: 30);
                             dm.stopRecord(player, root, dir);
                             dm.stopRecord(invoke_event: false);
                             has_initialization = false;
