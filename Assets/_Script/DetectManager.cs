@@ -13,12 +13,8 @@ namespace ETLab
     // 提供外部腳本事後定義偵測函式
     public delegate void DetectDelegate(Player player);
 
-    // 定義修改 Flag 的函式架構
-    public delegate Flag FlagDelegate(float flag);
-
     public delegate void IntegerEventDelegate(int val);
     public delegate void VoidEventDelegate();
-
 
     public class DetectManager : MonoBehaviour
     {
@@ -29,16 +25,15 @@ namespace ETLab
 
         [HideInInspector] public DetectDelegate detectManager = null;
 
-        // 修改 Flag 的函式指針(指向實際的函式內容)
-        [HideInInspector] public FlagDelegate modifyThresholdFlag = null;
-        Flag flag = Flag.Matching;
-
         // 透過 PlayerManager 存取 Player
         PlayerManager pm;
         int n_player;
 
         // 透過 MultiPosture 存取多動作比較源
         MultiPosture mp;
+
+        // 各動作比對關節
+        MovementDatas md;
 
         // 切換目前偵測之動作
         public Pose pose = Pose.None;
@@ -69,7 +64,7 @@ namespace ETLab
 
         #region 資源載入相關
         public UnityEvent onAllResourcesLoaded = new UnityEvent();
-        public UnityEvent onComparingPartsLoaded = new UnityEvent();
+        
         bool is_comparing_parts_loaded = false;
         public UnityEvent onMultiPostureLoaded = new UnityEvent();
         bool is_multi_posture_loaded = false;
@@ -107,6 +102,8 @@ namespace ETLab
             // 建構當下不會讀取數據，實際需要使用到前再讀取就好
             Utils.log("new MultiPosture()");
             mp = new MultiPosture();
+            md = new MovementDatas();
+            _ = loadComparingParts();
         }
 
         void Start()
@@ -120,7 +117,7 @@ namespace ETLab
                 initPlayer();
 
                 // 當比對關節載入完成
-                onComparingPartsLoaded.AddListener(() => {
+                md.onComparingPartsLoaded.AddListener(() => {
                     Debug.Log(string.Format("[DetectManager] Start | 比對關節載入完成"));
                     is_comparing_parts_loaded = true;
 
@@ -351,14 +348,9 @@ namespace ETLab
             }
 
             // 從 comparing_parts_dict 讀取比較關節，避免重複讀取
-            List<HumanBodyBones> comparing_parts;
+            List<HumanBodyBones> comparing_parts = md.getCompareParts(pose: target_pose);
 
-            if (comparing_parts_dict.ContainsKey(target_pose))
-            {
-                // 讀取比較關節
-                comparing_parts = comparing_parts_dict[target_pose];
-            }
-            else
+            if (comparing_parts == null)
             {
                 Debug.LogError(string.Format("[DetectManager] compareMovement | No {0} in comparing_parts_dict.", target_pose));
                 return;
@@ -551,17 +543,12 @@ namespace ETLab
             return 1f - total_diff;
         }
 
-        public float[] computeAsymptomaticAccuray(Player player, Pose base_pose, Pose compare_pose, float additional_accuracy = 1f)
+        public float[] computeAsymptomaticAccuray(Player player, Pose base_pose, Pose compare_pose)
         {
             // 從 comparing_parts_dict 讀取比較關節，避免重複讀取
-            List<HumanBodyBones> comparing_parts;
+            List<HumanBodyBones> comparing_parts = md.getCompareParts(pose: compare_pose);
 
-            if (comparing_parts_dict.ContainsKey(compare_pose))
-            {
-                // 讀取比較關節
-                comparing_parts = comparing_parts_dict[compare_pose];
-            }
-            else
+            if (comparing_parts == null)
             {
                 Utils.error(string.Format("No {0} in comparing_parts_dict.", compare_pose));
                 return null;
@@ -601,12 +588,13 @@ namespace ETLab
             List<List<Posture>> compare_multi_postures, List<HumanBodyBones> comparing_parts)
         {
             int model_idx, posture_idx, n_model = compare_multi_postures[0].Count;
+            int n_posture = compare_multi_postures.Count;
             List<Posture> compare_postures;
             FloatList acc_list;
             float acc;
 
             // 遍歷 ConfigData.n_posture 個分解動作
-            for (posture_idx = 0; posture_idx < ConfigData.n_posture; posture_idx++)
+            for (posture_idx = 0; posture_idx < n_posture; posture_idx++)
             {
                 // 多來源的第 posture_idx 個 Posture
                 compare_postures = compare_multi_postures[posture_idx];
@@ -812,41 +800,10 @@ namespace ETLab
         #endregion
 
         #region 載入動作偵測所需資訊
-        // loadComparingParts 改為同步讀取
-        // 讀取個動作所需比較關節
+        // 載入 MovementDatas 用以讀取個動作所需比較關節
         public async Task loadComparingParts()
         {
-            Debug.Log(string.Format("[DetectManager] loadComparingParts"));
-            comparing_parts_dict = new Dictionary<Pose, List<HumanBodyBones>>();
-
-            // MovementDatas 數據儲存路徑(不會因人而異的部分)
-            string path = Path.Combine(Application.streamingAssetsPath, "MovementData.txt");
-            StreamReader reader = new StreamReader(path);
-            string load_data = await reader.ReadToEndAsync();
-            load_data = load_data.Trim();
-            reader.Close();
-            MovementDatas datas = JsonConvert.DeserializeObject<MovementDatas>(load_data);
-            MovementData data;
-
-            foreach (Pose pose in Utils.poses)
-            {
-                // 數據包含該 pose 才作為
-                if (datas.contain(pose))
-                {
-                    data = datas.get(pose);
-
-                    //Debug.Log(string.Format("[DetectManager] load {0} into comparing_parts_dict.", pose));
-
-                    // 載入各動作的比對關節資訊
-                    comparing_parts_dict.Add(pose, data.getComparingParts());
-                }
-                else
-                {
-                    Debug.LogError(string.Format("[DetectManager] loadComparingParts | 數據中不包含動作 {0}", pose));
-                }
-            }
-
-            onComparingPartsLoaded.Invoke();
+            await md.loadMovementDatas();
         }
 
         public async Task loadMultiPostures(params Pose[] poses)

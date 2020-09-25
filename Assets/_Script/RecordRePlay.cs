@@ -113,8 +113,8 @@ namespace ETLab
                         if (Input.GetKeyDown(KeyCode.S) || Input.GetMouseButtonDown(0))
                         {
                             mode = Mode.Stop;
-                            //player.samplePosture(n_sample: ConfigData.n_posture);
-                            player.samplePosture(n_sample: 30);
+                            // TODO: 若是要記錄無動作的骨架數據，記得要將 ConfigData.n_posture 數值調高
+                            player.samplePosture(n_sample: ConfigData.n_posture);
                             dm.stopRecord(player, root, dir);
                             dm.stopRecord(invoke_event: false);
                             has_initialization = false;

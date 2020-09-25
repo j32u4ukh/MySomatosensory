@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -13,6 +14,7 @@ namespace ETLab
         [Header("偵測動作類型")]
         public Pose pose = Pose.RaiseTwoHands;
         private Pose training_pose;
+        public bool face_login;
 
         string gui = "";
         float modify_buffer = 3.0f;
@@ -131,7 +133,7 @@ namespace ETLab
             string temp;
             for (i = 0; i < 10; i++)
             {
-                rand = Random.Range(1, len);
+                rand = UnityEngine.Random.Range(1, len);
                 temp = questions[0];
                 questions[0] = questions[rand];
                 questions[rand] = temp;
@@ -205,10 +207,16 @@ namespace ETLab
             });
 
             login_button.onClick.AddListener(()=> {
-                _ = identifyPlayer(group_id: "noute_and_miyu_group");
-                //login_buffer.SetActive(false);
-                //logged_in = true;
-                //StartCoroutine(gameStart());
+                if (face_login)
+                {
+                    _ = identifyPlayer(group_id: "noute_and_miyu_group");
+                }
+                else
+                {
+                    login_buffer.SetActive(false);
+                    logged_in = true;
+                    StartCoroutine(gameStart());
+                }
             });
         }
 
@@ -324,7 +332,7 @@ namespace ETLab
         IEnumerator gamePlaying()
         {
             is_training = false;
-            dm.detect_mode = DetectMode.Testing;
+            //dm.detect_mode = DetectMode.Testing;
             Debug.Log(string.Format("[IrtDemo2] gamePlaying"));
             
             string question;
@@ -486,6 +494,8 @@ namespace ETLab
                 // 呈現當前動作正確率與門檻值
                 acc_list = new FloatList(player.getAccuracy(pose));
                 thres_list = new FloatList(player.getThreshold(pose));
+                Utils.log(string.Format("FloatList -> #acc_list: {0}, #thres_list: {1}", acc_list.length(), thres_list.length()));
+                
                 gap_list = acc_list - thres_list;
                 int i, len = gap_list.length();
                 for(i = 0; i < len; i++)
@@ -595,6 +605,8 @@ namespace ETLab
             // 呈現當前動作正確率與門檻值
             acc_list = new FloatList(player.getAccuracy(training_pose));
             thres_list = new FloatList(player.getThreshold(training_pose));
+            Utils.log(string.Format("FloatList -> #acc_list: {0}, #thres_list: {1}", acc_list.length(), thres_list.length()));
+
             gap_list = acc_list - thres_list;
             int i, len = gap_list.length();
             for (i = 0; i < len; i++)

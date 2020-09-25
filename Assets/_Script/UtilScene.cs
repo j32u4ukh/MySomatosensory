@@ -30,6 +30,9 @@ namespace ETLab
         void Start()
         {
             Utils.log();
+            #region 計算無動作正確率
+            compare_pose = Pose.RaiseTwoHands;
+
             pm.init(n_player: 1);
             player = pm.getPlayer(0);
             player.setId("9527");
@@ -37,17 +40,18 @@ namespace ETLab
             dm.initFileId();
             dm.initPlayer();
 
-            compare_pose = Pose.RaiseTwoHands;
             computeAsymptomaticAccuray(base_pose, compare_pose);
 
-            dm.onAllResourcesLoaded.AddListener(() => {
+            dm.onAllResourcesLoaded.AddListener(() =>
+            {
                 Utils.log("dm.onAllResourcesLoaded");
                 onAsymptomaticAccurayListener(base_pose, compare_pose);
-            });
+            }); 
+            #endregion
 
-            //displayRecordData(@"C:\Users\ETlab\Documents\Somatosensory\Data\9527\2020-08-11\IrtDemo2Scene-11-09-58-8691.txt");
+            //displayRecordData(@"C:\Users\ETlab\Documents\Somatosensory\Data\9527\2020-09-14\IrtDemo2Scene-15-28-53-5076.txt");
             //displayStandardData(@"D:\Unity Projects\MySomatosensory\Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-21-09-3302.txt");
-            //sampleStandardData(Pose.RaiseTwoHands);
+            //sampleStandardData(Pose.Squat);
         }
 
         // Update is called once per frame
@@ -130,7 +134,7 @@ namespace ETLab
                 {
                     Debug.Log(string.Format("file: {0}", file));
                     record = RecordData.loadRecordData(file);
-                    record.posture_list = Utils.sampleList(record.posture_list, n_sample: 5);
+                    record.posture_list = Utils.sampleList(record.posture_list, n_sample: ConfigData.n_posture);
                     record.reSave(file);
                 }
             }

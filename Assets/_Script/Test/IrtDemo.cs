@@ -99,43 +99,43 @@ namespace ETLab
 
         private void OnGUI()
         {
-            if(time < boundary_time)
-            {
-                GUI.color = Color.black;
-            }
-            else
-            {
-                GUI.color = Color.red;
-            }
+            //if(time < boundary_time)
+            //{
+            //    GUI.color = Color.black;
+            //}
+            //else
+            //{
+            //    GUI.color = Color.red;
+            //}
 
-            GUI.skin.label.fontSize = 60;
-            msg1 = string.Format("Acc1: {0:F4}, Thres1: {1:F4}", acc1, thres1);
-            msg2 = string.Format("Acc2: {0:F4}, Thres2: {1:F4}", acc2, thres2);
+            //GUI.skin.label.fontSize = 60;
+            //msg1 = string.Format("Acc1: {0:F4}, Thres1: {1:F4}", acc1, thres1);
+            //msg2 = string.Format("Acc2: {0:F4}, Thres2: {1:F4}", acc2, thres2);
 
-            if (matched1 || matched2)
-            {
-                if (matched1 && matched2)
-                {
-                    msg2 = string.Format("{0}\nAll player matched.", msg2);
-                }
-                else if (matched1)
-                {
-                    msg1 = string.Format("{0}, Player1 matched.", msg1);
+            //if (matched1 || matched2)
+            //{
+            //    if (matched1 && matched2)
+            //    {
+            //        msg2 = string.Format("{0}\nAll player matched.", msg2);
+            //    }
+            //    else if (matched1)
+            //    {
+            //        msg1 = string.Format("{0}, Player1 matched.", msg1);
 
-                }else if (matched2)
-                {
-                    msg2 = string.Format("{0}, Player2 matched.", msg2);
+            //    }else if (matched2)
+            //    {
+            //        msg2 = string.Format("{0}, Player2 matched.", msg2);
 
-                }
-            }
+            //    }
+            //}
 
-            gui = string.Format("Time: {0:F2}\nPose: {1}\n{2}\n{3}", time, pose, msg1, msg2);
-            GUILayout.Label(
-                // text on gui
-                gui,
-                // start to define gui layout
-                GUILayout.Width(Screen.width / 2f),
-                GUILayout.Height(Screen.height / 2f));
+            //gui = string.Format("Time: {0:F2}\nPose: {1}\n{2}\n{3}", time, pose, msg1, msg2);
+            //GUILayout.Label(
+            //    // text on gui
+            //    gui,
+            //    // start to define gui layout
+            //    GUILayout.Width(Screen.width / 2f),
+            //    GUILayout.Height(Screen.height / 2f));
         }
 
         private void OnDestroy()
@@ -144,22 +144,6 @@ namespace ETLab
         }
 
         // ====================================================
-        Flag modifingFlag(float f)
-        {
-            if (time > boundary_time && round_time > 5f)
-            {
-                //round_time = 0f;
-
-                // 配對(O), 修改門檻值(O)
-                return Flag.Modify;
-            }
-            else
-            {
-                // 配對(O), 修改門檻值(X)
-                return Flag.Matching;
-            }
-        }
-
         void defaultDetect(Player player)
         {
             int idx = player.index();

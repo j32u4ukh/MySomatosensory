@@ -198,14 +198,17 @@ namespace ETLab
             return null;
         }
 
-        public static async Task<List<Person>> postFaceIdentify(string group_id, string file_name)
+        public static async Task<List<Person>> postFaceIdentify(string group_id, string file_name, int tps = 3000)
         {
             FaceDetects face_detects = await postFaceDetect(file_name);
             Debug.Log(face_detects);
 
-            // Limit TPS (避免請求頻率過高) 3000
-            Debug.Log(string.Format("Limit TPS"));
-            await Task.Delay(3000);
+            if (tps > 0)
+            {
+                // Limit TPS (避免請求頻率過高) 3000
+                Debug.Log(string.Format("Limit TPS"));
+                await Task.Delay(tps);
+            }
 
             QueryParameter query = new QueryParameter(service: AzureService.Identify);
             Debug.Log(string.Format("uri: {0}", query.ToString()));
@@ -250,9 +253,12 @@ namespace ETLab
                         Person person = await getPerson(group_id, person_id);
                         people.Add(person);
 
-                        // Limit TPS (避免請求頻率過高) 3000
-                        Debug.Log(string.Format("Limit TPS"));
-                        await Task.Delay(3000);
+                        if (tps > 0)
+                        {
+                            // Limit TPS (避免請求頻率過高) 3000
+                            Debug.Log(string.Format("Limit TPS"));
+                            await Task.Delay(tps);
+                        }
                     }
 
                     Debug.Log(string.Format("辨識結束"));
@@ -265,15 +271,18 @@ namespace ETLab
 
         #region Create PerseonGroup
         // 似乎將它想得太難了，userData 既然是 (optional) 那就表示它並非創建時所必要的
-        public static async Task createPersonGroup(string group_id, string group_name, Dictionary<string, List<string>> people)
+        public static async Task createPersonGroup(string group_id, string group_name, Dictionary<string, List<string>> people, int tps = 3000)
         {
             Debug.Log(string.Format("開始建立 PerseonGroup(group_id: {0}, group_name: {1})", group_id, group_name));
             Debug.Log(string.Format("開始初始化"));
             await putPerseonGroupCreate(group_id: group_id, group_name: group_name);
 
-            // Limit TPS (避免請求頻率過高) 3000
-            Debug.Log(string.Format("Limit TPS"));
-            await Task.Delay(3000);
+            if (tps > 0)
+            {
+                // Limit TPS (避免請求頻率過高) 3000
+                Debug.Log(string.Format("Limit TPS"));
+                await Task.Delay(tps);
+            }
 
             foreach (string person_name in people.Keys)
             {
@@ -281,14 +290,20 @@ namespace ETLab
                 await postPersonCreate(group_id: group_id, person_name: person_name);
                 Debug.Log(string.Format("完成建立 Person: {0}", person_name));
 
-                // Limit TPS (避免請求頻率過高) 3000
-                Debug.Log(string.Format("Limit TPS"));
-                await Task.Delay(3000);
+                if (tps > 0)
+                {
+                    // Limit TPS (避免請求頻率過高) 3000
+                    Debug.Log(string.Format("Limit TPS"));
+                    await Task.Delay(tps);
+                }
             }
 
-            // Limit TPS (避免請求頻率過高) 3000
-            Debug.Log(string.Format("Limit TPS"));
-            await Task.Delay(3000);
+            if (tps > 0)
+            {
+                // Limit TPS (避免請求頻率過高) 3000
+                Debug.Log(string.Format("Limit TPS"));
+                await Task.Delay(tps);
+            }
 
             // 取得 PersonList，用於獲得各個 Person 的 person_id
             PersonList list = await getPersonList(group_id);
@@ -312,9 +327,12 @@ namespace ETLab
                         {
                             await postPersonAddFace(group_id: group_id, person_id: person_id, source_name: source_name);
 
-                            // Limit TPS (避免請求頻率過高) 3000
-                            Debug.Log(string.Format("Limit TPS"));
-                            await Task.Delay(3000);
+                            if (tps > 0)
+                            {
+                                // Limit TPS (避免請求頻率過高) 3000
+                                Debug.Log(string.Format("Limit TPS"));
+                                await Task.Delay(tps);
+                            }
                         }
 
                         break;
@@ -331,9 +349,12 @@ namespace ETLab
                 }
             }
 
-            // Limit TPS (避免請求頻率過高) 3000
-            Debug.Log(string.Format("Limit TPS"));
-            await Task.Delay(3000);
+            if (tps > 0)
+            {
+                // Limit TPS (避免請求頻率過高) 3000
+                Debug.Log(string.Format("Limit TPS"));
+                await Task.Delay(tps);
+            }
 
             await postPersonGroupTrain(group_id: group_id);
 
@@ -452,7 +473,7 @@ namespace ETLab
             }
         }
 
-        public static async Task postPersonGroupTrain(string group_id)
+        public static async Task postPersonGroupTrain(string group_id, int tps = 3000)
         {
             QueryParameter query = new QueryParameter(service: AzureService.TrainPersonGroup, group_id: group_id);
             Debug.Log(string.Format("uri: {0}", query.ToString()));
@@ -477,9 +498,12 @@ namespace ETLab
                     //json_string = request.downloadHandler.text;
                     Debug.Log(string.Format("完成 PersonGroup {0} 的訓練", group_id));
 
-                    // Limit TPS (避免請求頻率過高) 3000
-                    Debug.Log(string.Format("Limit TPS"));
-                    await Task.Delay(3000);
+                    if (tps > 0)
+                    {
+                        // Limit TPS (避免請求頻率過高) 3000
+                        Debug.Log(string.Format("Limit TPS"));
+                        await Task.Delay(tps);
+                    }
 
                     string training_status = await getPersonGroupGetTrainingStatus(group_id);
                     Debug.Log(string.Format("training_status: {0}", training_status));
@@ -554,7 +578,7 @@ namespace ETLab
         /// <param name="group_id">PersonGroup 的唯一對應碼</param>
         /// <param name="person_id">Person 的唯一對應碼</param>
         /// <returns></returns>
-        public static async Task deletePersonDelete(string group_id, string person_id)
+        public static async Task deletePersonDelete(string group_id, string person_id, int tps = 3000)
         {
             QueryParameter query = new QueryParameter(service: AzureService.DeletePerson, group_id: group_id, person_id: person_id);
             Debug.Log(string.Format("uri: {0}", query.ToString()));
@@ -575,9 +599,12 @@ namespace ETLab
                 }
             }
 
-            // Limit TPS (避免請求頻率過高) 3000
-            Debug.Log(string.Format("Limit TPS"));
-            await Task.Delay(3000);
+            if (tps > 0)
+            {
+                // Limit TPS (避免請求頻率過高) 3000
+                Debug.Log(string.Format("Limit TPS"));
+                await Task.Delay(tps);
+            }
 
             //
             PersonList list = await getPersonList(group_id);
@@ -589,7 +616,7 @@ namespace ETLab
         /// </summary>
         /// <param name="group_id">PersonGroup 的唯一對應碼</param>
         /// <returns></returns>
-        public static async Task deletePersonGroupDelete(string group_id)
+        public static async Task deletePersonGroupDelete(string group_id, int tps = 3000)
         {
             QueryParameter query = new QueryParameter(service: AzureService.PersonGroup, group_id: group_id);
 
@@ -609,9 +636,12 @@ namespace ETLab
                 }
             }
 
-            // Limit TPS (避免請求頻率過高) 3000
-            Debug.Log(string.Format("Limit TPS"));
-            await Task.Delay(3000);
+            if (tps > 0)
+            {
+                // Limit TPS (避免請求頻率過高) 3000
+                Debug.Log(string.Format("Limit TPS"));
+                await Task.Delay(tps);
+            }
 
             PersonGroupList list = await getPersonGroupList();
             Debug.Log(list);

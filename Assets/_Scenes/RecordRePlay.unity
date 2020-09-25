@@ -813,6 +813,6 @@ MonoBehaviour:
   pm: {fileID: 653403078}
   dm: {fileID: 1932749595}
   player_id: 9527
-  mode: 1
-  pose: 22
+  mode: 0
+  pose: 17
   replay_index: 1

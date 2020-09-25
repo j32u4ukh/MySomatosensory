@@ -265,7 +265,7 @@
     <None Include="Assets\K2Examples\Resources\AstraCoordMapper.compute" />
     <None Include="Assets\K2Examples\Resources\MedianShader.shader" />
     <None Include="Assets\StreamingAssets\MovementData\Run\RecordRePlay-17-28-20-4802.txt" />
-    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-24-49-9231.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-14-47-42-1650.txt" />
     <None Include="Assets\K2Examples\Resources\DepthShader.shader" />
     <None Include="Assets\StreamingAssets\MovementData\Squat\RecordRePlay-14-12-16-1236.txt" />
     <None Include="Assets\K2Examples\Resources\Body2DepthShader.shader" />
@@ -292,16 +292,16 @@
     <None Include="Assets\StreamingAssets\MovementData\None\RecordRePlay-14-09-24-3677.txt" />
     <None Include="Assets\K2Examples\Resources\CoordMapper.compute" />
     <None Include="Assets\StreamingAssets\MovementData\Squat\RecordRePlay-14-12-02-6955.txt" />
-    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-20-40-1913.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-14-48-13-7748.txt" />
     <None Include="Assets\StreamingAssets\MovementData\HopRight\RecordRePlay-17-12-15-2232.txt" />
     <None Include="Assets\K2Examples\Resources\Depth2ColorShader.shader" />
     <None Include="Assets\StreamingAssets\MovementData\Walk\RecordRePlay-17-27-36-8563.txt" />
     <None Include="Assets\JsonDotNet\link.xml" />
     <None Include="Assets\StreamingAssets\MovementData\Dribble\RecordRePlay-17-32-37-2155.txt" />
     <None Include="Assets\StreamingAssets\MovementData.txt" />
+    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-14-47-59-3886.txt" />
     <None Include="Assets\K2Examples\Resources\Erode.shader" />
     <None Include="Assets\StreamingAssets\MovementData\HopLeft\RecordRePlay-17-11-30-0455.txt" />
-    <None Include="Assets\StreamingAssets\MovementData\RaiseTwoHands\RecordRePlay-15-21-09-3302.txt" />
     <None Include="Assets\StreamingAssets\PlayerData\你要不要吃哈密瓜.txt" />
     <None Include="Assets\K2Examples\Resources\BodyShader.shader" />
     <None Include="Assets\StreamingAssets\MovementData\Jump\RecordRePlay-17-30-33-8398.txt" />

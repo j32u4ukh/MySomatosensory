@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace ETLab
 {
@@ -318,6 +319,8 @@ namespace ETLab
 
                         // 確保 posture_list 長度為 n_posture，因而每次抽樣含有一定的隨機性
                         posture_list = Utils.sampleList(posture_list, ConfigData.n_posture);
+                        //posture_list = Utils.sampleList(posture_list, 30);
+
 
                         multi_postures.Add(posture_list);
                     }
@@ -429,6 +432,8 @@ namespace ETLab
     {
         // 比對關節相關資訊
         public Dictionary<Pose, MovementData> datas;
+        private Dictionary<Pose, List<HumanBodyBones>>  comparing_parts_dict;
+        public UnityEvent onComparingPartsLoaded = new UnityEvent();
 
         // 數據儲存路徑
         public static readonly string path = Path.Combine(Application.streamingAssetsPath, "MovementData.txt");
@@ -436,6 +441,7 @@ namespace ETLab
         public MovementDatas()
         {
             datas = new Dictionary<Pose, MovementData>();
+            comparing_parts_dict = new Dictionary<Pose, List<HumanBodyBones>>();
         }
 
         public void set(Pose pose, MovementData data)
@@ -470,6 +476,18 @@ namespace ETLab
             return datas.ContainsKey(pose);
         }
 
+        public List<HumanBodyBones> getCompareParts(Pose pose)
+        {
+            if (comparing_parts_dict.ContainsKey(pose))
+            {
+                return comparing_parts_dict[pose];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         #region 紀錄數據
         public void save()
         {
@@ -484,44 +502,49 @@ namespace ETLab
         #endregion
 
         #region 讀取記錄
-        public static MovementDatas loadMovementDatas()
+        public async Task loadMovementDatas()
         {
             if (File.Exists(path))
             {
                 StreamReader reader = new StreamReader(path);
-                string load_data = reader.ReadToEnd().Trim();
+                string load_data = await reader.ReadToEndAsync();
+                load_data = load_data.Trim();
                 reader.Close();
 
-                Debug.Log(load_data);
+                MovementDatas temp_md = JsonConvert.DeserializeObject<MovementDatas>(load_data);
+                datas = temp_md.datas;
 
-                return JsonConvert.DeserializeObject<MovementDatas>(load_data);
+                extractComparingParts();
             }
             else
             {
-                Debug.Log("Not exists");
-                return new MovementDatas();
+                Debug.Log("No MovementData exists");
             }
         }
 
-        public static Dictionary<Pose, MovementData> loadMovementData()
+        public void extractComparingParts()
         {
-            if (File.Exists(path))
-            {
-                StreamReader reader = new StreamReader(path);
-                string load_data = reader.ReadToEnd().Trim();
-                reader.Close();
+            MovementData data;
 
-                //Debug.Log(string.Format("Exists: {0}", path));
-                Debug.Log(load_data);
-                return new Dictionary<Pose, MovementData>();
-
-                //return JsonConvert.DeserializeObject<MovementDatas>(load_data).datas;
-            }
-            else
+            foreach (Pose pose in Utils.poses)
             {
-                Debug.Log("Not exists");
-                return new Dictionary<Pose, MovementData>();
+                // 數據包含該 pose 才作為
+                if (contain(pose))
+                {
+                    data = get(pose);
+
+                    //Debug.Log(string.Format("[DetectManager] load {0} into comparing_parts_dict.", pose));
+
+                    // 載入各動作的比對關節資訊
+                    comparing_parts_dict.Add(pose, data.getComparingParts());
+                }
+                else
+                {
+                    Utils.error(string.Format("數據中不包含動作 {0}", pose));
+                }
             }
+
+            onComparingPartsLoaded.Invoke();
         }
         #endregion
     }

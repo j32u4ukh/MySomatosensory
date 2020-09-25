@@ -76,23 +76,6 @@ namespace ETLab
             }
         }
 
-        // 可根據需求，對何時開始更新門檻值這件事做設定
-        // 累計時間超過 3 秒 Flag 改為 Flag.Modify -> 開始偵測
-        Flag modifingFlag(float f)
-        {
-            if (f > 3f)
-            {
-                return Flag.Modify;
-            }
-
-            if (f > 1f)
-            {
-                return Flag.Matching;
-            }
-
-            return Flag.None;
-        }
-
         //////////////////////////////////////////////////
         //////////////////////////////////////////////////
         void defaultDetect(Player player)

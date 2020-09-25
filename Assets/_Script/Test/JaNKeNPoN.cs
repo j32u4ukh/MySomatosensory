@@ -111,19 +111,6 @@ namespace ETLab
         }
 
         // ====================================================
-        Flag modifingFlag(float f)
-        {
-            if(accumulate_time > 3f)
-            {
-                accumulate_time = 0f;
-                return Flag.Modify;
-            }
-            else
-            {
-                return Flag.Matching;
-            }            
-        }
-
         void defaultDetect(Player player)
         {
             List<Pose> poses = dm.getPoses(Pose.JaNKeNPoN);

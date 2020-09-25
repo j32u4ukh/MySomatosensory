@@ -5,13 +5,6 @@ using UnityEngine;
 
 namespace ETLab
 {
-    public enum Flag
-    {
-        None,       // 配對(X), 修改門檻值(X)
-        Matching,   // 配對(O), 修改門檻值(X)
-        Modify      // 配對(O), 修改門檻值(O)
-    }
-
     public enum DetectMode
     {
         None,
