@@ -46,6 +46,7 @@ RecordData.cs
 
 ## 開發注意事項
 
+* Unity 場景合併需藉由 UnityYAMLMerge 的協助來進行版本控制，使用教學可參考[此網站](https://nagachiang.github.io/tutorial-setup-smart-merge-for-unity-assets-with-git-chinese/#)
 * 發生過多次一執行場景，Unity 沒有出現錯誤訊息就直接關閉，查看 Console 當中的 Editor log 也未發現什麼錯誤，結果就是深度攝影機忘記接上，Nuitrack 無法獲取攝影機導致。
 * 逐步降低學習率。
 * 模型亂跳問題(本身的 animator 不要勾或不要勾它的 apply root motion，改勾 AvatarController 的 external root motion，使用其他物件或腳本來控制模型的位置)。
