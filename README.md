@@ -26,6 +26,24 @@ RecordData.cs
 * public static void finishWriting(string path)
 // 一個遊戲的所有紀錄皆寫完後，加上後綴"_done"，告訴其他程式已經可以上傳
 
+## 外部套件依賴
+
+* Orbbec driver
+
+獲取深度資訊。
+
+* Nuitrack SDK
+
+深度資訊轉換成 19 個骨架位置。可在[此網站](https://nuitrack.com/)下載到。
+
+* Kinect SDK
+
+將骨架位置映射到模型動作。可在[此網站](https://www.microsoft.com/en-us/download/details.aspx?id=44561)下載到。
+
+* JSON .NET For Unity
+
+用於將各種類型的數據寫出成 json 檔案，可在 Unity Assets Store 中下載。
+
 ## 開發注意事項
 
 * 發生過多次一執行場景，Unity 沒有出現錯誤訊息就直接關閉，查看 Console 當中的 Editor log 也未發現什麼錯誤，結果就是深度攝影機忘記接上，Nuitrack 無法獲取攝影機導致。
